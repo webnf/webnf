@@ -1,4 +1,4 @@
-(defproject webnf/base "0.1.0-SNAPSHOT"
+(defproject webnf/base "0.0.1"
   :description "Collection org.clojure libs and essential others"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"

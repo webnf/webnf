@@ -7,8 +7,8 @@
   :source-paths ["src/clj"]
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/tools.logging "0.2.6"]
-                 [ring/ring-servlet "1.2.0-beta2"
+                 [ring/ring-servlet "1.2.0-beta3"
                   :exclusions [javax.servlet/servlet-api]]
                  [org.glassfish/javax.servlet "3.0.1" :scope "provided"]]
 
-  :profiles {:test {:dependencies [[webnf/server "0.1.0-SNAPSHOT"]]}})
+  :profiles {:test {:dependencies [[webnf/server "0.0.1"]]}})
