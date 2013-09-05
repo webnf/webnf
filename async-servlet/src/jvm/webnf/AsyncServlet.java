@@ -46,7 +46,7 @@ public class AsyncServlet extends HttpServlet {
 		on_init = (Var) RESOLVE.invoke(config, "webnf.handler.init");
 		on_destroy = (Var) RESOLVE.invoke(config, "webnf.handler.destroy");
 		if (on_init != null) {
-			on_init.invoke(this);
+			on_init.invoke();
 		}
 	}
 	
@@ -59,6 +59,8 @@ public class AsyncServlet extends HttpServlet {
 	@Override
 	public void destroy() {
 		log("Destroying AsyncServlet");
-		on_destroy.invoke(this);
+		if (on_destroy != null) {
+			on_destroy.invoke();
+		}
 	}
 }

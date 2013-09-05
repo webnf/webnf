@@ -16,8 +16,7 @@
 
 (def ^:private write-chunk @#'servlet/set-body)
 
-(defn handle-servlet-request [servlet handler
-                              ^HttpServletRequest request response]
+(defn handle-servlet-request [handler ^HttpServletRequest request response]
   (let [request-map (assoc (servlet/build-request-map request)
                       :path-info (.getPathInfo request))
         response-map (handler request-map)]
@@ -60,7 +59,7 @@
                            (onComplete [this event]
                              (when complete
                                (complete event user-listener)))))
-        (init (AsyncEvent. ac) user-listener))
+        (when init (init (AsyncEvent. ac) user-listener)))
       (servlet/update-servlet-response response response-map))))
 
 

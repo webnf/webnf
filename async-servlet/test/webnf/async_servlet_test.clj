@@ -6,11 +6,11 @@
 (def test-port 32413)
 (def server (agent (srv/server :host "localhost" :port test-port)))
 
-(defn init-fn [this]
-  (println "start" this))
+(defn init-fn []
+  (println "start"))
 
-(defn destroy-fn [this]
-  (println "stop" this))
+(defn destroy-fn []
+  (println "stop"))
 
 (defn handler-fn [req]
   (println "Handled")

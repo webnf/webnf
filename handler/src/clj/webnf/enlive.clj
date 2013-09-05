@@ -50,3 +50,16 @@
        (emit*
         (at (load-html src#)
             ~@rules)))))
+
+(defmacro defsnippet [name source selector params & rules]
+  `(let [src# ~source
+         sel# ~selector
+         snip-src# (reify HtmlSource
+                     (to-html [_]
+                       (select-html (to-html src#) sel#))
+                     (cache-key [_]
+                       [(cache-key src#) sel#]))]
+     (defn ~name ~params
+       (emit*
+        (at (load-html snip-src#)
+            ~@rules)))))
