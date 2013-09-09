@@ -4,7 +4,7 @@
    [clojure.tools.logging :as log]
    [clojure.java.io :as io]
    [clojure.core.cache :as cache]
-   [net.cgrand.enlive-html :refer [set-attr clone-for html-resource at emit* content substitute]]))
+   [net.cgrand.enlive-html :refer [set-attr clone-for html-resource at emit* content substitute select]]))
 
 (defprotocol HtmlSource
   (to-html [source])
@@ -56,7 +56,7 @@
          sel# ~selector
          snip-src# (reify HtmlSource
                      (to-html [_]
-                       (select-html (to-html src#) sel#))
+                       (select (to-html src#) sel#))
                      (cache-key [_]
                        [(cache-key src#) sel#]))]
      (defn ~name ~params
