@@ -58,5 +58,8 @@
                  [ch.qos.logback/logback-classic "1.0.13"]
                  [org.slf4j/log4j-over-slf4j "1.7.5"]
                  [org.slf4j/jcl-over-slf4j "1.7.5"]
-                 [org.slf4j/jul-to-slf4j "1.7.5"]])
+                 [org.slf4j/jul-to-slf4j "1.7.5"]
+                 
+                 [net.intensivesystems/conduit "0.9.0"]
+                 [net.sourceforge.cssparser/cssparser "0.9.9"]])
 
