@@ -4,7 +4,8 @@
    [clojure.set :as set]
    [clojure.string :as str]
    [ring.util.servlet :as servlet]
-   [webnf.async-servlet.impl :as asi])
+;   [webnf.async-servlet.impl :as asi]
+   )
   (:import
    (org.eclipse.jetty.server Server Request)
    (org.eclipse.jetty.servlet ServletContextHandler ServletHolder)
@@ -15,13 +16,20 @@
 
 (set! *warn-on-reflection* true)
 
-(defn- proxy-handler
-  "Returns an Jetty Handler implementation for the given Ring handler."
-  [handler]
-  (proxy [AbstractHandler] []
-    (handle [_ ^Request base-request request response]
-      (asi/handle-servlet-request handler request response)
-      (.setHandled base-request true))))
+(comment
+  (defn- proxy-handler
+    "Returns an Jetty Handler implementation for the given Ring handler."
+    [handler]
+    (proxy [AbstractHandler] []
+      (handle [_ ^Request base-request request response]
+        (asi/handle-servlet-request handler request response)
+        (.setHandled base-request true))))
+  (defn make-ring-handler [handler mapping]
+    (doto (ServletContextHandler.)
+      (.addServlet (doto (ServletHolder.)
+                     (.setServletHandler (proxy-handler handler))
+                     (.setAsyncSupported true))
+                   mapping))))
 
 (defn make-servlet-handler [servlet-class params mapping]
   (doto (ServletContextHandler.)
@@ -29,22 +37,14 @@
                    (.setInitParameters params)
                    (.setAsyncSupported true))
                  mapping)
-                                        ;    (.setClassLoader (.getClassLoader servlet-class))
-    ))
-
-(defn make-ring-handler [handler mapping]
-  (doto (ServletContextHandler.)
-    (.addServlet (doto (ServletHolder.)
-                   (.setServletHandler (proxy-handler handler))
-                   (.setAsyncSupported true))
-                 mapping)))
+    (.setClassLoader (.getClassLoader servlet-class))))
 
 (defn add-vhost! 
   ([{:keys [jetty container handlers vhosts] :as ctx} 
     id add-vhosts servlet-context-handler]
      (when (handlers id)
        (throw (ex-info (str "Handler " id " is already running" {:id id}))))
-     (when-let [have (seq (set/intersection vhosts add-vhosts))]
+     (when-let [have (seq (set/intersection vhosts (set add-vhosts)))]
        (throw (ex-info (str "Vhosts " (str/join ", " have) " are already mapped")
                        {:id id :add-vhosts add-vhosts :vhosts vhosts})))
      (.addHandler container (doto servlet-context-handler

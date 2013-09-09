@@ -53,7 +53,7 @@ public class AsyncServlet extends HttpServlet {
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) 
 			throws ServletException, IOException {
-		SERVICE.invoke(this, on_service, req, resp);
+		SERVICE.invoke(on_service, req, resp);
 	}
 	
 	@Override
