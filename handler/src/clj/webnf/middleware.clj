@@ -1,6 +1,7 @@
 (ns webnf.middleware
   (:import (java.io ByteArrayOutputStream StringReader ByteArrayInputStream))
   (:require
+   [ring.util.response :as r]
    [clojure.java.io :as io]
    [webnf.kv :refer [merge-deep]]
    [clojure.string :as str]))
@@ -47,5 +48,7 @@
                                 body (merge-deep (replacement-body req body))
                                 head (add-headers head)))]
            (cond-> resp
-                   (= 201 status) (assoc :status 303)))
+                   (= 201 status) (r/status 303)
+                   (= 204 status) (-> (r/status 303)
+                                      (r/header "Location" (:uri req)))))
          (handler req)))))
