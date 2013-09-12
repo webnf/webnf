@@ -60,6 +60,5 @@
                      (cache-key [_]
                        [(cache-key src#) sel#]))]
      (defn ~name ~params
-       (emit*
-        (at (load-html snip-src#)
-            ~@rules)))))
+       (at (load-html snip-src#)
+           ~@rules))))
