@@ -54,7 +54,10 @@
 (defmacro defsnippet [name source selector params & rules]
   `(let [src# ~source
          sel# ~selector
-         snip-src# (reify HtmlSource
+         snip-src# (reify
+                     Object
+                     (toString [_] ~(str source " " (pr-str selector)))
+                     HtmlSource
                      (to-html [_]
                        (select (to-html src#) sel#))
                      (cache-key [_]
