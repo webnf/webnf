@@ -1,4 +1,4 @@
-(defproject webnf/handler "0.0.2"
+(defproject webnf/handler "0.0.3"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -7,7 +7,7 @@
   :dependencies [[webnf/base "0.0.3"]
                  [webnf/async-servlet "0.0.1"]
                  
-                 [enlive "1.1.4"]
+                 [enlive "1.1.1"]
                  [net.cgrand/moustache "1.1.0"
                   :exclusions [ring/ring-core]]
                  [ring/ring-core "1.2.0"]
