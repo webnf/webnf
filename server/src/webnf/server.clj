@@ -39,6 +39,10 @@
                  mapping)
     (.setClassLoader (.getClassLoader servlet-class))))
 
+(defn make-war-handler [app-path war-path mapping class-loader]
+  (doto (WebAppContext. (.getCanonicalPath (io/file app-path)) mapping)
+    (.setWar war-path)))
+
 (defn add-vhost! 
   ([{:keys [jetty container handlers vhosts] :as ctx} 
     id add-vhosts servlet-context-handler]
