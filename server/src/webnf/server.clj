@@ -12,7 +12,8 @@
    (org.eclipse.jetty.server ServerConnector)
    (org.eclipse.jetty.server.handler HandlerCollection HandlerList)
    (org.eclipse.jetty.util.thread ExecutorThreadPool)
-   (org.eclipse.jetty.server.handler AbstractHandler)))
+   (org.eclipse.jetty.server.handler AbstractHandler)
+   (org.eclipse.jetty.webapp WebAppContext)))
 
 (set! *warn-on-reflection* true)
 
