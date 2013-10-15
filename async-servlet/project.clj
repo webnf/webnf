@@ -1,4 +1,4 @@
-(defproject webnf/async-servlet "0.0.1"
+(defproject webnf/async-servlet "0.0.2"
   :description "A servlet 3.0 implementation, that enables the async api for ring applications"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -11,4 +11,4 @@
                   :exclusions [javax.servlet/servlet-api]]
                  [org.glassfish/javax.servlet "3.1.1" :scope "provided"]]
 
-  :profiles {:test {:dependencies [[webnf/server "0.0.1"]]}})
+  :profiles {:test {:dependencies [[webnf/server "0.0.4"]]}})
