@@ -9,11 +9,15 @@
   (:import
    (org.eclipse.jetty.server Server Request)
    (org.eclipse.jetty.servlet ServletContextHandler ServletHolder)
-   (org.eclipse.jetty.server ServerConnector)
+   (org.eclipse.jetty.server HttpConfiguration ServerConnector HttpConnectionFactory
+                             ConnectionFactory)
+;   (org.eclipse.jetty.spdy.server.http HTTPSPDYServerConnector)
    (org.eclipse.jetty.server.handler HandlerCollection HandlerList)
    (org.eclipse.jetty.util.thread ExecutorThreadPool)
    (org.eclipse.jetty.server.handler AbstractHandler)
-   (org.eclipse.jetty.webapp WebAppContext)))
+   (org.eclipse.jetty.webapp WebAppContext)
+   (org.eclipse.jetty.util.thread QueuedThreadPool)
+   (org.eclipse.jetty.util.ssl SslContextFactory)))
 
 (set! *warn-on-reflection* true)
 
@@ -68,21 +72,49 @@
           (update-in [:handlers] dissoc id)))
     (throw (ex-info (str "No handler with " id) {:id id}))))
 
-(defn server [&{:keys [host port idle-timeout default-handler]
-                :or {port 80}}]
+(defn server [{:keys [host port idle-timeout header-size
+                      default-handler min-threads max-threads
+                      ssl? ssl-port keystore key-password
+                      truststore trust-password client-auth]
+               :or {port 80 idle-timeout 200000 header-size 16384
+                    min-threads 4 max-threads 42}}]
   (let [container (HandlerCollection. true)
-        server (Server.)
-        connector (doto (ServerConnector. server)
-                    (.setPort port)
-                    (.setHost host))]
-    (when idle-timeout (.setIdleTimeout connector idle-timeout))
+        conn-facts (into-array ConnectionFactory
+                               [(HttpConnectionFactory. 
+                                 (doto (HttpConfiguration.)
+                                   (.setSendDateHeader true)
+                                   (.setSendServerVersion false)
+                                   (.setRequestHeaderSize header-size)
+                                   (.setResponseHeaderSize header-size)))])
+        server (Server. (QueuedThreadPool. max-threads min-threads))]
+    (.addConnector server (doto (ServerConnector. server conn-facts)
+                            (.setPort port)
+                            (.setHost host)
+                            (.setIdleTimeout idle-timeout)))
+    (when (or ssl? ssl-port)
+      (let [ssl-context-fact (SslContextFactory.)]
+        (when keystore
+          (.setKeyStorePath ssl-context-fact keystore))
+        (when key-password
+          (.setKeyStorePassword ssl-context-fact key-password))
+        (when truststore
+          (.setTrustStorePath ssl-context-fact truststore))
+        (when trust-password
+          (.setTrustStorePassword ssl-context-fact trust-password))
+        (case client-auth
+          :need (.setNeedClientAuth ssl-context-fact true)
+          :want (.setWantClientAuth ssl-context-fact true)
+          nil)
+        (.addConnector server (doto (ServerConnector. server ssl-context-fact conn-facts)
+                                (.setPort (or ssl-port 443))
+                                (.setHost host)
+                                (.setIdleTimeout idle-timeout)))))
     {:jetty (doto server
               (.setHandler (if default-handler
                              (doto (HandlerList.)
                                (.addHandler container)
                                (.addHandler default-handler))
                              container))
-              (.addConnector connector)
               (.setStopTimeout 1000)
               (.setStopAtShutdown true))
      :container container
