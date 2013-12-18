@@ -1,9 +1,11 @@
 (ns webnf.async-servlet.impl
   (:import
+   (java.io InputStream File FileInputStream OutputStream)
    (javax.servlet AsyncListener AsyncContext AsyncEvent ServletConfig)
    (javax.servlet.http HttpServlet HttpServletRequest HttpServletResponse))
   (:require [ring.util.servlet :as servlet]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [clojure.java.io :as io]))
 
 (set! *warn-on-reflection* true)
 
@@ -14,53 +16,105 @@
       (require ns)
       (resolve vsym))))
 
-(def ^:private write-chunk @#'servlet/set-body)
+(defmacro with-flush [bindings & body]
+  (assert (vector? bindings) "a vector for its binding")
+  (assert (even? (count bindings))) "an even number of forms in binding vector"
+  (cond
+   (= (count bindings) 0) `(do ~@body)
+   (symbol? (bindings 0)) `(let ~(subvec bindings 0 2)
+                             (try
+                               (with-flush ~(subvec bindings 2) ~@body)
+                               (finally
+                                 (. ~(bindings 0) flush))))
+   :else (throw (IllegalArgumentException.
+                 "with-flush only allows Symbols in bindings"))))
 
-(defn handle-servlet-request [handler ^HttpServletRequest request response]
-  (let [request-map (assoc (servlet/build-request-map request)
-                      :path-info (.getPathInfo request))
-        response-map (handler request-map)]
-    (if-let [make-net-listener (:async response-map)]
-      (let [ac (.startAsync request)
-            r  (.getResponse ac)
-            user-listener (fn [& {:keys [status headers chunk body] :as opts}]
-                            {:pre [(not (and chunk body))]}
-                            (when status
-                              (servlet/set-status r status))
-                            (when headers
-                              (servlet/set-headers r headers))
-                            (when chunk
-                              (write-chunk r chunk))
-                            (when body
-                              (write-chunk r body))
-                            (when (contains? opts :body)
-                              (.complete ac)))
-            {:keys [init start-async error timeout complete] :as net-listener}
-            (make-net-listener user-listener)]
-        (when-not (every? fn? [init start-async error timeout complete])
-          (log/debug "Not all servlet event handlers are set:"
-                     :init init :start-async start-async
-                     :error error :timeout timeout :complete complete))
-        (if-let [to (:timeout response-map)]
-          (.setTimeout ac to)
-          (log/debug "No timeout set on async response"))
-        (log/tracef "Started async response with timeout: %.1fs"
-                    (double (/ (.getTimeout ac) 1000)))
-        (.addListener ac (reify AsyncListener
-                           (onStartAsync [this event]
-                             (when start-async
-                               (start-async event user-listener)))
-                           (onError [this event]
-                             (when error
-                               (error event user-listener)))
-                           (onTimeout [this event]
-                             (when timeout
-                               (timeout event user-listener)))
-                           (onComplete [this event]
-                             (when complete
-                               (complete event user-listener)))))
-        (when init (init (AsyncEvent. ac) user-listener)))
-      (servlet/update-servlet-response response response-map))))
+(defn set-body
+  "Update a HttpServletResponse body with a String, ISeq, File or InputStream."
+  [^HttpServletResponse response, body]
+  (cond
+   (string? body)
+   (with-open [writer (.getWriter response)]
+     (.print writer body))
+   (seq? body)
+   (with-open [writer (.getWriter response)]
+     (doseq [chunk body]
+       ;; removed .flush, should lead to better performance
+       (.print writer (str chunk))))
+   (instance? InputStream body)
+   (with-open [^InputStream b body
+               ^OutputStream os (.getOutputStream response)]
+     (io/copy b os))
+   (instance? File body)
+   (let [^File f body]
+     (with-open [stream (FileInputStream. f)]
+       (set-body response stream)))
+   (nil? body)
+   nil
+   :else
+   (throw (Exception. ^String (format "Unrecognized body: %s" body)))))
+
+(defn write-chunk
+  "Update a HttpServletResponse body with a String, ISeq, File or InputStream."
+  [^HttpServletResponse response, body]
+  (cond
+   (string? body)
+   (with-flush [writer (.getWriter response)]
+     (.print writer body))
+   (seq? body)
+   (with-flush [writer (.getWriter response)]
+     (doseq [chunk body]
+       (.print writer (str chunk))))
+   (instance? InputStream body)
+   (with-open [^InputStream b body]
+     (with-flush [^OutputStream os (.getOutputStream response)]
+       (io/copy b os)))
+   (instance? File body)
+   (with-open [stream (FileInputStream. ^File body)]
+     (write-chunk response stream))
+   (nil? body)
+   nil
+   :else
+   (throw (Exception. ^String (format "Unrecognized body: %s" body)))))
+
+(defn make-listener [{:keys [error timeout complete]}]
+  (reify AsyncListener
+    (onStartAsync [this event]
+      ;; we won't react to this, since
+      ;; 1. it's name is confusing
+      ;; 2. reusing context between requests
+      ;;    doesn't fit into ring's request-response model
+      nil)
+    (onError [this event]
+      (when error
+        (error event)))
+    (onTimeout [this event]
+      (when timeout
+        (timeout event)))
+    (onComplete [this event]
+      (when complete
+        (complete event)))))
+
+(defn start-async [^HttpServletRequest request make-callbacks timeout]
+  (let [ctx (.startAsync request)]
+    (when timeout
+      (.setTimeout ctx timeout))
+    (log/tracef "Started async response with timeout: %.1fs"
+                (double (/ (or timeout (.getTimeout ctx)) 1000)))
+    (.addListener ctx (make-listener (make-callbacks ctx)))))
+
+(defn handle-servlet-request 
+  ([handler ^HttpServletRequest request response]
+     (let [request-map (assoc (servlet/build-request-map request)
+                         :path-info (.getPathInfo request))
+           {:keys [status headers body timeout] :as response-map} (handler request-map)]
+       (when status
+         (servlet/set-status response status))
+       (when-not (empty? headers)
+         (servlet/set-headers response headers))
+       (if (fn? body)
+         (start-async request body timeout)
+         (set-body response body)))))
 
 
 

@@ -7,8 +7,9 @@
 ;   [webnf.async-servlet.impl :as asi]
    )
   (:import
+   org.jfastcgi.servlet.FastCGIServlet
    (org.eclipse.jetty.server Server Request)
-   (org.eclipse.jetty.servlet ServletContextHandler ServletHolder)
+   (org.eclipse.jetty.servlet ServletContextHandler ServletHolder DefaultServlet)
    (org.eclipse.jetty.server HttpConfiguration ServerConnector HttpConnectionFactory
                              ConnectionFactory)
 ;   (org.eclipse.jetty.spdy.server.http HTTPSPDYServerConnector)
@@ -35,6 +36,17 @@
                      (.setServletHandler (proxy-handler handler))
                      (.setAsyncSupported true))
                    mapping))))
+
+(defn make-fcgi-handler [address fcgi-mapping cwd]
+  (doto (ServletContextHandler.)
+    (.setResourceBase cwd)
+    (.setWelcomeFiles (into-array String ["index.php" "index.html"]))
+    (.addServlet (doto (ServletHolder. FastCGIServlet)
+                   (.setInitParameters {"server-address" address}))
+                 fcgi-mapping)
+    (.addServlet (doto (ServletHolder. DefaultServlet)
+                   (.setInitParameters {"dirAllowed" "true"}))
+                 "/")))
 
 (defn make-servlet-handler [servlet-class params mapping]
   (doto (ServletContextHandler.)
