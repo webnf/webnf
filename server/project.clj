@@ -1,4 +1,4 @@
-(defproject webnf/server "0.0.6"
+(defproject webnf/server "0.0.7"
   :description "Vhost functionality with servlets and a jetty runner"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"

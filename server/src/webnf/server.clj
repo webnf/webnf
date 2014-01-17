@@ -63,7 +63,7 @@
 (defn add-vhost! 
   ([{:keys [jetty container handlers vhosts] :as ctx} 
     id add-vhosts servlet-context-handler]
-     (when (handlers id)
+     (when (get handlers id)
        (throw (ex-info (str "Handler " id " is already running" {:id id}))))
      (when-let [have (seq (set/intersection vhosts (set add-vhosts)))]
        (throw (ex-info (str "Vhosts " (str/join ", " have) " are already mapped")
