@@ -58,10 +58,6 @@
                  [clj-stacktrace "0.2.7"]
                  [clojure-complete "0.2.3"]
                  [criterium "0.4.2"]
-                 [ch.qos.logback/logback-classic "0.9.12"]
-                 [org.slf4j/log4j-over-slf4j "1.9"]
-                 [org.slf4j/jcl-over-slf4j "1.7.5"]
-                 [org.slf4j/jul-to-slf4j "1.7.5"]
                  
                  [net.sourceforge.cssparser/cssparser "0.9.11"]
 
