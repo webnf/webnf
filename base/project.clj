@@ -1,4 +1,4 @@
-(defproject webnf/base "0.0.6"
+(defproject webnf/base "0.0.7"
   :description "Collection org.clojure libs and essential others"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -6,7 +6,7 @@
   :repositories [["bendlas-nexus" {:url "http://nexus.bendlas.net/content/groups/public"
                                    :username "fetch" :password :gpg}]]
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-2120"]
+                 [org.clojure/clojurescript "0.0-2138"]
                  [org.clojure/core.incubator "0.1.3"]
                  [org.clojure/core.logic "0.8.5"]
                  [org.clojure/core.cache "0.6.3"]
@@ -14,16 +14,16 @@
                   :exclusions [org.clojure/core.cache]]
                  [org.clojure/core.contracts "0.0.5"]
                  [org.clojure/core.unify "0.5.6"]
-                 [org.clojure/core.typed "0.2.20"]
-                 [org.clojure/tools.reader "0.8.2"]
+                 [org.clojure/core.typed "0.2.21"]
+                 [org.clojure/tools.reader "0.8.3"]
                  [org.clojure/tools.trace "0.7.6"]
-                 [org.clojure/tools.cli "0.3.0"]
-                 [org.clojure/data.json "0.2.3"]
+                 [org.clojure/tools.cli "0.3.1"]
+                 [org.clojure/data.json "0.2.4"]
                  [org.clojure/data.generators "0.1.2"]
-                 [org.clojure/java.classpath "0.2.1"]
+                 [org.clojure/java.classpath "0.2.2"]
                  [org.clojure/core.async "0.1.242.0-44b1e3-alpha"]
 
-                 [org.clojure/core.match "0.2.0"]
+                 [org.clojure/core.match "0.2.1"]
 
                  [org.clojure/tools.logging "0.2.6"]
                  [org.clojure/tools.nrepl "0.2.3"]
@@ -41,10 +41,10 @@
 
                  [org.clojure/java.data "0.1.1"]
                  [org.clojure/java.jmx "0.2.0"]
-                 [org.clojure/java.jdbc "0.3.0"]
+                 [org.clojure/java.jdbc "0.3.2"]
 
                  [org.clojure/math.combinatorics "0.0.7"]
-                 [org.clojure/math.numeric-tower "0.0.2"]
+                 [org.clojure/math.numeric-tower "0.0.4"]
                  
                  [clj-stacktrace "0.2.7"]
                  [clojure-complete "0.2.3"]
@@ -58,8 +58,8 @@
                  [clj-stacktrace "0.2.7"]
                  [clojure-complete "0.2.3"]
                  [criterium "0.4.2"]
-                 [ch.qos.logback/logback-classic "1.0.13"]
-                 [org.slf4j/log4j-over-slf4j "1.7.5"]
+                 [ch.qos.logback/logback-classic "0.9.12"]
+                 [org.slf4j/log4j-over-slf4j "1.9"]
                  [org.slf4j/jcl-over-slf4j "1.7.5"]
                  [org.slf4j/jul-to-slf4j "1.7.5"]
                  
