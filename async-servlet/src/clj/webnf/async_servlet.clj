@@ -1,4 +1,5 @@
 (ns webnf.async-servlet
+  (:refer-clojure :exclude [flush chunk])
   (:import javax.servlet.AsyncContext)
   (:require [clojure.tools.logging :as log]
             [webnf.async-servlet.impl :as impl]
@@ -11,7 +12,7 @@
   (servlet/set-headers (.getResponse async-context) headers))
 
 (defn flush [^AsyncContext async-context]
-  (.flushBuffers (.getResponse async-context)))
+  (.flushBuffer (.getResponse async-context)))
 
 (defn chunk [^AsyncContext async-context chunk]
   (impl/write-chunk (.getResponse async-context) chunk))
