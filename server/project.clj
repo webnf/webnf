@@ -6,7 +6,7 @@
   :repositories [["bendlas-nexus" {:url "http://nexus.bendlas.net/content/groups/public"
                                    :username "fetch" :password :gpg}]]
 
-  :dependencies [[webnf/base "0.0.8"]
+  :dependencies [[webnf/base "0.0.9"]
                  [ring/ring-servlet "1.2.1"
                   :exclusions [javax.servlet/servlet-api]]
 

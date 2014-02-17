@@ -1,4 +1,4 @@
-(defproject webnf/handler "0.0.7"
+(defproject webnf/handler "0.0.8"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -6,7 +6,7 @@
   :repositories [["bendlas-nexus" {:url "http://nexus.bendlas.net/content/groups/public"
                                    :username "fetch" :password :gpg}]]
   :source-paths ["src/clj"]
-  :dependencies [[webnf/base "0.0.7"]
+  :dependencies [[webnf/base "0.0.9"]
                  [webnf/async-servlet "0.1.1"]
                  
                  [enlive "1.1.5"]

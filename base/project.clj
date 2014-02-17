@@ -1,4 +1,4 @@
-(defproject webnf/base "0.0.8"
+(defproject webnf/base "0.0.9"
   :description "Collection org.clojure libs and essential others"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -8,13 +8,13 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2156"]
                  [org.clojure/core.incubator "0.1.3"]
-                 [org.clojure/core.logic "0.8.5"]
+                 [org.clojure/core.logic "0.8.7"]
                  [org.clojure/core.cache "0.6.3"]
                  [org.clojure/core.memoize "0.5.6"
                   :exclusions [org.clojure/core.cache]]
                  [org.clojure/core.contracts "0.0.5"]
                  [org.clojure/core.unify "0.5.6"]
-                 [org.clojure/core.typed "0.2.27"]
+                 [org.clojure/core.typed "0.2.31"]
                  [org.clojure/tools.reader "0.8.3"]
                  [org.clojure/tools.trace "0.7.6"]
                  [org.clojure/tools.cli "0.3.1"]
@@ -50,10 +50,10 @@
                  [clojure-complete "0.2.3"]
                  [criterium "0.4.3"]
 
-                 [ch.qos.logback/logback-classic "1.1.0"]
-                 [org.slf4j/log4j-over-slf4j "1.7.5"]
-                 [org.slf4j/jcl-over-slf4j "1.7.5"]
-                 [org.slf4j/jul-to-slf4j "1.7.5"]
+                 [ch.qos.logback/logback-classic "1.1.1"]
+                 [org.slf4j/log4j-over-slf4j "1.7.6"]
+                 [org.slf4j/jcl-over-slf4j "1.7.6"]
+                 [org.slf4j/jul-to-slf4j "1.7.6"]
 
                  [clj-stacktrace "0.2.7"]
                  [clojure-complete "0.2.3"]
