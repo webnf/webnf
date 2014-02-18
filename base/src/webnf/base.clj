@@ -2,19 +2,23 @@
   (:require [clojure.java.io :as io]
             [clojure.tools.logging :as log]))
 
+(defn make-autoloader [replace-var var-ns var-name static]
+  (fn [& args]
+    (log/trace (str "Autoloading " var-ns))
+    (require var-ns)
+    (let [target-var (ns-resolve (find-ns var-ns) var-name)
+          f (if static
+              (deref target-var)
+              target-var)]
+      (alter-var-root replace-var (constantly f))
+      (alter-meta! replace-var (constantly (meta target-var)))
+      (apply f args))))
+
 (defmacro autoload [var-name]
-  (let [vns (symbol (namespace var-name))
-        {static :static :as vmeta} (meta var-name)
-        vn (with-meta (symbol (name var-name)) vmeta)
-        get-ns `(ns-resolve (find-ns '~vns) '~vn)]
-    `(defn ~vn [~'& args#]
-       (log/trace ~(str "Autoloading " vns))
-       (require '~vns)
-       (let [fn# ~(if static
-                    `(deref ~get-ns)
-                    get-ns)]
-         (def ~vn fn#)
-         (apply fn# args#)))))
+  (let [mm (meta var-name)
+        vn (with-meta (symbol (name var-name)) mm)
+        vns (symbol (namespace var-name))]
+    `(def ~vn (make-autoloader #'~vn '~vns '~vn ~(:static mm)))))
 
 (autoload clojure.pprint/pprint)
 
