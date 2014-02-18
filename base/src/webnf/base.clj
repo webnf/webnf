@@ -20,6 +20,16 @@
         vns (symbol (namespace var-name))]
     `(def ~vn (make-autoloader #'~vn '~vns '~vn ~(:static mm)))))
 
+(defmacro autoload-some [& specs]
+  (cons 'do (for [spec specs]
+              (if (coll? spec)
+                `(autoload-some
+                  ~@(let [ns (name (first spec))
+                          mm (meta spec)]
+                      (map #(with-meta (symbol ns (name %)) mm)
+                           (rest spec))))
+                `(autoload ~spec)))))
+
 (autoload clojure.pprint/pprint)
 
 (defn hostname []
