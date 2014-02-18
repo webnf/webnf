@@ -20,11 +20,3 @@
                        :id (.getId b)
                        :manufacturer (-> b .getManufacturer .getName)
                        :rendering-engine (-> b .getRenderingEngine .name)})}))
-
-(defn wrap-user-agent [h]
-  (fn [{:as req
-        {ua "user-agent"} :headers}]
-    (h
-     (if ua
-       (assoc req :user-agent (parse-user-agent ua))
-       req))))

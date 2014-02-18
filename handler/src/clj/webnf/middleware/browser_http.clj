@@ -5,7 +5,7 @@
    [clojure.java.io :as io]
    [webnf.kv :refer [merge-deep]]
    [clojure.string :as str]
-   [webnf.utils :refer [to-many]]))
+   [webnf.base :refer [to-many]]))
 
 (defn kw-methods [meth]
   {:pre [(string? meth)]}

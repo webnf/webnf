@@ -1,4 +1,4 @@
-(defproject webnf/async-servlet "0.1.1"
+(defproject webnf/async-servlet "0.1.2-SNAPSHOT"
   :description "A servlet 3.0 implementation, that enables the async api for ring applications"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -7,8 +7,7 @@
                                    :username "fetch" :password :gpg}]]
   :java-source-paths ["src/jvm"]
   :source-paths ["src/clj"]
-  :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/tools.logging "0.2.6"]
+  :dependencies [[webnf.deps/core "0.1.0-SNAPSHOT"]
                  [ring/ring-servlet "1.2.1"
                   :exclusions [javax.servlet/servlet-api]]
                  [org.glassfish/javax.servlet "3.1.1" :scope "provided"]]

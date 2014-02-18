@@ -1,4 +1,4 @@
-<configuration scan="true" scanPeriod="4 seconds">
+<configuration> <!--scan="true" scanPeriod="4 seconds"-->
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
@@ -6,8 +6,8 @@
     </encoder>
   </appender>
 
-  <logger name="org.eclipse.jetty" level="INFO" />
-  <logger name="org.eclipse.jetty.server.Server" level="INFO" />
+  <!--logger name="foo.bar" level="INFO" /-->
+  <!--logger name="foo.bar.Class" level="INFO" /-->
 
   <root level="TRACE">
     <appender-ref ref="STDOUT" />
