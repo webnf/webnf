@@ -21,9 +21,16 @@
     (cons (to-str (first args))
           (rest args))))
 
+;; ## jQuery helper macros
+;;
+;; As opposed to the jQuery helper _functions_ in webnf.util, these
+;; are called with plain symbols, which are stringified by the macro.
+
 (defmacro $->
   "Take obj and some calls like ->, but use $- to do the calls by
-  javascript method name. Useful to thread jQuery invokations."
+  javascript method name. Symbols in call position will be stringified
+  for the method lookup. Useful to thread jQuery invokations and other
+  kinds of interactions with external code without externs"
   [obj & calls]
   `(-> ~obj
        ~@(for [c calls

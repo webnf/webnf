@@ -36,6 +36,13 @@
   "Makes a js object from a map"
   (comp (scat js-obj) (scat concat)))
 
+;; ### jQuery helper functions
+;;
+;; These functions just let you pass in strings to interact with
+;; jQuery and other plain javascript method calls without externs.
+;; The closure compiler will eliminate double string literals, so we
+;; can get away with this.
+
 (defn $a*
   "Apply window.jQuery to a js array of args"
   [arrgs]
