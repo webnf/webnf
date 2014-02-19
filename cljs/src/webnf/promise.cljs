@@ -51,13 +51,20 @@
     (set! waiters nil)
     nil))
 
-(defn deliver [p val]
+(defn deliver
+  "Deliver on a promise akin to clojure.core/deliver"
+  [p val]
   (-deliver p val))
 
-(defn deliver-error [p e]
+(defn deliver-error
+  "Deliver an error to a promise"
+  [p e]
   (-deliver-error p e))
 
-(defn promise 
+(defn promise
+  "Create a promise, which can be used much like a read channel,
+  except that reads always return immediately, once the promise has
+  been delivered on."
   ([]
      (Promise. :webnf.promise/pending nil nil))
   ([source-ch]

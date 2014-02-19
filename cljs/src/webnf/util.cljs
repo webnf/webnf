@@ -12,14 +12,19 @@
   (:require-macros 
    [cljs.core.async.macros :refer [go]]))
 
-(defn log [& args]
+(defn log 
+  "Log args directly to the browser console"
+  [& args]
   (when-let [con js/console]
     (.apply (.-log con) con (to-array args))))
 
-(defn log-pr [& args]
+(defn log-pr 
+  "Log pr-str of args to browser console"
+  [& args]
   (apply log (map pr-str args)))
 
-(set! *print-fn* log-pr)
+(when-not *print-fn* ;; TODO: make this configurable, somehow?
+  (set! *print-fn* log-pr))
 
 (defn scat
   "Returns a function taking a seq on which f is applied.
@@ -31,41 +36,65 @@
   "Makes a js object from a map"
   (comp (scat js-obj) (scat concat)))
 
-(defn $a* [arrgs]
+(defn $a*
+  "Apply window.jQuery to a js array of args"
+  [arrgs]
   (.apply (aget js/window "jQuery")
           nil
           arrgs))
 
-(defn $* [& args]
+(defn $* 
+  "Apply window.jQuery to args"
+  [& args]
   ($a* (to-array args)))
 
-(defn $a- [obj meth arrgs]
+(defn $a- 
+  "Call string method on obj with array of args"
+  [obj meth arrgs]
   (and obj
        (.apply (aget obj meth) obj arrgs)))
 
-(defn $- [obj meth & args]
+(defn $- 
+  "Call string method on obj with args"
+  [obj meth & args]
   ($a- obj meth (to-array args)))
 
-(defn $$ [meth & args]
+(defn $$ 
+  "Call window.jQuery.<method> with args"
+  [meth & args]
   ($a- (aget js/window "jQuery") meth (to-array args)))
 
 (defn $
+  "Call window.jQuery(obj).<method> with args"
   ([obj] ((aget js/window "jQuery") obj))
   ([obj meth & args]
      ($a- ($ obj) meth (to-array args))))
 
-(defn $? [jq] (and jq (pos? (alength jq))))
+(defn $?
+  "jQuery predicate: array with length > 0"
+  [jq] (and jq (pos? (alength jq))))
 
-(defn eval-js [thunk]
+;; ## Async load infrastructure
+
+(defn eval-js
+  "Evaluate javascript string by adding a script tag to the document head"
+  [thunk]
   (.appendChild 
    (.-head js/document)
    (dom/createDom "script" nil thunk)))
 
-(defn add-stylesheets [& hrefs]
+(defn add-stylesheets
+  "Add a links to style sheets to the document head"
+  [& hrefs]
   (doseq [href hrefs]
     (dom/appendChild (.-head js/document)
                      (dom/createDom "link" (js-obj "href" href
                                                    "rel" "stylesheet")))))
+
+;; Here is some infrastructure to load up javascript asynchronously,
+;; but still keep the order of evaluation for dynamically loading
+;; dependencies with subdependencies and interleave javascript loaded
+;; from a server with javascript written inline.
 
 (defn- load-init-fetch [fetched-atom after-load scripts]
   (doseq [src scripts]
@@ -106,7 +135,14 @@
                                          q)))
     (after-load)))
 
-(defn hmap [hs]
+
+;; ### XHR
+
+;; why is this not in gclosure?
+
+(defn hmap
+  "Parse the headers of an XmlHttpRequest"
+  [hs]
   (persistent!
    (reduce (fn [res l]
              (if-let [[_ k v] (re-matches #"([^:]*):(.*)" l)]
@@ -116,7 +152,12 @@
                  res)))
            (transient {}) (split-lines hs))))
 
-(defn xhr 
+(defn xhr
+  "Request an uri with XmlHttpRequest, return channel that will
+  receive response in ring format {:uri :status :headers :body}
+
+  Request data can also be passed in ring format
+  {:method :params :headers :body}"
   ([uri] (xhr uri nil))
   ([uri {:keys [method body headers params]}]
      (let [ch (chan)
@@ -136,20 +177,27 @@
                    (and headers (to-js headers)))
        ch)))
 
-(defn urlenc-params [params]
+(defn urlenc-params
+  "Encode a map into a form-params string"
+  [params]
   (join \&
         (map #(str (gstr/urlEncode (key %))
                    \=
                    (gstr/urlEncode (val %)))
              params)))
 
-(defn urldec-params [s]
+(defn urldec-params
+  "Decode a form-params string into a map"
+  [s]
   (apply hash-map
          (map gstr/urlDecode
               (mapcat #(split % #"=")
                       (split s #"&")))))
 
-(defn dom-clone! [node-or-nodes]
+(defn dom-clone!
+  "Clone dom nodes. This draws on the usual convention to represent
+  markup as a node or collection of nodes"
+  [node-or-nodes]
   (if (sequential? node-or-nodes)
     (map #(.cloneNode % true) node-or-nodes)
     (.cloneNode node-or-nodes true)))
