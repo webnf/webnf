@@ -1,6 +1,6 @@
-(defproject webnf.deps/core "0.1.0-SNAPSHOT"
+(defproject webnf.deps/core "0.0.1"
   :description "Just the basic clojure runtime + logging infrastructure. Contains a logback.xml"
-  :url "http://example.com/FIXME"
+  :url "http://github.com/webnf/webnf"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/tools.logging "0.2.6"]

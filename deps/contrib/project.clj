@@ -1,11 +1,12 @@
-(defproject webnf.deps/contrib "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+(defproject webnf.deps/contrib "0.0.1"
+  :description "The uber dependency to get a full set of popular
+  dependencies. For development or when you have room in your .m2 repo."
+  :url "http://github.com/webnf/webnf"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[webnf.deps/core "0.1.0-SNAPSHOT"]
-                 [webnf.deps/dev "0.1.0-SNAPSHOT"]
-                 [webnf.deps/net "0.1.0-SNAPSHOT"]
+  :dependencies [[webnf.deps/core "0.0.1"]
+                 [webnf.deps/dev "0.0.1"]
+                 [webnf.deps/web "0.0.1"]
                  [org.clojure/core.incubator "0.1.3"]
                  [org.clojure/core.logic "0.8.7"]
                  [org.clojure/core.cache "0.6.3"]

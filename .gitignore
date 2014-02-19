@@ -2,3 +2,6 @@
 .project
 .settings
 .classpath
+pom.xml
+pom.xml.asc
+target

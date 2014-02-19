@@ -4,7 +4,7 @@
 
 (defn make-autoloader [replace-var var-ns var-name static]
   (fn [& args]
-    (log/trace (str "Autoloading " var-ns))
+    (log/trace (str "Autoloading " var-ns " for " var-name))
     (require var-ns)
     (let [target-var (ns-resolve (find-ns var-ns) var-name)
           f (if static

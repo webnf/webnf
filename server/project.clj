@@ -1,4 +1,4 @@
-(defproject webnf/server "0.0.10-SNAPSHOT"
+(defproject webnf/server "0.0.9"
   :description "Vhost functionality with servlets and a jetty runner"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -7,8 +7,8 @@
                                    :username "fetch" :password :gpg}]]
 
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [webnf/base "0.1.0-SNAPSHOT"]
-                 [webnf.deps/net "0.1.0-SNAPSHOT"]
+                 [webnf/base "0.0.9"]
+                 [webnf.deps/web "0.0.1"]
                  [ring/ring-servlet "1.2.1"
                   :exclusions [javax.servlet/servlet-api]]
 

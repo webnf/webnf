@@ -1,9 +1,9 @@
-(defproject webnf.deps/net "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+(defproject webnf.deps/web "0.0.1"
+  :description "Common dependencies for web apps"
+  :url "http://github.com/webnf/webnf"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[webnf.deps/core "0.1.0-SNAPSHOT"]
+  :dependencies [[webnf.deps/core "0.0.1"]
                  [nl.bitwalker/UserAgentUtils "1.2.4"]
                  [net.sourceforge.cssparser/cssparser "0.9.13"]                 
                  [commons-codec "1.9"]
