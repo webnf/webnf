@@ -19,7 +19,12 @@ This started as one developer's library code shared between various
 web projects and then grew some architectural spines in the form of
 the vhosting servlet runner.
 
-# Will it ever be done?
+## Help wanted
+
+We are looking for code that should be useful to most clojure coders,
+especially when working on web apps.
+
+## Will it ever be done?
 
 There are two important milestones, before webnf should be considered near 1.0:
 
@@ -33,21 +38,21 @@ There are two important milestones, before webnf should be considered near 1.0:
    developer has plans to use the debugging APIs to find all objects
    keeping a classloader alive.
 
-# F.A.Q
+## F.A.Q
 
-## Why not Immutant?
+### Why not Immutant?
 
 It happens that one developer was very comfortable with jetty and
 didn't want any EE. This only affects webnf/server. async-servlet and
 the other stuff should be fine in immutant or any modern servlet
 container, really.
 
-## Why not Ring?
+### Why not Ring?
 
-Actually Ring. Plus lot's of tidbits, that don't fit with ring and
-some that might.
+Actually Ring. Plus lot's of tidbits, that don't fit into ring's scope
+and some that might.
 
-## Why not Pedestal?
+### Why not Pedestal?
 
 async-servlet keeps true to the original ring lifecycle and just
 allowing you to extend it past the return in a way closely modelled
