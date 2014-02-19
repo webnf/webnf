@@ -1,8 +1,11 @@
 (ns webnf.base
+  "Various primitive core operations that should be 'just there'"
   (:require [clojure.java.io :as io]
             [clojure.tools.logging :as log]))
 
-(defn make-autoloader [replace-var var-ns var-name static]
+(defn make-autoloader
+  "PRIVATE used by autoload macro"
+  [replace-var var-ns var-name static]
   (fn [& args]
     (log/trace (str "Autoloading " var-ns " for " var-name))
     (require var-ns)
@@ -14,13 +17,28 @@
       (alter-meta! replace-var (constantly (meta target-var)))
       (apply f args))))
 
-(defmacro autoload [var-name]
+(defmacro autoload 
+  "Pass a (unquoted) qualified symbol. Generates a var with same name,
+  that will load the namespace on first invokation and put the foreign
+  var into the generated var. If passed symbol has a ^:static
+  metadata, it will put the contents of the foreign var into the
+  generated var.
+
+  (autoload foo/bar) -> (def bar #'foo/bar) ; on first call
+  (autoload ^:static foo/bar) -> (def bar @#'foo/bar) ; on first call" [var-name]
   (let [mm (meta var-name)
         vn (with-meta (symbol (name var-name)) mm)
         vns (symbol (namespace var-name))]
     `(def ~vn (make-autoloader #'~vn '~vns '~vn ~(:static mm)))))
 
-(defmacro autoload-some [& specs]
+(defmacro autoload-some
+  "Autoload multiple vars like in import:
+   
+   (autoload
+     bar/foo
+     (bas goo hoo)
+     ^:static (bat ioo joo))"
+  [& specs]
   (cons 'do (for [spec specs]
               (if (coll? spec)
                 `(autoload-some
@@ -32,10 +50,14 @@
 
 (autoload clojure.pprint/pprint)
 
-(defn hostname []
+(defn hostname
+  "Get the hostname of localhost"
+  []
   (.. java.net.InetAddress getLocalHost getHostName))
 
 (defn reset-logging-config!
+  "Pass a path to a logback config (default logback.xml) to reset the
+   logging configuration"
   ([] (reset-logging-config! "logback.xml"))
   ([logback-xml]
      (if-let [s (io/resource logback-xml)]
@@ -45,13 +67,21 @@
          (.doConfigure s))
        (throw (ex-info (str "Not a resource " logback-xml) {:filename logback-xml})))))
 
-(defn to-many [v]
+(defn to-many
+  "Ensure that seq can be called on a value. If value is not a coll
+  and not nil, it is put into an empty collection"
+  [v]
   (if (or (nil? v) (coll? v)) v (cons v nil)))
 
-(defn pprint-str [o]
+(defn pprint-str
+  "Return value pretty-printed into a string"
+  [o]
   (with-out-str (pprint o)))
 
-(defmacro squelch [val & body]
+(defmacro squelch 
+  "Eval body with a handler for Exception that returns a default expression val.
+  Logs exceptions on trace priority."
+  [val & body]
   `(try ~@body (catch Exception e#
                  (let [val# ~val]
                    (log/trace e# "during execution of" 
@@ -59,6 +89,8 @@
                               "\n used replacement value:" val#)
                    val#))))
 
-(defmacro forcat [bindings body]
+(defmacro forcat
+  "Concat the return value of a for expression"
+  [bindings body]
   `(apply concat (for ~bindings ~body)))
 
