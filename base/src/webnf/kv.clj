@@ -75,3 +75,21 @@
                              v)))
                  merged m))
     (transient m) maps)))
+
+(let [nnil? (complement nil?)]
+  (defn assoc-when
+    "Assoc only values matching predicate. Defaults to non-nil"
+    {:arglists (list '[m & {:as kvs}]
+                     '[val-pred? m & {:as kvs}])}
+    [& args]
+    (let [[val-pred? m kvs] (if (even? (count args))
+                              [(first args) (second args) (nnext args)]
+                              [nnil? (first args) (next args)])]
+      (loop [tm (transient m)
+             [k v & rst :as kvs*] kvs]
+        (if (seq kvs*)
+          (recur (if (val-pred? v)
+                   (assoc! tm k v)
+                   tm)
+                 rst)
+          (persistent! tm))))))

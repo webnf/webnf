@@ -1,4 +1,4 @@
-(defproject webnf/base "0.0.9"
+(defproject webnf/base "0.0.10"
   :description "Collection org.clojure libs and essential others"
   :url "http://github.com/webnf/webnf"
   :license {:name "Eclipse Public License"
@@ -6,4 +6,4 @@
   :repositories [["bendlas-nexus" {:url "http://nexus.bendlas.net/content/groups/public"
                                    :username "fetch" :password :gpg}]]
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [webnf.deps/core "0.0.1"]])
+                 [webnf.deps/core "0.0.2"]])

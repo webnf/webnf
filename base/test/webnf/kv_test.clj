@@ -31,3 +31,18 @@
           {:a 1 :b 1 :c {:a 1 :b 1} :d {:a 1 :b 1} :e {:a 1 :b 1} :f 1}
           {:b 2 :d {:b 2} :e 2 :f {:b 2}})
          {:a 1 :b 2 :c {:a 1 :b 1} :d {:a 1 :b 2} :e 2 :f {:b 2}})))
+
+(deftest assoc-when-test
+  (let [res-str (with-out-str
+                  (is (= (assoc-when pos? (do (println "Init")
+                                              {})
+                                     :keyA (do (print "Steps: 0")
+                                               0)
+                                     :keyB (do (print " 1")
+                                               1)
+                                     :keyC (do (print " 2")
+                                               2)
+                                     :keyD (do (println " end")
+                                               -42))
+                         {:keyB 1 :keyC 2})))]
+    (is (= res-str "Init\nSteps: 0 1 2 end\n"))))
