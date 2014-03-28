@@ -153,3 +153,15 @@
                         (update-in out [:success] inc))))
                 {:success 0 :errors []}
                 tx-result-channel))
+
+;; ### Middleware for proper request database access
+
+(defn wrap-connection
+  "Ring Middleware connecting to a database on creation, gets database at begin of every request.
+   Associates :datomic/conn and :datomic/db to the request."
+  [h uri]
+  (fn [req]
+    (let [conn (dtm/connect uri)]
+      (h (assoc req
+           :datomic/conn conn
+           :datomic/db (dtm/db conn))))))
