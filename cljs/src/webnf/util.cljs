@@ -8,7 +8,10 @@
    [goog.net.EventType :as NET]
    [goog.net.XhrIo :as XhrIo]
    [goog.Uri :as Uri]
-   [cljs.core.async :refer [chan >! close!]])
+   [cljs.core.async :refer [chan >! close!]]
+   [cljs.core.async.impl.protocols :as asyncp :refer [ReadPort WritePort]]
+   [webnf.channel :refer [callback-read-port]]
+   [webnf.promise :refer [promise]])
   (:require-macros 
    [cljs.core.async.macros :refer [go]]))
 
@@ -159,30 +162,32 @@
                  res)))
            (transient {}) (split-lines hs))))
 
+(defn- parse-xhr-response [evt]
+  (let [t (.-target evt)]
+    {:uri uri
+     :status (.getStatus t)
+     :headers (hmap (.getAllResponseHeaders t))
+     :body (.getResponseText t)}))
+
 (defn xhr
   "Request an uri with XmlHttpRequest, return channel that will
   receive response in ring format {:uri :status :headers :body}
 
   Request data can also be passed in ring format
-  {:method :params :headers :body}"
+  {:method :params :headers :body :always-refresh}
+  :auto-refresh true triggers a request on every read"
   ([uri] (xhr uri nil))
-  ([uri {:keys [method body headers params]}]
-     (let [ch (chan)
-           uri (Uri/parse uri)]
-       (reduce-kv (fn [_ param value]
-                    (.setParameterValue uri param value))
-                  nil params)
-       (XhrIo/send uri #(let [t (.-target %)
-                              rt {:uri uri
-                                  :status (.getStatus t)
-                                  :headers (hmap (.getAllResponseHeaders t))
-                                  :body (.getResponseText t)}]
-                          (go (>! ch rt)
-                              (close! ch)))
-                   method
-                   body
-                   (and headers (to-js headers)))
-       ch)))
+  ([uri {:keys [method body headers params auto-refresh]}]
+     (let [uri (Uri/parse uri)
+           _ (reduce-kv (fn [_ param value]
+                          (.setParameterValue uri param value))
+                        nil params)
+           headers (and headers (to-js headers))
+           rp (callback-read-port (fn [result]
+                                    (XhrIo/send uri (comp result parse-xhr-response)
+                                                method body headers)))]
+       (if auto-refresh
+         rp (promise rp)))))
 
 (defn urlenc-params
   "Encode a map into a form-params string"

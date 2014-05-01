@@ -1,6 +1,7 @@
 (ns webnf.promise
   (:require
    [webnf.util :refer [log]]
+   [webnf.channel :refer [serve-read-waiters]]
    [cljs.core.async.impl.dispatch :as dispatch]
    [cljs.core.async.impl.protocols :as async]
    [cljs.core.async :refer [<!]])
@@ -39,15 +40,8 @@
   (-deliver [p val]
     (when-not (= value :webnf.promise/pending)
       (throw (ex-info "Can't deliver on a promise more than once" {:webnf/promise p :new-value val})))
-    (let [waiters waiters]
-      (doseq [handler waiters]
-        (try (if (async/active? handler)
-               (let [f (async/commit handler)]
-                 (dispatch/run #(f val)))
-               (async/put! handler val (fn [])))
-             (catch :default e
-               (log "ERROR" "during promise delivery" e)))))
     (set! value val)
+    (serve-read-waiters waiters val)
     (set! waiters nil)
     nil))
 
