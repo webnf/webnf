@@ -1,6 +1,6 @@
 (ns webnf.channel
   (:require
-   [webnf.util :refer [log]]
+   [webnf.impl :refer [log]]
    [cljs.core.async.impl.dispatch :as dispatch]
    [cljs.core.async.impl.protocols :as async]
    [cljs.core.async :refer [<!]])

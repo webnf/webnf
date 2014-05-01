@@ -11,23 +11,13 @@
    [cljs.core.async :refer [chan >! close!]]
    [cljs.core.async.impl.protocols :as asyncp :refer [ReadPort WritePort]]
    [webnf.channel :refer [callback-read-port]]
-   [webnf.promise :refer [promise]])
+   [webnf.promise :refer [promise]]
+   [webnf.impl :as impl])
   (:require-macros 
    [cljs.core.async.macros :refer [go]]))
 
-(defn log 
-  "Log args directly to the browser console"
-  [& args]
-  (when-let [con js/console]
-    (.apply (.-log con) con (to-array args))))
-
-(defn log-pr 
-  "Log pr-str of args to browser console"
-  [& args]
-  (apply log (map pr-str args)))
-
-(when-not *print-fn* ;; TODO: make this configurable, somehow?
-  (set! *print-fn* log-pr))
+(def log impl/log)
+(def log-pr impl/log-pr)
 
 (defn scat
   "Returns a function taking a seq on which f is applied.
