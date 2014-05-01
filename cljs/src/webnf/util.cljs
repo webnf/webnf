@@ -154,7 +154,7 @@
 
 (defn- parse-xhr-response [evt]
   (let [t (.-target evt)]
-    {:uri uri
+    {:uri (.getLastUri t)
      :status (.getStatus t)
      :headers (hmap (.getAllResponseHeaders t))
      :body (.getResponseText t)}))
