@@ -44,3 +44,13 @@
   [init & calls]
   `($-> ($a* (cljs.core/array ~@(to-args init)))
         ~@calls))
+
+(defmacro log-expr [& exprs]
+  `(let [ret-exp# ~(last exprs)]
+     (log "Result of" ~(pr-str (last exprs)) "=>"
+          (cljs.core/pr-str ret-exp#) \newline
+          ~@(mapcat
+             (fn [e]
+               `[~(pr-str e) "=>" (cljs.core/pr-str ~e) \newline])
+             (butlast exprs)))
+     ret-exp#))
