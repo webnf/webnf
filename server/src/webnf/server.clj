@@ -85,6 +85,26 @@
       (log/debug cause "LifeCycle Failure" event)
       (when failure (.run failure)))))
 
+(defn- map-vars [syms cbs]
+  (let [ns (create-ns 'webnf.server.auto)]
+    (doall (map #(intern ns %1 %2)
+                syms cbs))))
+
+(defn- unmap-vars [syms]
+  (let [ns (create-ns 'webnf.server.auto)]
+    (dorun (map #(ns-unmap ns %) syms))))
+
+(defn make-ring-handler [service & {:keys [init destroy]}]
+  (let [cbs [init destroy service]
+        [init-s destroy-s service-s :as syms] (repeatedly (count cbs) #(gensym "callback-"))]
+    (make-servlet-handler webnf.AsyncServlet
+                          {"webnf.handler.init" (when init (str "webnf.server.auto/" init-s))
+                           "webnf.handler.service" (when service (str "webnf.server.auto/" service-s))
+                           "webnf.handler.destroy" (when destroy (str "webnf.server.auto/" destroy-s))}
+                          "/" :lifecycle-listener (make-lifecycle-listener
+                                                   :starting #(map-vars syms cbs)
+                                                   :stopped #(unmap-vars syms)))))
+
 (defn make-war-handler [app-path war-path mapping class-loader]
   (doto (WebAppContext. (.getCanonicalPath (io/file app-path)) mapping)
     (.setWar war-path)))
@@ -296,7 +316,13 @@
      :handlers {}}))
 
 (defn start! [{:keys [^Server jetty] :as ctx}]
-  (.start jetty)
+  (let [t0 (System/currentTimeMillis)]
+    (log/info "Starting jetty ...")
+    (.start jetty)
+    (log/info "... waiting for listeners")
+    (doseq [l (.getListeners jetty)]
+      (.getLocalPort l))
+    (log/info "... jetty startup finished in" (- t0 (System/currentTimeMillis)) "ms"))
   ctx)
 
 (defn stop! [{:keys [^Server jetty] :as ctx}]
