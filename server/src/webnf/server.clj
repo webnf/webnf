@@ -320,7 +320,7 @@
     (log/info "Starting jetty ...")
     (.start jetty)
     (log/info "... waiting for listeners")
-    (doseq [l (.getListeners jetty)]
+    (doseq [l (.getConnectors jetty)]
       (.getLocalPort l))
     (log/info "... jetty startup finished in" (- t0 (System/currentTimeMillis)) "ms"))
   ctx)
