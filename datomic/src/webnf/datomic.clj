@@ -89,8 +89,9 @@
                                                     :params '~params
                                                     :code ~(pr-str body*)}
                                                    :imports '~imports
-                                                   :requires (conj '~requires
-                                                                   'clojure.repl)))}
+                                                   :requires (into '~requires
+                                                                   '[[clojure.repl]
+                                                                     [clojure.pprint]])))}
                  :db/doc ~doc)))
 
 ;; ## Connection routines
