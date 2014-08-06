@@ -3,6 +3,6 @@
   :url "http://github.com/webnf/webnf"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[webnf/base "0.0.10"]
-                 [com.datomic/datomic-free "0.9.4699"
+  :dependencies [[webnf/base "0.0.11"]
+                 [com.datomic/datomic-free "0.9.4815.12"
                   :exclusions [org.slf4j/slf4j-nop]]])

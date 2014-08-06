@@ -1,4 +1,4 @@
-(defproject webnf/async-servlet "0.1.2"
+(defproject webnf/async-servlet "0.1.3"
   :description "A servlet 3.0 implementation, that enables the async api for ring applications"
   :url "http://github.com/webnf/webnf"
   :license {:name "Eclipse Public License"
@@ -7,9 +7,9 @@
                                    :username "fetch" :password :gpg}]]
   :java-source-paths ["src/jvm"]
   :source-paths ["src/clj"]
-  :dependencies [[webnf.deps/core "0.0.1"]
-                 [ring/ring-servlet "1.2.1"
+  :dependencies [[webnf.deps/core "0.0.4"]
+                 [ring/ring-servlet "1.3.0"
                   :exclusions [javax.servlet/servlet-api]]
                  [org.glassfish/javax.servlet "3.1.1" :scope "provided"]]
 
-  :profiles {:test {:dependencies [[webnf/server "0.0.6"]]}})
+  :profiles {:test {:dependencies [[webnf/server "0.0.11"]]}})
