@@ -76,13 +76,18 @@
         _ (assert (every? known-flags (keys flags)) (str "Flags can be of " known-flags))
         body* `(try ~@body (catch Exception e#
                              (if (instance? clojure.lang.ExceptionInfo e#)
-                               (throw e#)
+                               (throw (ex-info (.getMessage e#)
+                                               (assoc (ex-data e#)
+                                                 :name '~name
+                                                 :args (pr-str ~params))))
                                (throw (ex-info "Wrapped native exception" 
-                                               {:cause
-                                                (let [w# (java.io.StringWriter.)]
-                                                  (binding [*err* w#]
-                                                    (clojure.repl/pst e#))
-                                                  (str w#))})))))]
+                                               {:name '~name
+                                                :args (pr-str ~params)
+                                                :wrapped e#
+                                                :cause (let [w# (java.io.StringWriter.)]
+                                                         (binding [*err* w#]
+                                                           (clojure.repl/pst e#))
+                                                         (str w#))})))))]
     `(assoc-when {:db/id (tempid ~part)
                   :db/ident ~(keyword name)
                   :db/fn (dtm/function (assoc-when {:lang :clojure
