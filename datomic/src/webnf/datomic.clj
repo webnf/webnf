@@ -1,11 +1,15 @@
 (ns webnf.datomic
   "# Datomic connection helpers
    This namespace contains schema helpers, connection and transaction routines"
+  (:import datomic.db.Db)
   (:require
+   [webnf.base :refer [forcat]]
    [webnf.kv :refer [treduce-kv assoc-when]]
+   [clojure.core.match :refer [match]]
    [clojure.core.async :as async :refer [go <! <!! >! >!! close!]]
    [clojure.tools.logging :as log]
-   [datomic.api :as dtm :refer [tempid]]))
+   [datomic.api :as dtm :refer [tempid]]
+   [clojure.core.typed :refer [ann All Keyword]]))
 
 ;; ## Schema generation helpers
 
@@ -55,49 +59,97 @@
                  :db/ident id}
                 :db/doc doc)))
 
-;; # TODO allow for destructoring in param list
-
-(defmacro function
-  "Define a database function to be transacted. Syntax similar to clojure.core/fn, attributes can hold:
-   :part the db partition for the tempid
-   :imports for the db function
-   :requires for the db function"
-  {:arglists (list '[name doc? [& params] & body]
-                   '[name doc? {:imports [& imports] :requires [& requires] :part db-part} [& params] & body])}
-  [name & args]
+(defn- parse-fn-body [name args]
   (let [[doc args] (if (string? (first args))
                      [(first args) (next args)]
                      [nil args])
         [flags [params & body]] (if (map? (first args))
                                   [(first args) (next args)]
                                   [nil args])
-        {:keys [imports requires part] :or {part :db.part/user}} flags
-        known-flags #{:imports :requires :part}
+        known-flags #{:imports :requires :part :db-requires}
         _ (assert (every? known-flags (keys flags)) (str "Flags can be of " known-flags))
-        body* `(try ~@body (catch Exception e#
-                             (if (instance? clojure.lang.ExceptionInfo e#)
-                               (throw (ex-info (.getMessage e#)
-                                               (assoc (ex-data e#)
-                                                 :name '~name
-                                                 :args (pr-str ~params))))
-                               (throw (ex-info "Wrapped native exception" 
-                                               {:name '~name
-                                                :args (pr-str ~params)
-                                                :wrapped e#
-                                                :cause (let [w# (java.io.StringWriter.)]
-                                                         (binding [*err* w#]
-                                                           (clojure.repl/pst e#))
-                                                         (str w#))})))))]
-    `(assoc-when {:db/id (tempid ~part)
-                  :db/ident ~(keyword name)
-                  :db/fn (dtm/function (assoc-when {:lang :clojure
-                                                    :params '~params
-                                                    :code ~(pr-str body*)}
-                                                   :imports '~imports
-                                                   :requires (into '~requires
-                                                                   '[[clojure.repl]
-                                                                     [clojure.pprint]])))}
-                 :db/doc ~doc)))
+        [params' lets] (reduce (fn [[params lets] param]
+                                 (if (symbol? param)
+                                   [(conj params param) lets]
+                                   (let [s (gensym "param-")]
+                                     [(conj params s) (into lets [param s])])))
+                               [[] []] params)
+        {:keys [imports requires part db-requires] :or {part :db.part/user}} flags]
+    {:name name :doc doc :params params' :imports imports :requires requires :db-requires db-requires :part part :lets lets :body body}))
+
+(defn- parse-db-require [r version]
+  (match [r version]
+         [[fn-name] _]                             [nil fn-name nil]
+         [[fn-name :- typ] :transactor]            [nil fn-name nil]
+         [[fn-name :- typ] :local]                 [nil fn-name typ]
+         [[local-name fn-name] _]                  [local-name fn-name nil]
+         [[local-name fn-name :- typ] :transactor] [local-name fn-name nil]
+         [[local-name fn-name :- typ] :local] [local-name fn-name typ]))
+
+(ann extract-fn (All [f] [Db Keyword -> f]))
+(defn ^:no-check extract-fn [db fname]
+  (:db/fn (datomic.api/entity db fname)))
+
+(defn- dbfn-source [{:keys [name doc params body imports requires part db-requires lets]} version]
+  (let [db-sym (first params)]
+    `(let ~(into lets (forcat [r db-requires]
+                              (let [[local-name fn-name typ] (parse-db-require r version)]
+                                [(or local-name (symbol (clojure.core/name fn-name)))
+                                 (if typ
+                                   `(clojure.core.typed/ann-form (extract-fn ~db-sym ~fn-name ) ~typ)
+                                   `(:db/fn (datomic.api/entity ~db-sym ~fn-name)))])))
+       (try ~@body (catch Exception e#
+                     (if (instance? clojure.lang.ExceptionInfo e#)
+                       (throw (ex-info (.getMessage e#)
+                                       (assoc (ex-data e#)
+                                         :name ~(pr-str name)
+                                         :args (pr-str ~params))))
+                       (throw (ex-info "Wrapped native exception" 
+                                       {:name ~(pr-str name)
+                                        :args (pr-str ~params)
+                                        :wrapped e#
+                                        :cause (let [w# (java.io.StringWriter.)]
+                                                 (binding [*err* w#]
+                                                   (clojure.repl/pst e#))
+                                                 (str w#))}))))))))
+
+(defn- make-db-fn [{:keys [name doc params body imports requires part db-requires lets] :as desc}]
+  `(assoc-when {:db/id (tempid ~part)
+                :db/ident ~(keyword name)
+                :db/fn (dtm/function (assoc-when {:lang :clojure
+                                     :params '~params
+                                     :code '~(dbfn-source desc :transactor)}
+                                    :imports '~imports
+                                    :requires (into '~requires
+                                                    '[[clojure.repl]
+                                                      [clojure.pprint]])))}
+               :db/doc ~doc))
+
+(defmacro function
+  "Define a database function to be transacted. Syntax similar to clojure.core/fn, attributes can hold:
+   :part the db partition for the tempid
+   :imports for the db function
+   :requires for the db function
+   :db-requires generates a wrapping let that binds another database function (assumes db as first parameter)"
+  {:arglists (list '[name doc? [& params] & body]
+                   '[name doc? attributes [& params] & body])}
+  [name & args]
+  (make-db-fn (parse-fn-body name args)))
+
+(defmacro defn-db
+  "Defines a database function in regular clojure, for it to be accessible to type checking, direct calling, ...
+   Has the :db/fn entity in :dbfn/entity of var metadata."
+  {:arglists (list '[name doc? [& params] & body]
+                   '[name doc? {:imports [& imports] :requires [& requires] :part db-part} [& params] & body])}
+  [fname & args]
+  (let [{:keys [doc params requires imports] :as desc} (parse-fn-body fname args)]
+    `(do ~@(when (seq requires) [`(require ~@(map (partial list 'quote) requires))])
+         ~@(when (seq imports) [`(import ~@imports)])
+         (defn ~(with-meta (symbol (name fname))
+                  (assoc (meta fname) :dbfn/name (str fname)
+                         :dbfn/entity (make-db-fn desc)))
+           ~@(when doc [doc]) ~params
+           ~(dbfn-source desc :local)))))
 
 ;; ## Connection routines
 
