@@ -9,7 +9,7 @@
    [clojure.core.async :as async :refer [go <! <!! >! >!! close!]]
    [clojure.tools.logging :as log]
    [datomic.api :as dtm :refer [tempid]]
-   [clojure.core.typed :refer [ann All Keyword]]))
+   [clojure.core.typed :as typed :refer [ann All Keyword]]))
 
 ;; ## Schema generation helpers
 
@@ -60,7 +60,10 @@
                 :db/doc doc)))
 
 (defn- parse-fn-body [name args]
-  (let [[doc args] (if (string? (first args))
+  (let [[typ args] (if (= :- (first args))
+                     [(second args) (nnext args)]
+                     [nil args])
+        [doc args] (if (string? (first args))
                      [(first args) (next args)]
                      [nil args])
         [flags [params & body]] (if (map? (first args))
@@ -75,16 +78,22 @@
                                      [(conj params s) (into lets [param s])])))
                                [[] []] params)
         {:keys [imports requires part db-requires] :or {part :db.part/user}} flags]
-    {:name name :doc doc :params params' :imports imports :requires requires :db-requires db-requires :part part :lets lets :body body}))
+    {:name name :doc doc :params params' :imports imports :requires requires :db-requires db-requires
+     :part part :lets lets :body body :typ typ}))
 
-(defn- parse-db-require [r version]
-  (match [r version]
-         [[fn-name] _]                             [nil fn-name nil]
-         [[fn-name :- typ] :transactor]            [nil fn-name nil]
-         [[fn-name :- typ] :local]                 [nil fn-name typ]
-         [[local-name fn-name] _]                  [local-name fn-name nil]
-         [[local-name fn-name :- typ] :transactor] [local-name fn-name nil]
-         [[local-name fn-name :- typ] :local] [local-name fn-name typ]))
+(defn- resolve-db-require [r]
+  (let [[local-name var-name] (match [r]
+                                     [[var-name]] [nil var-name]
+                                     [[local-name var-name]] [local-name var-name])
+        var-sym (if (namespace var-name)
+                  var-name
+                  (symbol (str (ns-name *ns*)) (str var-name)))
+        the-var (find-var var-sym)
+        varm (meta the-var)]
+    (assert varm (str "No var " var-sym))
+    [(or local-name (symbol (name var-name)))
+     (:dbfn/name varm)
+     (:dbfn/type varm)]))
 
 (ann extract-fn (All [f] [Db Keyword -> f]))
 (defn ^:no-check extract-fn [db fname]
@@ -93,10 +102,10 @@
 (defn- dbfn-source [{:keys [name doc params body imports requires part db-requires lets]} version]
   (let [db-sym (first params)]
     `(let ~(into lets (forcat [r db-requires]
-                              (let [[local-name fn-name typ] (parse-db-require r version)]
-                                [(or local-name (symbol (clojure.core/name fn-name)))
-                                 (if typ
-                                   `(clojure.core.typed/ann-form (extract-fn ~db-sym ~fn-name ) ~typ)
+                              (let [[local-name fn-name typ] (resolve-db-require r)]
+                                [local-name
+                                 (if (and typ (= version :local))
+                                   `(clojure.core.typed/ann-form (extract-fn ~db-sym ~fn-name) ~typ)
                                    `(:db/fn (datomic.api/entity ~db-sym ~fn-name)))])))
        (try ~@body (catch Exception e#
                      (if (instance? clojure.lang.ExceptionInfo e#)
@@ -142,12 +151,15 @@
   {:arglists (list '[name doc? [& params] & body]
                    '[name doc? {:imports [& imports] :requires [& requires] :part db-part} [& params] & body])}
   [fname & args]
-  (let [{:keys [doc params requires imports] :as desc} (parse-fn-body fname args)]
+  (let [{:keys [doc params requires typ imports] :as desc} (parse-fn-body fname args)
+        fnsym (symbol (name fname))]
     `(do ~@(when (seq requires) [`(require ~@(map (partial list 'quote) requires))])
          ~@(when (seq imports) [`(import ~@imports)])
-         (defn ~(with-meta (symbol (name fname))
-                  (assoc (meta fname) :dbfn/name (str fname)
-                         :dbfn/entity (make-db-fn desc)))
+         ~@(when typ [`(ann ~fnsym ~typ)])
+         (defn ~(with-meta fnsym
+                  (assoc (meta fname) :dbfn/name (keyword fname)
+                         :dbfn/entity (make-db-fn desc)
+                         :dbfn/type (list 'quote typ)))
            ~@(when doc [doc]) ~params
            ~(dbfn-source desc :local)))))
 
