@@ -4,5 +4,5 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[webnf/base "0.0.11"]
-                 [com.datomic/datomic-free "0.9.4815.12"
+                 [com.datomic/datomic-free "0.9.4880"
                   :exclusions [org.slf4j/slf4j-nop]]])
