@@ -9,7 +9,10 @@
    [clojure.core.async :as async :refer [go <! <!! >! >!! close!]]
    [clojure.tools.logging :as log]
    [datomic.api :as dtm :refer [tempid]]
-   [clojure.core.typed :as typed :refer [ann All Keyword]]))
+   [clojure.core.typed :as typed :refer [ann All Keyword]]
+   [clojure.algo.monads :refer [state-m set-state fetch-state domonad defmonadfn
+                                with-state-field m-fmap]]
+   [clojure.repl]))
 
 ;; ## Schema generation helpers
 
@@ -162,6 +165,36 @@
                          :dbfn/type (list 'quote typ)))
            ~@(when doc [doc]) ~params
            ~(dbfn-source desc :local)))))
+
+(defmacro defm-db
+  "Defines a monad to be run in the current-db state monad"
+  [mname steps expr]
+  `(def ~mname (domonad state-m ~steps ~expr)))
+
+(defn m-transact [tx']
+  (fn [{:keys [db tx ti]}]
+    (let [{:keys [db-after tempids]} (dtm/with db tx')]
+      (assert (distinct? (keys ti) (keys tempids))
+              "Clashing tempids")
+      [db-after
+       {:db db-after
+        :ti (into (or ti {}) tempids)
+        :tx (into (or tx []) tx')}])))
+
+(def m-db (juxt identity :db))
+
+(defn m-resolve-tempid [tid]
+  (fn [{:keys [db tempids] :as st}]
+    [(dtm/resolve-tempid db tempids tid) st]))
+
+(defmonadfn m-entity 
+  ([eid k] (m-fmap k (m-entity eid)))
+  ([eid]
+     (fn [{db :db :as st}]
+       [(dtm/entity db eid) st])))
+
+(defmonadfn m-fn [eid]
+  (m-entity eid :db/fn))
 
 ;; ## Connection routines
 
