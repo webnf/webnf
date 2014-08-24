@@ -1,4 +1,4 @@
-(defproject webnf/base "0.0.11"
+(defproject webnf/base "0.0.12-SNAPSHOT"
   :description "Collection org.clojure libs and essential others"
   :url "http://github.com/webnf/webnf"
   :license {:name "Eclipse Public License"

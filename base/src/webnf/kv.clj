@@ -76,20 +76,44 @@
                  merged m))
     (transient m) maps)))
 
-(let [nnil? (complement nil?)]
+(let [nnil? (fn [k v] (not (nil? v)))]
   (defn assoc-when
-    "Assoc only values matching predicate. Defaults to non-nil"
+    "Assoc only values matching predicate. Defaults to 'value non-nil'"
     {:arglists (list '[m & {:as kvs}]
-                     '[val-pred? m & {:as kvs}])}
+                     '[kv-pred? m & {:as kvs}])}
     [& args]
-    (let [[val-pred? m kvs] (if (even? (count args))
-                              [(first args) (second args) (nnext args)]
-                              [nnil? (first args) (next args)])]
+    (let [[kv-pred? m kvs] (if (even? (count args))
+                             [(first args) (second args) (nnext args)]
+                             [nnil? (first args) (next args)])]
       (loop [tm (transient m)
              [k v & rst :as kvs*] kvs]
         (if (seq kvs*)
-          (recur (if (val-pred? v)
+          (recur (if (kv-pred? k v)
                    (assoc! tm k v)
                    tm)
                  rst)
           (persistent! tm))))))
+
+(defn- assoc-when-arm [p-s k-ex v-ex]
+  `(as-> trans# (let [k# ~k-ex]
+                  (if (~p-s k#)
+                    (let [v# ~v-ex]
+                      (if (~p-s k# v#)
+                        (assoc! trans# k# v#)
+                        trans#))
+                    trans#))))
+
+(let [nnil? `(fn* ([k] true) ([k v] (not (nil? v))))]
+  (defmacro assoc-when*
+    "Calls (kv-pred key) for every key to be assoced. If true, value is evaluated and (kv-pred key val) is called. If true, assoc."
+    {:arglists '([m & {:as kvs}] [kv-pred? m & {:as kvs}])}
+    [& args]
+    (let [[kv-pred-expr m-expr kv-exprs] (if (even? (count args))
+                                           [(first args) (second args) (nnext args)]
+                                           [nnil? (first args) (next args)])
+          pred-s (gensym "pred-")]
+      `(let [~pred-s ~kv-pred-expr]
+         (-> (transient ~m-expr)
+             ~@(for [[kex vex] (partition 2 kv-exprs)]
+                 (assoc-when-arm pred-s kex vex))
+             persistent!)))))
