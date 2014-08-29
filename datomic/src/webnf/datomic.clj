@@ -36,13 +36,13 @@
     (cond-> {:db/id (tempid :db.part/db)
              :db.install/_attribute :db.part/db
              :db/ident id
-             :db/doc doc
              :db/valueType (if (namespace type)
                              type
                              (keyword "db.type" (name type)))
              :db/cardinality (if (:many flags)
                                :db.cardinality/many
                                :db.cardinality/one)}
+            doc (assoc :db/doc doc)
             (:index flags) (assoc :db/index true)
             (:unique flags) (assoc :db/unique
                               (if (:identity flags)
