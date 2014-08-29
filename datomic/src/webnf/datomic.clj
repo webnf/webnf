@@ -235,7 +235,7 @@
            db' db*
            tx-ids {}
            tx' []]
-      (if-let [[tx & rst] txs']
+      (if-let [[tx & rst] (seq txs')]
         (let [{:keys [db-after tempids]} (d/with db' tx)
               tx-ids' (update-tx-ids db' tx-ids tempids)]
           (recur rst db-after tx-ids'
