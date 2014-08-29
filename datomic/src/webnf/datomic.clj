@@ -9,7 +9,7 @@
    [clojure.core.async :as async :refer [go <! <!! >! >!! close!]]
    [clojure.tools.logging :as log]
    [datomic.api :as dtm :refer [tempid]]
-   [clojure.core.typed :as typed :refer [ann All Keyword]]
+   [clojure.core.typed :as typed :refer [ann Any All Keyword List defalias Map HMap HVec I U Seqable]]
    [clojure.algo.monads :refer [state-m set-state fetch-state domonad defmonadfn
                                 with-state-field m-fmap]]
    [clojure.repl]))
@@ -166,35 +166,81 @@
            ~@(when doc [doc]) ~params
            ~(dbfn-source desc :local)))))
 
-(defmacro defm-db
-  "Defines a monad to be run in the current-db state monad"
-  [mname steps expr]
-  `(def ~mname (domonad state-m ~steps ~expr)))
+(defn dbfn-tx
+  "Get transaction for installing a db function
+   Example usage
+   -------------
+   (transact conn (dbfn-tx #'webnf.datomic/compose-tx))"
+  [& fn-vars]
+  (map (comp :dbfn/entity meta) fn-vars))
 
-(defn m-transact [tx']
-  (fn [{:keys [db tx ti]}]
-    (let [{:keys [db-after tempids]} (dtm/with db tx')]
-      (assert (distinct? (keys ti) (keys tempids))
-              "Clashing tempids")
-      [db-after
-       {:db db-after
-        :ti (into (or ti {}) tempids)
-        :tx (into (or tx []) tx')}])))
 
-(def m-db (juxt identity :db))
+(defalias DbId (U datomic.db.DbId Long Keyword (HVec [Keyword Any])))
+(defalias TxItem (U (HVec [Keyword Any *])
+                    (I (Map Keyword Any)
+                       (HMap :mandatory {:db/id DbId}))))
+(defalias Tx (Seqable TxItem))
 
-(defn m-resolve-tempid [tid]
-  (fn [{:keys [db tempids] :as st}]
-    [(dtm/resolve-tempid db tempids tid) st]))
-
-(defmonadfn m-entity 
-  ([eid k] (m-fmap k (m-entity eid)))
-  ([eid]
-     (fn [{db :db :as st}]
-       [(dtm/entity db eid) st])))
-
-(defmonadfn m-fn [eid]
-  (m-entity eid :db/fn))
+(ann compose-tx [Db (Seqable Tx) -> Tx])
+(defn-db webnf.datomic/compose-tx
+  "Composes multiple transactions, into one, as if they got transacted in order
+   Example usage
+   -------------
+   [:webnf.datomic/compose-tx
+    [
+     [[:db/add (tempid :db.part/user) :db/ident :test/entity]]
+     [[:db/add :test/entity :db/doc \"Cool\"]
+      [:db/add (tempid :db.part/user) :db/lang :test/entity]]
+    ]]"
+  {:requires [[datomic.api :as d]]}
+  [db* txs]
+  (letfn [(tx-map-items [tm]
+            (let [id (or (:db/id tm)
+                         (throw (ex-info "Need :db/id" {:t tm})))]
+              (for [[k v] (dissoc tm :db/id)]
+                (if (.startsWith (name k) "_")
+                  [:db/add v (keyword (namespace k) (subs (name k) 1)) id]
+                  [:db/add id k v]))))
+          (tx-tuple-items [db [op & args :as tt]]
+            (case op (:db/add :db/retract) [tt]
+                  (tx-items db (apply (:db/fn (d/entity db op))
+                                      db args))))
+          (tx-items [db tx]
+            (mapcat #(cond (vector? %) (tx-tuple-items db %)
+                           (map? %) (tx-map-items %)
+                           :else (throw (ex-info "Not a tx element" {:t %})))
+                    tx))
+          (update-tx-ids [db tx-ids tempids]
+            (reduce-kv (fn [res tid id]
+                         (if (res id)
+                           res
+                           (assoc res id tid)))
+                       tx-ids tempids))
+          (update-id [db tempids tx-ids id]
+            (let [tx-id (or (d/resolve-tempid db tempids id)
+                            (d/entid db id)
+                            (assert false (str "No id: " id)))]
+              (get tx-ids tx-id tx-id)))
+          (rewrite-tx [db tx tempids tx-ids]
+            (for [[op e a v :as tx-item] (tx-items db tx)]
+              (case op
+                :db/add [op
+                         (update-id db tempids tx-ids e)
+                         a
+                         (if (= :db.type/ref (:db/valueType (d/entity db a)))
+                           (update-id db tempids tx-ids v)
+                           v)]
+                :db/retract tx-item)))]
+    (loop [txs' txs
+           db' db*
+           tx-ids {}
+           tx' []]
+      (if-let [[tx & rst] txs']
+        (let [{:keys [db-after tempids]} (d/with db' tx)
+              tx-ids' (update-tx-ids db' tx-ids tempids)]
+          (recur rst db-after tx-ids'
+                 (into tx' (rewrite-tx db' tx tempids tx-ids'))))
+        tx'))))
 
 ;; ## Connection routines
 
