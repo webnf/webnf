@@ -103,7 +103,7 @@
                         trans#))
                     trans#))))
 
-(let [nnil? `(fn* ([k] true) ([k v] (not (nil? v))))]
+(let [nnil? `(fn* ([k#] true) ([k# v#] (not (nil? v#))))]
   (defmacro assoc-when*
     "Calls (kv-pred key) for every key to be assoced. If true, value is evaluated and (kv-pred key val) is called. If true, assoc."
     {:arglists '([m & {:as kvs}] [kv-pred? m & {:as kvs}])}
