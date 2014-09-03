@@ -6,10 +6,10 @@
             [ring.util.servlet :as servlet]))
 
 (defn status [^AsyncContext async-context status]
-  (servlet/set-status (.getResponse async-context) status))
+  (impl/set-status (.getResponse async-context) status))
 
 (defn headers [^AsyncContext async-context headers]
-  (servlet/set-headers (.getResponse async-context) headers))
+  (impl/set-headers (.getResponse async-context) headers))
 
 (defn flush [^AsyncContext async-context]
   (.flushBuffer (.getResponse async-context)))

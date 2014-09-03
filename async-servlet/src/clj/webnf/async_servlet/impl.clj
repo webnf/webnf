@@ -1,7 +1,7 @@
 (ns webnf.async-servlet.impl
   (:import
    (java.io InputStream File FileInputStream OutputStream)
-   (javax.servlet AsyncListener AsyncContext AsyncEvent ServletConfig)
+   (javax.servlet AsyncListener AsyncContext AsyncEvent ServletConfig ServletException)
    (javax.servlet.http HttpServlet HttpServletRequest HttpServletResponse))
   (:require [ring.util.servlet :as servlet]
             [clojure.tools.logging :as log]
@@ -10,11 +10,15 @@
 (set! *warn-on-reflection* true)
 
 (defn resolve-config-var [^ServletConfig config ^String name]
-  (when-let [vname (.getInitParameter config name)]
-    (let [vsym (symbol vname)
-          ns (symbol (namespace vsym))]
-      (require ns)
-      (resolve vsym))))
+  (try
+    (when-let [vname (.getInitParameter config name)]
+      (let [vsym (symbol vname)
+            ns (symbol (namespace vsym))]
+        (require ns)
+        (resolve vsym)))
+    (catch Exception e
+      (log/fatal e "Error during servlet statup" config)
+      (throw (ServletException. "Error during startup" e)))))
 
 (defmacro with-flush [bindings & body]
   (assert (vector? bindings) "a vector for its binding")
@@ -103,15 +107,37 @@
                 (double (/ (or timeout (.getTimeout ctx)) 1000)))
     (.addListener ctx (make-listener (make-callbacks ctx)))))
 
+(def set-status @#'servlet/set-status)
+(def set-headers @#'servlet/set-headers)
+
+(defn header [rr n]
+  (let [h (.getHeaders rr n)]
+    (if (> (count h) 1)
+      (set h)
+      (first h))))
+(defn header-map [req-or-resp]
+  (reduce #(assoc %1 %2 (header req-or-resp %2))
+          {} (.getHeaderNames req-or-resp)))
+(require '[webnf.base :refer [pprint-str]])
 (defn handle-servlet-request 
   ([handler ^HttpServletRequest request response]
      (let [request-map (assoc (servlet/build-request-map request)
                          :path-info (.getPathInfo request))
-           {:keys [status headers body timeout] :as response-map} (handler request-map)]
+           srh (header-map response)
+           {:keys [status headers body timeout] :as response-map} 
+           (try (handler request-map)
+                (catch Exception e
+                  (log/error e "Uncaught exception during request"
+                             (:request-method request-map)
+                             (:uri request-map))
+                  (throw (ServletException. "Uncaught exception from handler" e))))]
        (when status
-         (servlet/set-status response status))
+         (set-status response status))
        (when-not (empty? headers)
-         (servlet/set-headers response headers))
+         (set-headers response headers))
+       (log/info (pprint-str {:ring-resp-h headers
+                              :start-resp-h srh
+                              :end-resp-h (header-map response)}))
        (if (fn? body)
          (start-async request body timeout)
          (set-body response body)))))
