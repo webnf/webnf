@@ -1,4 +1,4 @@
-(defproject webnf/handler "0.0.11"
+(defproject webnf/handler "0.0.12-SNAPSHOT"
   :description "The first minor release of webnf handler, a collection
   of code to aid web handler development. There is:
   - Browser middlewares
@@ -14,6 +14,6 @@
                                    :username "fetch" :password :gpg}]]
   :source-paths ["src/clj"]
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [webnf/base "0.0.11"]
-                 [webnf/async-servlet "0.1.3"]
-                 [webnf.deps/web "0.0.3"]])
+                 [webnf/base "0.0.12-SNAPSHOT"]
+                 [webnf/async-servlet "0.1.4-SNAPSHOT"]
+                 [webnf.deps/web "0.0.4-SNAPSHOT"]])

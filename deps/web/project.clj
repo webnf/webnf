@@ -1,4 +1,4 @@
-(defproject webnf.deps/web "0.0.3"
+(defproject webnf.deps/web "0.0.4-SNAPSHOT"
   :description "Common dependencies for web apps"
   :url "http://github.com/webnf/webnf"
   :license {:name "Eclipse Public License"
@@ -13,4 +13,6 @@
                  [commons-net "3.3"]
                  [ring/ring-core "1.3.0"]
                  [ring-mock "0.1.5"]
-                 [org.clojure/tools.nrepl "0.2.3"]])
+                 [org.clojure/tools.nrepl "0.2.3"]
+                 [net.cgrand/moustache "1.2.0-alpha2"
+                  :exclusions [ring/ring-core]]])
