@@ -1,6 +1,7 @@
 (ns webnf.base
   "Various primitive core operations that should be 'just there'"
   (:require [clojure.java.io :as io]
+            [clojure.string :as str]
             [clojure.tools.logging :as log]))
 
 (defn make-autoloader
@@ -96,7 +97,7 @@
 
 (autoload clojure.reflect/reflect)
 
-(defn pr-cls [^Class cls & {:as flags :keys [public private protected static fields methods declaring bases final abstract]}]
+(defn pr-cls [^Class cls & {:as flags :keys [public private protected static fields methods declaring bases final abstract all]}]
   (let [{:as want-flags? :keys [public private protected static fields methods declaring bases abstract]}
         (merge {:public true :private false :protected false :static true
                 :fields true :methods true :bases true :declaring false
@@ -105,9 +106,7 @@
         rc (reflect cls :ancestors bases)
         want-member? (fn [{fl :flags dc :declaring-class pt :parameter-types :as mt}]
                        ;; (log/trace (:name mt) dc (keys mt) (:flags mt))
-                       (cond #_#_ (and (not= (name dc) (.getName cls))
-                                       (not bases))
-                             false
+                       (cond all true
                              (and (not pt) (not fields))
                              false
                              :else (every? want-flags?
@@ -145,6 +144,7 @@
                                      (when (seq exception-types)
                                        (cons " throws " (interpose ", " exception-types)))))
                            [";"]
-                           (when declaring [" // from " (str declaring-class)])
+                           (when declaring
+                             [" // " (last (str/split (str declaring-class) #"\."))])
                            ["\n"]))
                   ["}\n"])))))
