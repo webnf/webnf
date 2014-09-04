@@ -28,6 +28,8 @@
 
 (set! *warn-on-reflection* false)
 
+;; Use this to add fcgi services, such as php apps via php-fpm
+
 (defn fcgi-handler [address fcgi-mapping cwd]
   (doto (ServletContextHandler.)
     (.setResourceBase cwd)
@@ -40,14 +42,16 @@
                    (.setInitParameters {"dirAllowed" "true"}))
                  "/")))
 
+;; This is the main workhorse, wrapping servlets into jetty handlers
+
 (defn servlet-handler [servlet-class params mapping
-                       & {:keys [lifecycle-listener]}]
+                       & {:keys [lifecycle-listener class-loader]}]
   (cond-> (doto (ServletContextHandler.)
             (.addServlet (doto (ServletHolder. servlet-class)
                            (.setInitParameters params)
                            (.setAsyncSupported true))
                          mapping)
-            (.setClassLoader (.getClassLoader servlet-class)))
+            (.setClassLoader (or class-loader (.getClassLoader servlet-class))))
           lifecycle-listener (doto (.addLifeCycleListener lifecycle-listener))))
 
 (defn- map-vars [syms cbs]
@@ -58,6 +62,9 @@
 (defn- unmap-vars [syms]
   (let [ns (create-ns 'webnf.server.auto)]
     (dorun (map #(ns-unmap ns %) syms))))
+
+;; Preferrably only use this for small service pages within the app server
+;; Web apps should be loaded within their own classloader and added via servlet handler
 
 (defn ring-handler [service & {:keys [init destroy]}]
   (let [cbs [init destroy service]
@@ -70,27 +77,31 @@
                                               :starting #(map-vars syms cbs)
                                               :stopped #(unmap-vars syms)))))
 
-(defn war-handler [app-path war-path mapping #_class-loader
-                   & {:keys [add-system-classes]}]
-  (let [wac (WebAppContext. (.getCanonicalPath (io/file app-path)) mapping)
-        ;; wcl (WebAppClassLoader. class-loader wac)
-        ]
+;; In a test case, a nexus .war seems to run best with the default
+;; generated classloader by jetty, with no logback from outside.
+;; i.e. no add-system-classes and no class-loader
+
+(defn war-handler [app-path war-path mapping
+                   & {:keys [add-system-classes class-loader]}]
+  (let [wac (WebAppContext. (.getCanonicalPath (io/file app-path)) mapping)]
     (doseq [sc add-system-classes]
       (.addSystemClass wac sc))
+    (when class-loader
+      (doto wac
+        (.setClassLoader (WebAppClassLoader. class-loader wac))
+        (.setParentLoaderPriority true)))
     (doto wac
-      (.setWar war-path)
-      ;; (.setClassLoader wcl)
-      ;; (.setParentLoaderPriority true)
-      )))
+      (.setWar war-path))))
 
+;; Construct a host component
 
-(defn host [& {:keys [id handler vhosts]}]
-  (cmp/using
-   (scmp/map->HostComponent
-    {:id id
-     :handler (doto handler
-                (.setVirtualHosts (into-array String vhosts)))})
-   {:container ::container}))
+(defn host [id handler & {:keys [vhosts]}]
+  (cmp/system-map
+   :id id
+   :handler (doto handler
+              (.setVirtualHosts (into-array String vhosts)))))
+
+;; Construct a jetty component
 
 (defn server [& {:keys [host port idle-timeout header-size
                         default-handler min-threads max-threads
@@ -103,7 +114,7 @@
         conn-facts (into-array ConnectionFactory
                                [(HttpConnectionFactory. 
                                  (doto (HttpConfiguration.)
-                                   (.setSendDateHeader false)
+                                   (.setSendDateHeader true)
                                    (.setSendServerVersion false)
                                    (.setRequestHeaderSize header-size)
                                    (.setResponseHeaderSize header-size)))])
@@ -138,32 +149,30 @@
       :default-handler default-handler
       :identify identify
       :logging-queue logging-queue
-      :hosts (cmp/using (cmp/system-map ::container container)
-                        {::container :container})
+      :handlers (cmp/system-map)
       :vhosts #{}})))
 
-
-(defn add-host [{:as server :keys [hosts vhosts jetty]}
-                {:as host-cmp :keys [id handler]}]
-  (let [cmp-vhosts (set (.getVirtualHosts handler))]
-    (when (get hosts id)
-      (throw (ex-info (str "Host " id " is already running" {:id id}))))
+(defn add-host [{:as server :keys [handlers jetty container]}
+                id handler & {:keys [vhosts]}]
+  (when vhosts (.setVirtualHosts handler (into-array String vhosts)))
+  (let [cmp-vhosts (set (.getVirtualHosts handler))
+        vhosts (:vhosts server)]
+    (when (get handlers id)
+      (throw (ex-info (str "Host " id " is already added" {:id id}))))
     (when-let [have (seq (set/intersection vhosts cmp-vhosts))]
       (throw (ex-info (str "Vhosts " (str/join ", " have) " are already mapped")
                       {:id id :cmp-vhosts cmp-vhosts :vhosts vhosts})))
+    (.addHandler container handler)
     (-> server
-        (assoc :hosts  (assoc hosts id host-cmp)
-               :vhosts (into vhosts cmp-vhosts))
-        (cond-> (.isRunning jetty)
-                (update-in [:hosts] cmp/update-system [id] #'cmp/start)))))
+        (assoc :handlers  (assoc handlers id handler)
+               :vhosts (into vhosts cmp-vhosts)))))
 
-(defn remove-host [{:as server :keys [hosts vhosts jetty]}
-                   id]
-  (let [host (or (get hosts id)
-                 (throw (ex-info (str "No handler with " id) {:id id})))
-        cmp-vhosts (set (.getVirtualHosts (:handler host)))]
+(defn remove-host [{:as server :keys [handlers vhosts jetty container]}
+                   id & _]
+  (let [handler (or (get handlers id)
+                    (throw (ex-info (str "No handler with " id) {:id id})))
+        cmp-vhosts (set (.getVirtualHosts handler))]
+    (.removeHandler container handler)
     (-> server
-        (cond-> (.isRunning jetty)
-                (update-in [:hosts] cmp/update-system [id] #'cmp/stop))
-        (assoc :hosts (dissoc hosts id)
+        (assoc :hosts (dissoc handlers id)
                :vhosts (set/difference vhosts cmp-vhosts)))))

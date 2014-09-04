@@ -66,6 +66,49 @@
                     :when (not (ex?# h#))]
                 [h# (.getHeader re# h#)]))))
 
+(defn make-lifecycle-listener [& {:keys [^Runnable starting
+                                         ^Runnable started
+                                         ^Runnable stopping
+                                         ^Runnable stopped
+                                         ^Runnable failure]}]
+  (reify LifeCycle$Listener
+    (lifeCycleStarting [_ event]
+      (log/trace "LifeCycle Starting" event)
+      (when starting (.run starting)))
+    (lifeCycleStarted [_ event]
+      (log/trace "LifeCycle Started" event)
+      (when started (.run started)))
+    (lifeCycleStopping [_ event]
+      (log/trace "LifeCycle Stopping" event)
+      (when stopping (.run stopping)))
+    (lifeCycleStopped [_ event]
+      (log/trace "LifeCycle Stopped" event)
+      (when stopped (.run stopped)))
+    (lifeCycleFailure [_ event cause]
+      (log/debug cause "LifeCycle Failure" event)
+      (when failure (.run failure)))))
+
+(defn ensure-uuids [req resp client-cookie session-cookie request-id-header uuid-provider]
+  (try
+    (when (and client-cookie (nil? (.getAttribute req "webnf.client.id")))
+      (ensure-uuid-cookie! req resp client-cookie "webnf.client.id" (* 60 60 24 356) uuid-provider))
+    (when (and session-cookie (nil? (.getAttribute req "webnf.session.id")))
+      (ensure-uuid-cookie! req resp session-cookie "webnf.session.id" -1 uuid-provider))
+    (when (and request-id-header (nil? (.getAttribute req "webnf.request.id")))
+      (let [id (uuid-provider)]
+        (.setHeader resp ^String request-id-header (str id))
+        (.setAttribute req "webnf.request.id" id)))
+    (catch Exception e
+      (log/error e "In id-ceptor")
+      (throw e))))
+
+(defn request-id-ceptor
+  ([{:keys [client-cookie session-cookie request-id-header uuid-provider] :as conf
+     :or {uuid-provider #(UUID/randomUUID)}}]
+     (reify JettyInterceptor
+       (onEvent [_ req resp]
+         (ensure-uuids req resp client-cookie session-cookie request-id-header uuid-provider)))))
+
 (defn reify-request [^Request request ^Response response]
   (-> {:request/protocol (.getProtocol request)
        :request/scheme (.getScheme request)
@@ -97,46 +140,6 @@
        :request.http/auth-type (.getAuthType request)
        :request.http/cookies (seq (map from-cookie (.getCookies request)))
        :request.http/query-params (.getQueryString request))))
-
-(defn make-lifecycle-listener [& {:keys [^Runnable starting
-                                         ^Runnable started
-                                         ^Runnable stopping
-                                         ^Runnable stopped
-                                         ^Runnable failure]}]
-  (reify LifeCycle$Listener
-    (lifeCycleStarting [_ event]
-      (log/trace "LifeCycle Starting" event)
-      (when starting (.run starting)))
-    (lifeCycleStarted [_ event]
-      (log/trace "LifeCycle Started" event)
-      (when started (.run started)))
-    (lifeCycleStopping [_ event]
-      (log/trace "LifeCycle Stopping" event)
-      (when stopping (.run stopping)))
-    (lifeCycleStopped [_ event]
-      (log/trace "LifeCycle Stopped" event)
-      (when stopped (.run stopped)))
-    (lifeCycleFailure [_ event cause]
-      (log/debug cause "LifeCycle Failure" event)
-      (when failure (.run failure)))))
-
-(defn request-id-ceptor
-  ([{:keys [client-cookie session-cookie request-id-header uuid-provider] :as conf
-     :or {uuid-provider #(UUID/randomUUID)}}]
-     (reify JettyInterceptor
-       (onEvent [_ req resp]
-         (try
-           (when (and client-cookie (nil? (.getAttribute req "webnf.client.id")))
-             (ensure-uuid-cookie! req resp client-cookie "webnf.client.id" (* 60 60 24 356) uuid-provider))
-           (when (and session-cookie (nil? (.getAttribute req "webnf.session.id")))
-             (ensure-uuid-cookie! req resp session-cookie "webnf.session.id" -1 uuid-provider))
-           (when (and request-id-header (nil? (.getAttribute req "webnf.request.id")))
-             (let [id (uuid-provider)]
-               (.setHeader resp ^String request-id-header (str id))
-               (.setAttribute req "webnf.request.id" id)))
-           (catch Exception e
-             (log/error e "In id-ceptor")
-             (throw e)))))))
 
 (defn request-log-ceptor [^Queue queue]
   (reify JettyInterceptor

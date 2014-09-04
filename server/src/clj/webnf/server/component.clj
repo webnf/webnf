@@ -2,15 +2,41 @@
   (:require [com.stuartsierra.component :as cmp]
             [clojure.tools.logging :as log]
             [webnf.kv :refer [map-vals map-kv treduce-kv assoc-when*]]
+            [webnf.base :refer [pr-cls]]
             [webnf.server.util :refer [request-id-ceptor request-log-ceptor]]
             [clojure.set :as set]
             [clojure.string :as str])
   (:import (org.eclipse.jetty.server Server)
            (org.eclipse.jetty.servlet ServletContextHandler)
            (org.eclipse.jetty.server.handler HandlerCollection HandlerList)
+           (org.eclipse.jetty.util.component LifeCycle)
            webnf.server.JettyHandlerWrapper))
 
-(defrecord ServerComponent [^Server jetty container default-handler identify logging-queue hosts vhosts]
+(extend-protocol cmp/Lifecycle
+  LifeCycle
+  (start [lc] (when-not (.isRunning lc) (.start lc)) lc)
+  (stop [lc] (when-not (.isStopped lc) (.stop lc)) lc)
+  Server
+  (start [jetty]
+    (when-not (.isRunning jetty)
+      (let [t0 (System/currentTimeMillis)]
+        (log/info "Starting jetty ...")
+        (.start jetty)
+        (log/info "... waiting for listeners")
+        (doseq [l (.getConnectors jetty)]
+          (.getLocalPort l))
+        (log/info "... jetty startup finished in" (- (System/currentTimeMillis) t0) "ms")))
+    jetty)
+  (stop [jetty]
+    (when-not (.isStopped jetty)
+      (let [t0 (System/currentTimeMillis)]
+        (log/info "Stopping jetty ...")
+        (.stop jetty)
+        (.join jetty)
+        (log/info "... jetty stopped in" (- (System/currentTimeMillis) t0) "ms")))
+    jetty))
+
+(defrecord ServerComponent [^Server jetty container default-handler identify logging-queue handlers vhosts]
   cmp/Lifecycle
   (start [this]
     (if (.isRunning jetty)
@@ -26,31 +52,10 @@
                                                    (when identify (request-id-ceptor identify))
                                                    (when logging-queue (request-log-ceptor logging-queue)))
                              handler))
-        (log/info "Starting jetty ...")
-        (.start jetty)
-        (log/info "... waiting for listeners")
-        (doseq [l (.getConnectors jetty)]
-          (.getLocalPort l))
-        (log/info "... jetty startup finished in" (- (System/currentTimeMillis) t0) "ms")
-        (assoc this :hosts (cmp/start hosts)))))
+        (cmp/start-system this [:jetty]))))
   (stop [this]
-    (if (.isRunning jetty)
-      (do
-        (.stop jetty)
-        (.join jetty)
-        (assoc this :hosts (cmp/stop hosts)))
-      this)))
+    (cmp/stop-system this [:jetty])))
 
-(defrecord HostComponent [^HandlerCollection container ^ServletContextHandler handler]
-  cmp/Lifecycle
-  (start [this]
-    (.addHandler container handler)
-    (.start handler)
-    this)
-  (stop [this]
-    (.stop handler)
-    (.removeHandler container handler)
-    this))
 
 (comment
   (defrecord PrComponent [id]
