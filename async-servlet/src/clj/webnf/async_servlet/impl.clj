@@ -115,10 +115,12 @@
     (if (> (count h) 1)
       (set h)
       (first h))))
+
 (defn header-map [req-or-resp]
   (reduce #(assoc %1 %2 (header req-or-resp %2))
           {} (.getHeaderNames req-or-resp)))
-(require '[webnf.base :refer [pprint-str]])
+
+#_(require '[webnf.base :refer [pprint-str]])
 (defn handle-servlet-request 
   ([handler ^HttpServletRequest request response]
      (let [request-map (assoc (servlet/build-request-map request)
@@ -135,9 +137,9 @@
          (set-status response status))
        (when-not (empty? headers)
          (set-headers response headers))
-       (log/info (pprint-str {:ring-resp-h headers
-                              :start-resp-h srh
-                              :end-resp-h (header-map response)}))
+       #_(log/debug (pprint-str {:ring-resp-h headers
+                                 :start-resp-h srh
+                                 :end-resp-h (header-map response)}))
        (if (fn? body)
          (start-async request body timeout)
          (set-body response body)))))
