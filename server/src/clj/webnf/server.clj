@@ -158,7 +158,7 @@
   (let [cmp-vhosts (set (.getVirtualHosts handler))
         vhosts (:vhosts server)]
     (when (get handlers id)
-      (throw (ex-info (str "Host " id " is already added" {:id id}))))
+      (throw (ex-info (str "Host " id " is already added") {:id id})))
     (when-let [have (seq (set/intersection vhosts cmp-vhosts))]
       (throw (ex-info (str "Vhosts " (str/join ", " have) " are already mapped")
                       {:id id :cmp-vhosts cmp-vhosts :vhosts vhosts})))
@@ -174,5 +174,5 @@
         cmp-vhosts (set (.getVirtualHosts handler))]
     (.removeHandler container handler)
     (-> server
-        (assoc :hosts (dissoc handlers id)
+        (assoc :handlers (dissoc handlers id)
                :vhosts (set/difference vhosts cmp-vhosts)))))
