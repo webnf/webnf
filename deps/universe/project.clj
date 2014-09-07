@@ -15,4 +15,6 @@
                  [net.mikera/core.matrix "0.29.1"]
                  [net.mikera/vectorz-clj "0.25.0"]
                  [instaparse "1.3.3"]
-                 [com.stuartsierra/component "0.2.1"]])
+                 [com.stuartsierra/component "0.2.2"]
+                 [de.kotka/lazymap "3.1.1"]
+                 [org.reflections/reflections "0.9.9-RC2"]])
