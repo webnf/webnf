@@ -13,7 +13,8 @@
   :repositories [["bendlas-nexus" {:url "http://nexus.bendlas.net/content/groups/public"
                                    :username "fetch" :password :gpg}]]
   :source-paths ["src/clj"]
-  :dependencies [[org.clojure/clojure "1.6.0"]
+  :dependencies [[org.clojure/clojure "1.7.0-alpha2"]
                  [webnf/base "0.0.12-SNAPSHOT"]
                  [webnf/async-servlet "0.1.4-SNAPSHOT"]
-                 [webnf.deps/web "0.0.4-SNAPSHOT"]])
+                 [webnf.deps/web "0.0.4-SNAPSHOT"]
+                 [com.lambdaworks/scrypt "1.4.0"]])
