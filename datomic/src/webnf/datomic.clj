@@ -2,17 +2,15 @@
   "# Datomic connection helpers
    This namespace contains schema helpers, connection and transaction routines"
   (:import datomic.db.Db)
-  (:require
-   [webnf.base :refer [forcat]]
-   [webnf.kv :refer [treduce-kv assoc-when]]
-   [clojure.core.match :refer [match]]
-   [clojure.core.async :as async :refer [go <! <!! >! >!! close!]]
-   [clojure.tools.logging :as log]
-   [datomic.api :as dtm :refer [tempid]]
-   [clojure.core.typed :as typed :refer [ann Any All Keyword List defalias Map HMap HVec I U Seqable]]
-   [clojure.algo.monads :refer [state-m set-state fetch-state domonad defmonadfn
-                                with-state-field m-fmap]]
-   [clojure.repl]))
+  (:require [clojure.core.async :as async :refer [go <! <!! >! >!! close!]]
+            [clojure.core.match :refer [match]]
+            [clojure.core.typed :as typed :refer [ann Any All Keyword List defalias Map HMap HVec I U Seqable]]
+            [clojure.repl]
+            [clojure.string :as str]
+            [clojure.tools.logging :as log]
+            [datomic.api :as dtm :refer [tempid]]
+            [webnf.base :refer [forcat]]
+            [webnf.kv :refer [treduce-kv assoc-when]]))
 
 ;; ## Schema generation helpers
 

@@ -25,7 +25,7 @@
   (let [[id-sym attr & clauses] (if (symbol? (first args))
                                   args (cons (?qsym "id") args))]
     {:find [id-sym]
-     :where (into [['?id attr]] clauses)}))
+     :where (into [[id-sym attr]] clauses)}))
 
 (defn by-value "Query entities where attribute is of value"
   {:arglists '([id-sym attr value & clauses] [attr value & clauses])}
