@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DIRS="`echo deps/{core,dev,web,contrib}` base async-servlet cljs enlive.cljs enlive.clj handler server"
+DIRS="`echo deps/{core,dev,web,contrib,universe}` base async-servlet cljs enlive.cljs enlive.clj handler server"
 
 for d in $DIRS; do
     echo "Running '$@' in $d"
