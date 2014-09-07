@@ -5,5 +5,5 @@
   :url "http://github.com/webnf/webnf"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojurescript "0.0-2280"]
+  :dependencies [[org.clojure/clojurescript "0.0-2322"]
                  [webnf.deps/core "0.0.4"]])

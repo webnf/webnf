@@ -97,7 +97,9 @@
 
 (autoload clojure.reflect/reflect)
 
-(defn pr-cls [^Class cls & {:as flags :keys [public private protected static fields methods declaring bases final abstract all]}]
+(defn pr-cls
+  "Print class in java-like syntax"
+  [^Class cls & {:as flags :keys [public private protected static fields methods declaring bases final abstract all]}]
   (let [{:as want-flags? :keys [public private protected static fields methods declaring bases abstract]}
         (merge {:public true :private false :protected false :static true
                 :fields true :methods true :bases true :declaring false

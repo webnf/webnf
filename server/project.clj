@@ -8,11 +8,11 @@
   :java-source-paths ["src/jvm"]
   :javac-options ["-source" "1.7"]
   :source-paths ["src/clj"]
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [webnf/async-servlet "0.1.3"]
+  :dependencies [[org.clojure/clojure "1.7.0-alpha2"]
+                 [webnf/async-servlet "0.1.4-SNAPSHOT"]
                  [webnf/base "0.0.12-SNAPSHOT"]
                  [webnf.deps/web "0.0.3"]
-                 [ring/ring-servlet "1.3.0"
+                 [ring/ring-servlet "1.3.1"
                   :exclusions [javax.servlet/servlet-api]]
 
                  [org.eclipse.jetty/jetty-servlet "9.2.2.v20140723"]

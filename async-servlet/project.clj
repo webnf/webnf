@@ -7,9 +7,9 @@
                                    :username "fetch" :password :gpg}]]
   :java-source-paths ["src/jvm"]
   :source-paths ["src/clj"]
-  :dependencies [[org.clojure/clojure "1.6.0"]
+  :dependencies [[org.clojure/clojure "1.7.0-alpha2"]
                  [webnf.deps/core "0.0.4"]
-                 [ring/ring-servlet "1.3.0"
+                 [ring/ring-servlet "1.3.1"
                   :exclusions [javax.servlet/servlet-api]]
                  [javax.servlet/javax.servlet-api "3.1.0" :scope "provided"]]
 

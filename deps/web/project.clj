@@ -11,8 +11,8 @@
                  [commons-codec "1.9"]
                  [javax.mail/mail "1.4.7"]
                  [commons-net "3.3"]
-                 [ring/ring-core "1.3.0"]
+                 [ring/ring-core "1.3.1"]
                  [ring-mock "0.1.5"]
-                 [org.clojure/tools.nrepl "0.2.3"]
+                 [org.clojure/tools.nrepl "0.2.5"]
                  [net.cgrand/moustache "1.2.0-alpha2"
                   :exclusions [ring/ring-core]]])
