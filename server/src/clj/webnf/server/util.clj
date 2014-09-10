@@ -60,11 +60,12 @@
 
 (defmacro headers [to-seq re exclude?]
   `(let [re# ~re
+         to-seq# ~to-seq
          ex?# ~exclude?]
-     (into {} (for [H# (~to-seq (.getHeaderNames re#))
+     (into {} (for [H# (to-seq# (.getHeaderNames re#))
                     :let [h# (.toLowerCase ^String H#)]
                     :when (not (ex?# h#))]
-                [h# (.getHeader re# h#)]))))
+                [h# (to-seq# (.getHeaders re# h#))]))))
 
 (defn make-lifecycle-listener [& {:keys [^Runnable starting
                                          ^Runnable started
@@ -118,7 +119,6 @@
        :request/host (.getServerName request)
        :request/port (.getServerPort request)
        :remote/ip (.getRemoteAddr request)
-       :remote/host (.getRemoteHost request)
        :remote/port (.getRemotePort request)
 
        :request.http/method (.toUpperCase (.getMethod request))
@@ -130,16 +130,16 @@
        :response.http/headers (headers collection-seq response #{ ;"x-request-id"
                                                                  })
 
-       :request.servlet/content-read (.getContentRead request)
-       :response.servlet/content-written (.getContentCount response)}
+       :request/content-read (.getContentRead request)
+       :response/content-written (.getContentCount response)}
       (assoc-when*
        :remote/user (.getRemoteUser request)
-       :request/client-id (.getAttribute request "webnf.client.id")
-       :request/session-id (.getAttribute request "webnf.session.id")
-       :request/id (.getAttribute request "webnf.request.id")
+       :client.webnf/id (.getAttribute request "webnf.client.id")
+       :session.webnf/id (.getAttribute request "webnf.session.id")
+       :request.webnf/id (.getAttribute request "webnf.request.id")
        :request.http/auth-type (.getAuthType request)
        :request.http/cookies (seq (map from-cookie (.getCookies request)))
-       :request.http/query-params (.getQueryString request))))
+       :request.http/query-string (.getQueryString request))))
 
 (defn request-log-ceptor [^Queue queue]
   (reify JettyInterceptor
