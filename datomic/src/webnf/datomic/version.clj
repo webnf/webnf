@@ -74,7 +74,8 @@
        (ensure-schema! conn ident version nil))
      (and schema-tx (major= version version'))
      (do (log/info "Auto upgrading schema" ident "from version" version' "to" version)
-         @(dtm/transact conn schema-tx)
+         @(dtm/transact conn (cons [:db.fn/retractEntity (:db/id version-info)]
+                                   schema-tx))
          (recur conn ident version schema-tx))
      :else (throw (ex-info (str "Version of [" ident " " version' "] doesn't match expected version " version)
                            {:schema ident :has-version version' :expect-version version})))))
