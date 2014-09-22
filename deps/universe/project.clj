@@ -5,7 +5,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[webnf.deps/core "0.0.4"]
-                 [webnf.deps/dev "0.0.2"]
+                 [webnf.deps/dev "0.0.3-SNAPSHOT"]
                  [webnf.deps/web "0.0.4-SNAPSHOT"]
                  [webnf.deps/contrib "0.0.4-SNAPSHOT"]
                  [com.lambdaworks/scrypt "1.4.0"]
@@ -17,4 +17,5 @@
                  [instaparse "1.3.3"]
                  [com.stuartsierra/component "0.2.2"]
                  [de.kotka/lazymap "3.1.1"]
-                 [org.reflections/reflections "0.9.9-RC2"]])
+                 [org.reflections/reflections "0.9.9-RC2"]
+                 [amazonica "0.2.25"]])
