@@ -179,6 +179,14 @@
                        (HMap :mandatory {:db/id DbId}))))
 (defalias Tx (Seqable TxItem))
 
+(defn-db webnf.datomic/compose-with-results
+  [prev-with-result with-result]
+  (let [{:keys [rev-tempids tempids tx-data]} prev-with-result
+        {:keys [db-after] tempids* :tempids tx-data* :tx-data}
+        rev-tempids* (update-tx-ids rev-tempids tempids*)]
+    {:rev-tempids rev-tempids*
+     :tempids (merge tempids)}))
+
 (ann compose-tx [Db (Seqable Tx) -> Tx])
 (defn-db webnf.datomic/compose-tx
   "Composes multiple transactions, into one, as if they got transacted in order

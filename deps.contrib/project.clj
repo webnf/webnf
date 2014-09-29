@@ -1,8 +1,6 @@
-(defproject webnf.deps/contrib "0.0.4-SNAPSHOT"
+(defproject webnf.deps/contrib "0.1.0-SNAPSHOT"
+  :plugins [[lein-modules "0.3.9"]]
   :description "Depend on projects covered by clojure's CA"
-  :url "http://github.com/webnf/webnf"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/algo.generic "0.1.2"]
                  [org.clojure/algo.monads "0.1.5"]
                  [org.clojure/clojurescript "0.0-2356"]
@@ -36,7 +34,7 @@
                  [org.clojure/math.numeric-tower "0.0.4"]
                  [org.clojure/test.check "0.5.9"]
                  [org.clojure/test.generative "0.5.1"]
-                 [org.clojure/tools.analayzer "0.6.0"]
+                 [org.clojure/tools.analyzer "0.6.0"]
                  [org.clojure/tools.analyzer.js "0.1.0-beta4"]
                  [org.clojure/tools.analyzer.jvm "0.6.0"]
                  [org.clojure/tools.cli "0.3.1"]
