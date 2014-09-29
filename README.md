@@ -80,7 +80,7 @@ container, really.
 
 ### Why not Ring?
 
-Actually Ring. Plus lot's of tidbits, that don't fit into ring's scope
+Actually Ring. Plus lots of tidbits, that don't fit into ring's scope
 and some that might.
 
 ### Why not Pedestal?
