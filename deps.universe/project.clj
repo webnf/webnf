@@ -2,7 +2,7 @@
   :plugins [[lein-modules "0.3.9"]]
   :description "The uber dependency to get a full set of popular
   dependencies. For development or when you have room in your .m2 repo."
-  :dependencies [[webnf.deps/core "_"]
+  :dependencies [[webnf.deps/logback "_"]
                  [webnf.deps/dev "_"]
                  [webnf.deps/web "_"]
                  [webnf.deps/contrib "_"]

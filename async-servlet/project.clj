@@ -4,7 +4,7 @@
   :java-source-paths ["src/jvm"]
   :source-paths ["src/clj"]
   :dependencies [[org.clojure/clojure "_"]
-                 [webnf.deps/core "_"]
+                 [webnf.deps/logback "_"]
                  [ring/ring-servlet "1.3.1"
                   :exclusions [javax.servlet/servlet-api]]
                  [javax.servlet/javax.servlet-api "3.1.0" :scope "provided"]]

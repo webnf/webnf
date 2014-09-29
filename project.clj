@@ -18,9 +18,9 @@
               :aliases      {"all" ^:displace ["do" "clean," "test," "install"]
                              "-f" ["with-profile" "+fast"]}
               :scm          {:dir ".."}}
-             :dirs ["deps.core" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
+             :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
                     "async-servlet" "base" "cljs" "datomic" "enlive.clj" "enlive.cljs" "handler" "server"]
              :versions {org.clojure/clojure           "1.6.0"
-                        webnf "0.1.0-SNAPSHOT"
-                        webnf.deps "0.1.0-SNAPSHOT"
-                        webnf/async-servlet "0.1.4-SNAPSHOT"}})
+                        webnf                         "0.1.0-SNAPSHOT"
+                        webnf.deps                    "0.1.0-SNAPSHOT"
+                        webnf/async-servlet           "0.1.4-SNAPSHOT"}})

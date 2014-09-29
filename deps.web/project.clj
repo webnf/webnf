@@ -2,8 +2,7 @@
   :plugins [[lein-modules "0.3.9"]]
   :description "Common dependencies for web apps"
   :url "http://github.com/webnf/webnf"
-  :dependencies [[webnf.deps/core "_"]
-                 [nl.bitwalker/UserAgentUtils "1.2.4"]
+  :dependencies [[nl.bitwalker/UserAgentUtils "1.2.4"]
                  [net.sourceforge.cssparser/cssparser "0.9.14"]                 
                  [org.lesscss/lesscss "1.7.0.1.1"
                   :exclusions [org.slf4j/slf4j-simple]]

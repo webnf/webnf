@@ -4,4 +4,4 @@
   - port of strint from clojure.core.incubator
   - Event delecation helper in webnf.event"
   :dependencies [[org.clojure/clojurescript "0.0-2356"]
-                 [webnf.deps/core "_"]])
+                 [webnf/base "_"]])
