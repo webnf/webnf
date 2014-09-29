@@ -5,4 +5,5 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[clj-stacktrace "0.2.8"]
                  [clojure-complete "0.2.4"]
-                 [criterium "0.4.3"]])
+                 [criterium "0.4.3"]
+                 [prone "0.6.0"]])
