@@ -1,0 +1,16 @@
+<configuration> <!--scan="true" scanPeriod="4 seconds"-->
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%-5level %logger{36}: %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="datomic" level="INFO" />
+  <!--logger name="foo.bar.Class" level="INFO" /-->
+
+  <root level="TRACE">
+    <appender-ref ref="STDOUT" />
+  </root>
+
+</configuration>
