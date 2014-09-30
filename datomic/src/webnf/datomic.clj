@@ -87,8 +87,8 @@
                                      [[var-name]] [nil var-name]
                                      [[local-name var-name]] [local-name var-name])
         var-sym (if (namespace var-name)
-                  var-name
-                  (symbol (str (ns-name *ns*)) (str var-name)))
+                  (symbol (namespace var-name) (name var-name))
+                  (symbol (str (ns-name *ns*)) (name var-name)))
         the-var (find-var var-sym)
         varm (meta the-var)]
     (assert varm (str "No var " var-sym))
@@ -116,12 +116,8 @@
                                          :args (pr-str ~params))))
                        (throw (ex-info "Wrapped native exception" 
                                        {:name ~(pr-str name)
-                                        :args (pr-str ~params)
-                                        :wrapped e#
-                                        :cause (let [w# (java.io.StringWriter.)]
-                                                 (binding [*err* w#]
-                                                   (clojure.repl/pst e#))
-                                                 (str w#))}))))))))
+                                        :args (pr-str ~params)}
+                                       e#))))))))
 
 (defn- make-db-fn [{:keys [name doc params body imports requires part db-requires lets] :as desc}]
   `(assoc-when {:db/id (tempid ~part)
@@ -179,14 +175,6 @@
                        (HMap :mandatory {:db/id DbId}))))
 (defalias Tx (Seqable TxItem))
 
-(defn-db webnf.datomic/compose-with-results
-  [prev-with-result with-result]
-  (let [{:keys [rev-tempids tempids tx-data]} prev-with-result
-        {:keys [db-after] tempids* :tempids tx-data* :tx-data}
-        rev-tempids* (update-tx-ids rev-tempids tempids*)]
-    {:rev-tempids rev-tempids*
-     :tempids (merge tempids)}))
-
 (ann compose-tx [Db (Seqable Tx) -> Tx])
 (defn-db webnf.datomic/compose-tx
   "Composes multiple transactions, into one, as if they got transacted in order
@@ -236,32 +224,40 @@
                          (if (= :db.type/ref (:db/valueType (d/entity db a)))
                            (update-id db tempids tx-ids v)
                            v)]
-                :db/retract tx-item)))]
+                :db/retract tx-item)))
+          (into-tx [tx-base tx]
+            (persistent!
+             (reduce (fn [res [_ e a :as item]]
+                       (assoc! res [e a] item))
+                     (transient tx-base) tx)))]
     (loop [txs' txs
            db' db*
            tx-ids {}
-           tx' []]
+           tx' {}]
       (if-let [[tx & rst] (seq txs')]
         (let [{:keys [db-after tempids]} (d/with db' tx)
               tx-ids' (update-tx-ids db' tx-ids tempids)]
           (recur rst db-after tx-ids'
-                 (into tx' (rewrite-tx db' tx tempids tx-ids'))))
-        tx'))))
+                 (into-tx tx' (rewrite-tx db' tx tempids tx-ids'))))
+        (vals tx')))))
 
 ;; ## Connection routines
 
 (defn connect
   "Create and connect to database. If created, transact schema.
    Return connection."
-  [db-uri schema & init-data]
-  (let [created (dtm/create-database db-uri)
-        conn (dtm/connect db-uri)]
-    (when created
-      (log/info "Creating schema on" db-uri)
-      @(dtm/transact conn schema)
-      (doseq [d init-data]
-        @(dtm/transact conn d)))
-    conn))
+  ([db-uri]
+     (dtm/create-database db-uri)
+     (dtm/connect db-uri))
+  ([db-uri schema & init-data]
+     (let [created (dtm/create-database db-uri)
+           conn (dtm/connect db-uri)]
+       (when created
+         (log/info "Creating schema on" db-uri)
+         @(dtm/transact conn schema)
+         (doseq [d init-data]
+           @(dtm/transact conn d)))
+       conn)))
 
 (defn recreate!!
   "Drop database and recreate, returning connection."
