@@ -34,8 +34,8 @@
 
 (deftest assoc-when-test
   (let [res-str (with-out-str
-                  (is (= (assoc-when pos? (do (println "Init")
-                                              {})
+                  (is (= (assoc-when #(pos? %2) (do (println "Init")
+                                                    {})
                                      :keyA (do (print "Steps: 0")
                                                0)
                                      :keyB (do (print " 1")
