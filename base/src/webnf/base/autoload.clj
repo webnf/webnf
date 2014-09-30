@@ -3,7 +3,7 @@
 
 (defn make-autoloader
   "PRIVATE used by autoload macro"
-  [replace-var var-ns var-name static]
+  [replace-var var-ns var-name static macro]
   (fn [& args]
     (log/trace (str "Autoloading " var-ns " for " var-name))
     (require var-ns)
@@ -11,6 +11,8 @@
           f (if static
               (deref target-var)
               target-var)]
+      (assert (= (boolean macro) (boolean (:macro (meta target-var))))
+              (str replace-var " macro: " (boolean macro) "; " target-var " macro: " (not macro)))
       (alter-var-root replace-var (constantly f))
       (alter-meta! replace-var (constantly (meta target-var)))
       (apply f args))))
@@ -27,7 +29,7 @@
   (let [mm (meta var-name)
         vn (with-meta (symbol (name var-name)) mm)
         vns (symbol (namespace var-name))]
-    `(def ~vn (make-autoloader #'~vn '~vns '~vn ~(:static mm)))))
+    `(def ~vn (make-autoloader #'~vn '~vns '~vn ~(:static mm) ~(:macro mm)))))
 
 (defmacro autoload-some
   "Autoload multiple vars like in import:
@@ -42,6 +44,6 @@
                 `(autoload-some
                   ~@(let [ns (name (first spec))
                           mm (meta spec)]
-                      (map #(with-meta (symbol ns (name %)) mm)
+                      (map #(with-meta (symbol ns (name %)) (merge mm (meta %)))
                            (rest spec))))
                 `(autoload ~spec)))))
