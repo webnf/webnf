@@ -1,11 +1,15 @@
 (ns webnf.test-util
   (:require 
-   [clojure.test :refer [assert-expr report]]))
    [webnf.base :refer [autoload autoload-some forcat]]
+   [clojure.test :refer [assert-expr report]]
+   [clojure.core.unify :refer [unify]]))
 
+;; clojure.test/is extensions
+
+
+                                        ;  (submap? super sub) form useable as a predicate in test-is.
+                                        ;  Checks for every entry in sub whether its value is equal.
 (defmethod assert-expr 'submap?
-  "(submap? super sub) form useable as a predicate in test-is.
-  Checks for every entry in sub whether its value is equal."
   [msg form]
   (let [[_ supermap submap] form]
     `(let [supermap# ~supermap
@@ -17,6 +21,23 @@
              (report {:type :fail :message ~msg
                       :expected (list '~'= (list k# supermap#) (list k# submap#))
                       :actual (list '~'not= gv# ev#)})))))))
+
+(defmethod assert-expr 'match?
+  [msg form]
+  (let [[op arg pattern binding & body] form
+        uf `(try (let [res# (unify ~arg ~pattern)]
+                   (report {:type :pass :message ~msg})
+                   res#)
+                 (catch Exception e#
+                   (report {:type :fail :message ~msg
+                            :expected '~(list op arg pattern)
+                            :actual (.getMessage e#)})
+                   false))]
+    (if binding
+      `(when-let [res# ~uf]
+         (let [~binding res#]
+           ~@body))
+      uf)))
 
 ;; ## Mock requests
 
