@@ -1,8 +1,7 @@
 (ns webnf.test-util
   (:require 
-   [ring.mock.request :refer [request]]
-   [clojure.data.codec.base64 :as base64]
    [clojure.test :refer [assert-expr report]]))
+   [webnf.base :refer [autoload autoload-some forcat]]
 
 (defmethod assert-expr 'submap?
   "(submap? super sub) form useable as a predicate in test-is.
@@ -19,15 +18,21 @@
                       :expected (list '~'= (list k# supermap#) (list k# submap#))
                       :actual (list '~'not= gv# ev#)})))))))
 
+;; ## Mock requests
+
+(def ^:private b64-enc
+  (delay (sun.misc.BASE64Encoder.)))
+
 (defn basic-auth-str 
   "Construct a basic auth string for mock requests"
   [user pw]
-  (str "Basic " (String. (base64/encode (.getBytes (str user \: pw) "UTF-8")))))
+  (str "Basic " (String. (.encode
+                          ^sun.misc.BASE64Encoder @b64-enc
+                          (.getBytes (str user \: pw) "UTF-8")))))
 
-(defn basic-authenticated-request
+(defn basic-authenticate-request
   "Construct a basic-authenticated ring request"
-  [method uri user pw]
-  (assoc-in (request method uri)
-            [:headers "authorization"]
+  [req user pw]
+  (assoc-in req [:headers "authorization"]
             (basic-auth-str user pw)))
 
