@@ -28,3 +28,14 @@
   "Concat the return value of a for expression"
   [bindings body]
   `(apply concat (for ~bindings ~body)))
+
+(defmacro static-case
+  "Variant of case where keys are evaluated at compile-time
+   WARNING: only use this for dispatch values with stable hashes,
+     like edn literals, java Enums, ..."
+  [val & cases]
+  `(case ~val
+     ~@(forcat [[field thunk] (partition 2 cases)]
+               [(eval field) thunk])
+     ~@(when (odd? (count cases))
+         [(last cases)])))
