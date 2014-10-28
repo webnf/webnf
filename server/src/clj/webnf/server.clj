@@ -5,6 +5,7 @@
    [clojure.string :as str]
    [ring.util.servlet :as servlet]
    [clojure.tools.logging :as log]
+   [webnf.base :refer [hostname]]
    [webnf.server.util :as util]
    [webnf.server.component :as scmp]
    [com.stuartsierra.component :as cmp])
@@ -176,3 +177,12 @@
     (-> server
         (assoc :handlers (dissoc handlers id)
                :vhosts (set/difference vhosts cmp-vhosts)))))
+
+(defn quick-serve! [handler & {:keys [vhosts port]
+                               :or {port 8080}}]
+  (-> (server :port port)
+      (add-host
+       :main (ring-handler handler)
+       :vhosts (into ["127.0.0.1" "localhost" (hostname)] vhosts))
+      cmp/start))
+
