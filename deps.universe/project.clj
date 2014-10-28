@@ -9,13 +9,13 @@
 
                  ;; Algorithms
                  [com.lambdaworks/scrypt "1.4.0"]
-                 [net.mikera/core.matrix "0.29.1"]
-                 [instaparse "1.3.3"]
+                 [net.mikera/core.matrix "0.30.2"]
+                 [instaparse "1.3.4"]
 
                  ;; Data formats
                  [clj-time "0.8.0"]
-                 [net.mikera/vectorz-clj "0.25.0"]
-                 [org.reflections/reflections "0.9.9-RC2"]
+                 [net.mikera/vectorz-clj "0.26.1"]
+                 [org.reflections/reflections "0.9.9"]
 
                  ;; Evaluation controllers
                  [com.stuartsierra/component "0.2.2"]
@@ -23,4 +23,4 @@
 
                  ;; APIs
                  [clj-http "1.0.0"]
-                 [amazonica "0.2.25" :exclusions [joda-time]]])
+                 [amazonica "0.2.28" :exclusions [joda-time]]])

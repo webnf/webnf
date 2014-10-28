@@ -24,6 +24,7 @@
                         webnf                         "0.1.0-SNAPSHOT"
                         webnf.deps                    "0.1.0-SNAPSHOT"
                         webnf/async-servlet           "0.1.4-SNAPSHOT"
-                        webnf.deps/logback            "0.1.0-alpha1"
-                        webnf/base                    "0.1.0-alpha1"
-                        webnf/datomic                 "0.1.0-alpha1"}})
+                        webnf.deps/logback            "0.1.0-alpha2"
+                        webnf/base                    "0.1.0-alpha2"
+                        webnf/datomic                 "0.1.0-alpha2"
+                        webnf/cljs                    "0.1.0-alpha2"}})
