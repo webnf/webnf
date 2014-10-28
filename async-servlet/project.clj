@@ -1,4 +1,4 @@
-(defproject webnf/async-servlet "0.1.4-SNAPSHOT"
+(defproject webnf/async-servlet "0.1.4"
   :plugins [[lein-modules "0.3.9"]]
   :description "A servlet 3.0 implementation, that enables the async api for ring applications"
   :java-source-paths ["src/jvm"]
