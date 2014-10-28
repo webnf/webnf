@@ -29,116 +29,9 @@
   "Makes a js object from a map"
   (comp (scat js-obj) (scat concat)))
 
-;; ### jQuery helper functions
-;;
-;; These functions just let you pass in strings to interact with
-;; jQuery and other plain javascript method calls without externs.
-;; The closure compiler will eliminate double string literals, so we
-;; can get away with this.
-
-(defn $a*
-  "Apply window.jQuery to a js array of args"
-  [arrgs]
-  (.apply (aget js/window "jQuery")
-          nil
-          arrgs))
-
-(defn $* 
-  "Apply window.jQuery to args"
-  [& args]
-  ($a* (to-array args)))
-
-(defn $a- 
-  "Call string method on obj with array of args"
-  [obj meth arrgs]
-  (and obj
-       (.apply (aget obj meth) obj arrgs)))
-
-(defn $- 
-  "Call string method on obj with args"
-  [obj meth & args]
-  ($a- obj meth (to-array args)))
-
-(defn $$ 
-  "Call window.jQuery.<method> with args"
-  [meth & args]
-  ($a- (aget js/window "jQuery") meth (to-array args)))
-
-(defn $
-  "Call window.jQuery(obj).<method> with args"
-  ([obj] ((aget js/window "jQuery") obj))
-  ([obj meth & args]
-     ($a- ($ obj) meth (to-array args))))
-
-(defn $?
-  "jQuery predicate: array with length > 0"
-  [jq] (and jq (pos? (alength jq))))
-
-;; ## Async load infrastructure
-
-(defn eval-js
-  "Evaluate javascript string by adding a script tag to the document head"
-  [thunk]
-  (.appendChild 
-   (.-head js/document)
-   (dom/createDom "script" nil thunk)))
-
-(defn add-stylesheets
-  "Add a links to style sheets to the document head"
-  [& hrefs]
-  (doseq [href hrefs]
-    (dom/appendChild (.-head js/document)
-                     (dom/createDom "link" (js-obj "href" href
-                                                   "rel" "stylesheet")))))
-
-;; Here is some infrastructure to load up javascript asynchronously,
-;; but still keep the order of evaluation for dynamically loading
-;; dependencies with subdependencies and interleave javascript loaded
-;; from a server with javascript written inline.
-
-(defn- load-init-fetch [fetched-atom after-load scripts]
-  (doseq [src scripts]
-    (XhrIo/send src (fn [e]
-                      (let [xhr (.-target e)]
-                        (when (= NET/COMPLETE (.-type e))
-                          (swap! fetched-atom assoc
-                                 src
-                                 (.getResponseText xhr))
-                          (after-load)))))))
-
-(defn take-completed [todo-steps fetched]
-  (loop [[[op data] :as steps] todo-steps
-         result {:thunks []}]
-    (if-not (seq steps)
-      (assoc result :todo steps)
-      (case op
-        :eval (recur (rest steps) 
-                     (update-in result [:thunks] 
-                                conj data))
-        :src  (if-let [t (fetched data)]
-                (recur (rest steps)
-                       (update-in result [:thunks]
-                                  conj t))
-                (assoc result :todo steps))))))
-
-(defn queued-load [& type-steps]
-  (let [q (partition 2 type-steps)
-        fetched-atom (atom {})
-        todo-atom (atom q)
-        after-load (fn after-load []
-                     (let [{:keys [thunks todo]} (take-completed @todo-atom @fetched-atom)]
-                       (doseq [thunk thunks]
-                         (eval-js thunk))
-                       (reset! todo-atom todo)))]
-    (load-init-fetch fetched-atom after-load
-                     (map second (filter (comp #(= :src %) first)
-                                         q)))
-    (after-load)))
-
-
 ;; ### XHR
 
-;; why is this not in gclosure?
+;; how is this not in gclosure?
 
 (defn hmap
   "Parse the headers of an XmlHttpRequest"
@@ -159,6 +52,11 @@
      :headers (hmap (.getAllResponseHeaders t))
      :body (.getResponseText t)}))
 
+(defn- as-str [o]
+  (if (keyword? o)
+    (name o)
+    (str o)))
+
 (defn xhr
   "Request an uri with XmlHttpRequest, return channel that will
   receive response in ring format {:uri :status :headers :body}
@@ -175,7 +73,7 @@
            headers (and headers (to-js headers))
            rp (callback-read-port (fn [result]
                                     (XhrIo/send uri (comp result parse-xhr-response)
-                                                method body headers)))]
+                                                (as-str method) body headers)))]
        (if auto-refresh
          rp (promise rp)))))
 

@@ -19,12 +19,28 @@
                    val#))))
 
 (autoload clojure.pprint/pprint)
+
 (defn pprint-str
-  "Return value pretty-printed into a string"
-  [o]
-  (with-out-str (pprint o)))
+  "Return value pretty-printed into a string.
+   Allows for clojure.pprint/*print-right-margin* to be passed as second argument"
+  ([o] (with-out-str (pprint o)))
+  ([o right-margin]
+     (require 'clojure.pprint)
+     (binding [clojure.pprint/*print-right-margin* right-margin]
+       (pprint-str o))))
 
 (defmacro forcat
   "Concat the return value of a for expression"
   [bindings body]
   `(apply concat (for ~bindings ~body)))
+
+(defmacro static-case
+  "Variant of case where keys are evaluated at compile-time
+   WARNING: only use this for dispatch values with stable hashes,
+     like edn literals, java Enums, ..."
+  [val & cases]
+  `(case ~val
+     ~@(forcat [[field thunk] (partition 2 cases)]
+               [(eval field) thunk])
+     ~@(when (odd? (count cases))
+         [(last cases)])))
