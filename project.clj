@@ -24,6 +24,7 @@
                         webnf.deps                    "0.1.0-SNAPSHOT"
                         webnf.deps/logback            "0.1.0-alpha2"
                         webnf.deps/dev                "0.1.0-alpha2"
+                        webnf.deps/web                "0.1.0-alpha2"
                         webnf                         "0.1.0-SNAPSHOT"
                         webnf/async-servlet           "0.1.4-SNAPSHOT"
                         webnf/base                    "0.1.0-alpha2"
