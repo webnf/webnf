@@ -316,3 +316,21 @@
       (h (assoc req
            :datomic/conn conn
            :datomic/db (dtm/db conn))))))
+
+;; ### Race - free report queue
+
+(defmacro with-report-queue
+  "Wrapper for tx-report-queue. This ensures, that tx-report-queue is closed, so you have to finish using the report queue in the body. Additionally, a base-db value is passed in a race-free manner."
+  [conn [base-db-sym queue-sym] & body]
+  `(let [conn# ~conn
+         q# (dtm/tx-report-queue conn#)
+         ~queue-sym q#]
+     (try
+       (loop [~base-db-sym
+              (let [db# (dtm/db conn#)
+                    {qdb# :db-after} (.poll ^java.util.Queue q#)]
+                (if (and qdb# (> (dtm/base-t qdb#)
+                                 (dtm/base-t db#)))
+                  qdb# db#))]
+         ~@body)
+       (finally (dtm/remove-tx-report-queue conn#)))))
