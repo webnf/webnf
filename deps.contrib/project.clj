@@ -1,4 +1,4 @@
-(defproject webnf.deps/contrib "0.1.0-SNAPSHOT"
+(defproject webnf.deps/contrib "0.1.0-alpha2"
   :plugins [[lein-modules "0.3.9"]]
   :description "Depend on projects covered by clojure's CA"
   :dependencies [[org.clojure/algo.generic "0.1.2"]
@@ -27,21 +27,21 @@
                  [org.clojure/data.zip "0.1.1"]
                  [org.clojure/java.classpath "0.2.2"]
                  [org.clojure/java.data "0.1.1"]
-                 [org.clojure/java.jdbc "0.3.5"]
+                 [org.clojure/java.jdbc "0.3.6"]
                  [org.clojure/java.jmx "0.3.0"]
                  [org.clojure/jvm.tools.analyzer "0.6.1"]
                  [org.clojure/math.combinatorics "0.0.8"]
                  [org.clojure/math.numeric-tower "0.0.4"]
                  [org.clojure/test.check "0.5.9"]
                  [org.clojure/test.generative "0.5.1"]
-                 [org.clojure/tools.analyzer "0.6.2"]
+                 [org.clojure/tools.analyzer "0.6.3"]
                  [org.clojure/tools.analyzer.js "0.1.0-beta4"]
-                 [org.clojure/tools.analyzer.jvm "0.6.3"]
+                 [org.clojure/tools.analyzer.jvm "0.6.4"]
                  [org.clojure/tools.cli "0.3.1"]
                  [org.clojure/tools.emitter.jvm "0.1.0-beta5"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.macro "0.1.5"]
                  [org.clojure/tools.namespace "0.2.7"]
                  [org.clojure/tools.nrepl "0.2.6"]
-                 [org.clojure/tools.reader "0.8.10"]
+                 [org.clojure/tools.reader "0.8.12"]
                  [org.clojure/tools.trace "0.7.8"]])

@@ -21,10 +21,7 @@
              :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
                     "async-servlet" "base" "cljs" "datomic" "enlive.clj" "enlive.cljs" "handler" "server"]
              :versions {org.clojure/clojure           "1.6.0"
-                        webnf.deps                    "0.1.0-SNAPSHOT"
-                        webnf.deps/logback            "0.1.0-alpha2"
-                        webnf.deps/dev                "0.1.0-alpha2"
-                        webnf.deps/web                "0.1.0-alpha2"
+                        webnf.deps                    "0.1.0-alpha2"
                         webnf                         "0.1.0-SNAPSHOT"
                         webnf/async-servlet           "0.1.4"
                         webnf/base                    "0.1.0-alpha2"
