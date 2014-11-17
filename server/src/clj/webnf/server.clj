@@ -183,6 +183,7 @@
   (-> (server :port port)
       (add-host
        :main (ring-handler handler)
-       :vhosts (into ["127.0.0.1" "localhost" (hostname)] vhosts))
+       :vhosts (when (seq vhosts)
+                 (into ["127.0.0.1" "localhost" (hostname)] vhosts)))
       cmp/start))
 
