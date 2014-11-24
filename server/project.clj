@@ -1,4 +1,4 @@
-(defproject webnf/server "0.1.0-SNAPSHOT"
+(defproject webnf/server "0.1.0-alpha3"
   :plugins [[lein-modules "0.3.9"]]
   :description "Vhost functionality with servlets and a jetty runner"
   :java-source-paths ["src/jvm"]
@@ -11,7 +11,7 @@
                  [ring/ring-servlet "1.3.1"
                   :exclusions [javax.servlet/servlet-api]]
 
-                 [org.eclipse.jetty/jetty-servlet "9.3.0.M0"]
-                 [org.eclipse.jetty/jetty-webapp "9.3.0.M0"]
-                 [org.eclipse.jetty.fcgi/fcgi-server "9.3.0.M0"]
+                 [org.eclipse.jetty/jetty-servlet "9.3.0.M1"]
+                 [org.eclipse.jetty/jetty-webapp "9.3.0.M1"]
+                 [org.eclipse.jetty.fcgi/fcgi-server "9.3.0.M1"]
                  [com.stuartsierra/component "0.2.2"]])

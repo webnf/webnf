@@ -1,8 +1,10 @@
 (ns webnf.datomic
   "# Datomic connection helpers
    This namespace contains schema helpers, connection and transaction routines"
-  (:import datomic.db.Db)
-  (:require [clojure.core.async :as async :refer [go <! <!! >! >!! close!]]
+  (:import datomic.db.Db
+           (java.util.concurrent BlockingQueue TimeUnit))
+  (:require [clojure.core.async :as async :refer [go go-loop <! <!! >! >!! close! chan mult tap untap alt! put!]]
+            [clojure.core.async.impl.protocols :refer [closed?]]
             [clojure.core.match :refer [match]]
             [clojure.core.typed :as typed :refer [ann Any All Keyword List defalias Map HMap HVec I U Seqable]]
             [clojure.repl]
@@ -319,18 +321,62 @@
 
 ;; ### Race - free report queue
 
-(defmacro with-report-queue
-  "Wrapper for tx-report-queue. This ensures, that tx-report-queue is closed, so you have to finish using the report queue in the body. Additionally, a base-db value is passed in a race-free manner."
-  [conn [base-db-sym queue-sym] & body]
-  `(let [conn# ~conn
-         q# (dtm/tx-report-queue conn#)
-         ~queue-sym q#]
-     (try
-       (loop [~base-db-sym
-              (let [db# (dtm/db conn#)
-                    {qdb# :db-after} (.poll ^java.util.Queue q#)]
-                (if (and qdb# (> (dtm/base-t qdb#)
-                                 (dtm/base-t db#)))
-                  qdb# db#))]
-         ~@body)
-       (finally (dtm/remove-tx-report-queue conn#)))))
+(defn listen-reports
+  "Connect to db and open a tx report queue.
+   Listener channels can be added and removed by put!-ing tap and untap messages to ctl-chan:
+   (put! ctl-chan [:tap listener-channel])
+   (put! ctl-chan [:untap listener-channel])
+   The first message on a freshly tapped listener channel will always be {:db most-current-db}
+   Then, datomic transaction reports will arrive as they are received from the report queue."
+  [db-uri ctl-chan]
+  (let [conn (connect db-uri)
+        ^BlockingQueue q (dtm/tx-report-queue conn)
+        report-chan (chan)
+        out-chan (chan)
+        out-mult (mult out-chan)]
+    ;; Set up loop to pull tx updates from the report queue and put them on report-chan
+    (go (try (loop []
+               (log/trace "TX Q step")
+               (when-not (closed? ctl-chan)
+                 (when-let [report (.poll q 10 TimeUnit/SECONDS)]
+                   (log/trace "Received TX report from Q" report)
+                   (>! report-chan report))
+                 (recur)))
+             (finally
+               (log/trace "Closing TX Q")
+               (dtm/remove-tx-report-queue conn)
+               (close! report-chan))))
+    ;; Loop to transfer from report-chan to the out mult,
+    ;; + handling taps and untaps
+    (go-loop [db (let [db (dtm/db conn)
+                       {qdb :db-after} (.poll q)]
+                   (if (and qdb (> (dtm/basis-t qdb)
+                                   (dtm/basis-t db)))
+                     qdb db))]
+      (log/trace "Delivery step")
+      (alt! report-chan ([{:as report :keys [db-after]}]
+                         (cond (nil? report)
+                               (do (log/error "Report chan closed, closing control-chan")
+                                   (close! ctl-chan)
+                                   {:error :report-chan-died})
+
+                               (> (dtm/basis-t db-after)
+                                  (dtm/basis-t db))
+                               (do (log/trace "Delivering TX report" report)
+                                   (>! out-chan report)
+                                   (recur db-after))
+
+                               :else (recur db)))
+            ctl-chan ([ctl-msg]
+                      (log/trace "Receiving CTL message" ctl-msg)
+                      (match [ctl-msg]
+                             [nil] (do (close! out-chan)
+                                       {:success :shutdown})
+                             [{:control :tap :channel ch}] (do (put! ch {:db db})
+                                                               (tap out-mult ch)
+                                                               (recur db))
+                             [{:control :untap :channel ch}] (do (untap out-mult ch)
+                                                                 (recur db))
+                             :else (do (log/error "Unknown control message" ctl-msg)
+                                       (log/info "Resuming control loop")
+                                       (recur db))))))))

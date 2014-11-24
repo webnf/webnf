@@ -1,4 +1,4 @@
-(defproject webnf.deps/contrib "0.1.0-alpha2"
+(defproject webnf.deps/contrib "0.1.0-alpha3"
   :plugins [[lein-modules "0.3.9"]]
   :description "Depend on projects covered by clojure's CA"
   :dependencies [[org.clojure/algo.generic "0.1.2"]
@@ -32,11 +32,11 @@
                  [org.clojure/jvm.tools.analyzer "0.6.1"]
                  [org.clojure/math.combinatorics "0.0.8"]
                  [org.clojure/math.numeric-tower "0.0.4"]
-                 [org.clojure/test.check "0.5.9"]
+                 [org.clojure/test.check "0.6.1"]
                  [org.clojure/test.generative "0.5.1"]
-                 [org.clojure/tools.analyzer "0.6.3"]
-                 [org.clojure/tools.analyzer.js "0.1.0-beta4"]
-                 [org.clojure/tools.analyzer.jvm "0.6.4"]
+                 [org.clojure/tools.analyzer "0.6.4"]
+                 [org.clojure/tools.analyzer.js "0.1.0-beta5"]
+                 [org.clojure/tools.analyzer.jvm "0.6.5"]
                  [org.clojure/tools.cli "0.3.1"]
                  [org.clojure/tools.emitter.jvm "0.1.0-beta5"]
                  [org.clojure/tools.logging "0.3.1"]

@@ -102,12 +102,14 @@
     (map #(.cloneNode % true) node-or-nodes)
     (.cloneNode node-or-nodes true)))
 
+(declare random-uuid)
+
 (let [rex (js/RegExp. "[018]" "g")
       replacer #(.toString (bit-xor % (bit-shift-right
                                        (* 16 (js/Math.random))
                                        (/ % 4)))
                            16)
       ;; short for "10000000-1000-4000-8000-100000000000"
-      init-string (+ #js[1e7] -1e3 -4e3 -8e3 -1e11)]
+      init-string (str 1e7 -1e3 -4e3 -8e3 -1e11)]
   (defn random-uuid "Return a random UUID as string"
     [] (.replace init-string rex replacer)))

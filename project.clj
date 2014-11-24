@@ -1,4 +1,4 @@
-(defproject webnf/parent "0.1.0-SNAPSHOT"
+(defproject webnf/parent "0.1.0-alpha3"
   :plugins [[lein-modules "0.3.9"]]
 
   :profiles {:provided
@@ -21,9 +21,6 @@
              :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
                     "async-servlet" "base" "cljs" "datomic" "enlive.clj" "enlive.cljs" "handler" "server"]
              :versions {org.clojure/clojure           "1.6.0"
-                        webnf.deps                    "0.1.0-alpha2"
-                        webnf                         "0.1.0-SNAPSHOT"
-                        webnf/async-servlet           "0.1.4"
-                        webnf/base                    "0.1.0-alpha2"
-                        webnf/datomic                 "0.1.0-alpha2"
-                        webnf/cljs                    "0.1.0-alpha2"}})
+                        webnf                         "0.1.0-alpha3"
+                        webnf.deps                    "0.1.0-alpha3"
+                        webnf/async-servlet           "0.1.5"}})
