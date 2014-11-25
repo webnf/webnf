@@ -10,6 +10,11 @@
   []
   (.. java.net.InetAddress getLocalHost getHostName))
 
+(defn local-ip
+  "Get the ip of localhost"
+  []
+  (.. java.net.InetAddress getLocalHost getHostAddress))
+
 (defn reset-logging-config!
   "Pass a path to a logback config (default logback.xml) to reset the
    logging configuration"

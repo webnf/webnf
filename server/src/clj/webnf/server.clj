@@ -5,7 +5,7 @@
    [clojure.string :as str]
    [ring.util.servlet :as servlet]
    [clojure.tools.logging :as log]
-   [webnf.base :refer [hostname]]
+   [webnf.base :refer [hostname local-ip]]
    [webnf.server.util :as util]
    [webnf.server.component :as scmp]
    [com.stuartsierra.component :as cmp])
@@ -94,14 +94,6 @@
     (doto wac
       (.setWar war-path))))
 
-;; Construct a host component
-
-(defn host [id handler & {:keys [vhosts]}]
-  (cmp/system-map
-   :id id
-   :handler (doto handler
-              (.setVirtualHosts (into-array String vhosts)))))
-
 ;; Construct a jetty component
 
 (defn server [& {:keys [host port idle-timeout header-size
@@ -153,37 +145,42 @@
       :handlers (cmp/system-map)
       :vhosts #{}})))
 
-(defn add-host [{:as server :keys [handlers jetty container]}
-                id handler & {:keys [vhosts]}]
-  (when vhosts (.setVirtualHosts handler (into-array String vhosts)))
-  (let [cmp-vhosts (set (.getVirtualHosts handler))
-        vhosts (:vhosts server)]
-    (when (get handlers id)
-      (throw (ex-info (str "Host " id " is already added") {:id id})))
+(defn- add-host [{:as server :keys [handlers jetty container vhosts]} handler]
+  (let [cmp-vhosts (set (.getVirtualHosts handler))]
     (when-let [have (seq (set/intersection vhosts cmp-vhosts))]
       (throw (ex-info (str "Vhosts " (str/join ", " have) " are already mapped")
-                      {:id id :cmp-vhosts cmp-vhosts :vhosts vhosts})))
+                      {:handler handler :cmp-vhosts cmp-vhosts :vhosts vhosts})))
     (.addHandler container handler)
     (-> server
-        (assoc :handlers  (assoc handlers id handler)
-               :vhosts (into vhosts cmp-vhosts)))))
+        (assoc :vhosts (into vhosts cmp-vhosts)))))
 
-(defn remove-host [{:as server :keys [handlers vhosts jetty container]}
-                   id & _]
-  (let [handler (or (get handlers id)
-                    (throw (ex-info (str "No handler with " id) {:id id})))
-        cmp-vhosts (set (.getVirtualHosts handler))]
+(defn- remove-host [{:as server :keys [handlers vhosts jetty container]} handler]
+  (let [cmp-vhosts (set (.getVirtualHosts handler))]
     (.removeHandler container handler)
     (-> server
-        (assoc :handlers (dissoc handlers id)
-               :vhosts (set/difference vhosts cmp-vhosts)))))
+        (assoc :vhosts (set/difference vhosts cmp-vhosts)))))
+
+(defn add-handler [server id {:keys [vhosts handler] :as cmp}]
+  (when (seq vhosts)
+    (.setVirtualHosts handler (into-array String vhosts)))
+  (-> server
+      (add-host handler)
+      (cmp/update-system [:handlers] assoc id cmp)))
+
+(defn remove-handler [server id]
+  (let [{handler :handler :as cmp} (get-in server [:handlers id])]
+    (cmp/stop cmp)
+    (-> server
+        (remove-host handler)
+        (cmp/update-system [:handlers] dissoc id))))
 
 (defn quick-serve! [handler & {:keys [vhosts port]
                                :or {port 8080}}]
   (-> (server :port port)
-      (add-host
-       :main (ring-handler handler)
-       :vhosts (when (seq vhosts)
-                 (into ["127.0.0.1" "localhost" (hostname)] vhosts)))
+      (add-host (cond-> (ring-handler handler)
+                        (seq vhosts)
+                        (doto (.setVirtualHosts
+                               (into-array String (into #{"127.0.0.1" "localhost"
+                                                          (hostname) (local-ip)}
+                                                        vhosts))))))
       cmp/start))
-
