@@ -30,13 +30,17 @@
 (autoload clojure.reflect/reflect)
 (defn pr-cls
   "Print class in java-like syntax"
-  [^Class cls & {:as flags :keys [public private protected static fields methods declaring bases final abstract all]}]
+  [cls & {:as flags :keys [public private protected static fields methods declaring bases final abstract all]}]
   (let [{:as want-flags? :keys [public private protected static fields methods declaring bases abstract]}
         (merge {:public true :private false :protected false :static true
                 :fields true :methods true :bases true :declaring false
                 :final true :abstract true}
                flags)
-        rc (reflect cls :ancestors bases)
+        rc (reflect cls
+                    :ancestors bases
+                    :reflector (clojure.reflect.JavaReflector.
+                                (or (and (class? cls) (.getClassLoader ^Class cls))
+                                    (.getContextClassLoader (Thread/currentThread)))))
         want-member? (fn [{fl :flags dc :declaring-class pt :parameter-types :as mt}]
                        ;; (log/trace (:name mt) dc (keys mt) (:flags mt))
                        (cond all true
