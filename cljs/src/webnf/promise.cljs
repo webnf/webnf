@@ -6,27 +6,38 @@
    [cljs.core.async :refer [<!]])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
+(defn- wrap-error [e]
+  (if (instance? js/Error e) e (js/Error e)))
+
 (defprotocol IPromise
   (-deliver [p val])
-  (-deliver-error [p e]))
+  (-deliver-error [p e])
+  (-on-deliver [p value-cb] [p value-cb error-cb]))
 
 (deftype Promise [^:mutable value ^:mutable error ^:mutable waiters]
+  Object
+  (toString [_]
+    (str "Promise:"
+     (case value
+       :webnf.promise/pending "Pending"
+       :webnf.promise/error error
+       (str "Delivered: " value))))
   async/ReadPort
   (take! [p handler]
     (when (async/active? handler)
-      (if (= :webnf.promise/pending value)
-        (do (set! waiters (cons handler waiters))
-            nil)
+      (case value
+        :webnf.promise/pending (do (set! waiters (cons handler waiters))
+                                   nil)
+        :webnf.promise/error (do (async/commit handler)
+                                 error)
         (do (async/commit handler)
-            p))))
+            value))))
 
   IDeref
   (-deref [p]
-    (condp = value 
-      :webnf.promise/pending
-      (throw (ex-info "Can't deref a pending promise in cljs, sorry" {:webnf/promise p}))
-      :webnf.promise/error
-      error
+    (case value 
+      :webnf.promise/pending (throw (ex-info "Can't deref a pending promise in cljs, sorry" {:webnf/promise p}))
+      :webnf.promise/error (throw error)
       
       value))
 
@@ -35,7 +46,10 @@
     (when-not (= value :webnf.promise/pending)
       (throw (ex-info "Can't deliver on a promise more than once" {:webnf/promise p :new-value val})))
     (set! value :webnf.promise/error)
-    (set! error e))
+    (set! error (wrap-error e))
+    (serve-read-waiters waiters error)
+    (set! waiters nil)
+    nil)
   (-deliver [p val]
     (when-not (= value :webnf.promise/pending)
       (throw (ex-info "Can't deliver on a promise more than once" {:webnf/promise p :new-value val})))
