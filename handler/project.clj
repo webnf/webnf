@@ -1,5 +1,5 @@
-(defproject webnf/handler "0.1.0-alpha4"
-  :plugins [[lein-modules "0.3.9"]]
+(defproject webnf/handler "0.1.0-alpha6"
+  :plugins [[lein-modules "0.3.10"]]
   :description "The first minor release of webnf handler, a collection
   of code to aid web handler development. There is:
   - Browser middlewares

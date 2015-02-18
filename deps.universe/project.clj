@@ -1,5 +1,5 @@
-(defproject webnf.deps/universe "0.1.0-alpha4"
-  :plugins [[lein-modules "0.3.9"]]
+(defproject webnf.deps/universe "0.1.0-alpha6"
+  :plugins [[lein-modules "0.3.10"]]
   :description "The uber dependency to get a full set of popular
   dependencies. For development or when you have room in your .m2 repo."
   :dependencies [[webnf.deps/logback "_"]
@@ -9,13 +9,19 @@
 
                  ;; Algorithms
                  [com.lambdaworks/scrypt "1.4.0"]
-                 [net.mikera/core.matrix "0.31.1"]
-                 [instaparse "1.3.4"]
+                 [net.mikera/core.matrix "0.33.1"]
+                 [instaparse "1.3.5"]
+                 [nf.fr.eraasoft/objectpool "1.1.2"]
+                 [clojurewerkz/meltdown "1.1.0"]
+                 [net.polyc0l0r/hasch "0.3.0-beta2"]
 
                  ;; Data formats
-                 [clj-time "0.9.0-beta1"]
-                 [net.mikera/vectorz-clj "0.26.2"]
+                 [clj-time "0.9.0"]
+                 [net.mikera/vectorz-clj "0.28.0"]
                  [org.reflections/reflections "0.9.9"]
+                 [danlentz/clj-uuid "0.1.2-20150217.010720-1"]
+                 [org.fressian/fressian "0.6.5"]
+                 [cheshire "5.4.0"]
 
                  ;; Evaluation controllers
                  [com.stuartsierra/component "0.2.2"]
@@ -23,4 +29,5 @@
 
                  ;; APIs
                  [clj-http "1.0.1"]
-                 [amazonica "0.2.30" :exclusions [joda-time]]])
+                 [amazonica "0.3.15" :exclusions [joda-time]]
+                 [javax.mail/mail "1.4"]])
