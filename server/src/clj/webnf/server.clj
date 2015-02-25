@@ -165,7 +165,9 @@
     (.setVirtualHosts handler (into-array String vhosts)))
   (-> server
       (add-host handler)
-      (cmp/update-system [:handlers] assoc id cmp)))
+      (cmp/update-system [:handlers] assoc id (if (scmp/started? (:jetty server))
+                                                (cmp/start cmp)
+                                                cmp))))
 
 (defn remove-handler [server id]
   (let [{handler :handler :as cmp} (get-in server [:handlers id])]

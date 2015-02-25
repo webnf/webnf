@@ -12,6 +12,9 @@
            (org.eclipse.jetty.util.component LifeCycle)
            webnf.server.JettyHandlerWrapper))
 
+(defn started? [^LifeCycle lc]
+  (.isRunning lc))
+
 (extend-protocol cmp/Lifecycle
   LifeCycle
   (start [lc] (when-not (.isRunning lc) (.start lc)) lc)
@@ -52,9 +55,9 @@
                                                    (when identify (request-id-ceptor identify))
                                                    (when logging-queue (request-log-ceptor logging-queue)))
                              handler))
-        (cmp/start-system this [:jetty]))))
+        (cmp/start-system this [:jetty :handlers]))))
   (stop [this]
-    (cmp/stop-system this [:jetty])))
+    (cmp/stop-system this [:jetty :handlers])))
 
 
 (comment
