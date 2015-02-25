@@ -1,4 +1,4 @@
-(defproject webnf/cljs "0.1.0-alpha6"
+(defproject webnf/cljs "0.1.0-SNAPSHOT"
   :plugins [[lein-modules "0.3.10"]]
   :description "ClojureScript functionality
   - port of strint from clojure.core.incubator

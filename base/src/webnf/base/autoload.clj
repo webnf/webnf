@@ -25,7 +25,8 @@
   generated var.
 
   (autoload foo/bar) -> (def bar #'foo/bar) ; on first call
-  (autoload ^:static foo/bar) -> (def bar @#'foo/bar) ; on first call" [var-name]
+  (autoload ^:static foo/bar) -> (def bar @#'foo/bar) ; on first call"
+  [var-name]
   (let [mm (meta var-name)
         vn (with-meta (symbol (name var-name)) mm)
         vns (symbol (namespace var-name))]

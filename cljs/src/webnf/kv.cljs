@@ -38,6 +38,15 @@
                     #(let [[k v] %2] (f %1 k v)))
                   (transient init) coll))))
 
+(defn map-to-kv
+  "Maps (f assoc! v) over a coll to build up a map
+   f should return the result of (assoc! k* v*)"
+  [f coll]
+  (persistent!
+   (reduce (fn [t v]
+             (f #(assoc! t %1 %2) v))
+           (transient {}) coll)))
+
 (defn map-kv
   "Maps (f assoc! k v) over a map, where
    [k v] are MapEntry pairs from coll.
@@ -48,6 +57,11 @@
               (empty coll) coll))
 
 (defn map-juxt
+  "Map separate key and value functions over seq to build up a map"
+  [fk fv coll]
+  (map-to-kv #(%1 (fk %2) (fv %2)) coll))
+
+(defn map-juxt-kv
   "Map separate key and value functions over keys and vals of MapEntry coll"
   [fk fv coll]
   (map-kv #(%1 (fk %2) (fv %3))
@@ -56,12 +70,12 @@
 (defn map-keys 
   "Map a function over the keys of MapEntry coll"
   [f coll]
-  (map-juxt f identity coll))
+  (map-juxt-kv f identity coll))
 
 (defn map-vals 
   "Map a function over the vals of MapEntry coll"
   [f coll]
-  (map-juxt identity f coll))
+  (map-juxt-kv identity f coll))
 
 (defn apply-kw
   "Like apply, but f takes keyword arguments and the last argument is
