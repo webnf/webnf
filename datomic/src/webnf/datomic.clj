@@ -330,7 +330,7 @@
    Then, datomic transaction reports will arrive as they are received from the report queue."
   [db-uri ctl-chan]
   (let [conn (connect db-uri)
-        ^BlockingQueue q (dtm/tx-report-queue conn)
+        q (dtm/tx-report-queue conn)
         report-chan (chan)
         out-chan (chan)
         out-mult (mult out-chan)]
@@ -338,7 +338,7 @@
     (go (try (loop []
                (log/trace "TX Q step")
                (when-not (closed? ctl-chan)
-                 (when-let [report (.poll q 10 TimeUnit/SECONDS)]
+                 (when-let [report (.poll ^BlockingQueue q 10 TimeUnit/SECONDS)]
                    (log/trace "Received TX report from Q" report)
                    (>! report-chan report))
                  (recur)))
@@ -349,7 +349,7 @@
     ;; Loop to transfer from report-chan to the out mult,
     ;; + handling taps and untaps
     (go-loop [db (let [db (dtm/db conn)
-                       {qdb :db-after} (.poll q)]
+                       {qdb :db-after} (.poll ^BlockingQueue q)]
                    (if (and qdb (> (dtm/basis-t qdb)
                                    (dtm/basis-t db)))
                      qdb db))]
