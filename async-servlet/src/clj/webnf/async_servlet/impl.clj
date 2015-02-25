@@ -5,7 +5,8 @@
    (javax.servlet.http HttpServlet HttpServletRequest HttpServletResponse))
   (:require [ring.util.servlet :as servlet]
             [clojure.tools.logging :as log]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [webnf.kv :refer [map-juxt]]))
 
 (set! *warn-on-reflection* true)
 
@@ -110,39 +111,63 @@
 (def set-status @#'servlet/set-status)
 (def set-headers @#'servlet/set-headers)
 
-(defn header [rr n]
-  (let [h (.getHeaders rr n)]
-    (if (> (count h) 1)
-      (set h)
-      (first h))))
+(defprotocol RequestOrResponse
+  (header [rr header-name])
+  (header-map [rr]))
 
-(defn header-map [req-or-resp]
-  (reduce #(assoc %1 %2 (header req-or-resp %2))
-          {} (.getHeaderNames req-or-resp)))
+(defn- to-header [h]
+  (if (> (count h) 1)
+    (set h)
+    (first h)))
+
+(defn- to-header-map [r hs]
+  (reduce #(assoc %1 %2 (header r %2)) {} hs))
+
+(extend-protocol RequestOrResponse
+  HttpServletRequest
+  (header [req name]
+    (to-header (.getHeaders req name)))
+  (header-map [req]
+    (to-header-map req (.getHeaderNames req)))
+  HttpServletResponse
+  (header [resp name]
+    (to-header (.getHeaders resp name)))
+  (header-map [resp]
+    (to-header-map resp (.getHeaderNames resp))))
 
 #_(require '[webnf.base :refer [pprint-str]])
 (defn handle-servlet-request 
   ([handler ^HttpServletRequest request response]
-     (let [request-map (assoc (servlet/build-request-map request)
-                         :path-info (.getPathInfo request))
-           srh (header-map response)
-           {:keys [status headers body timeout] :as response-map} 
-           (try (handler request-map)
-                (catch Exception e
-                  (log/error e "Uncaught exception during request"
-                             (:request-method request-map)
-                             (:uri request-map))
-                  (throw (ServletException. "Uncaught exception from handler" e))))]
-       (when status
-         (set-status response status))
-       (when-not (empty? headers)
-         (set-headers response headers))
-       #_(log/debug (pprint-str {:ring-resp-h headers
-                                 :start-resp-h srh
-                                 :end-resp-h (header-map response)}))
-       (if (fn? body)
-         (start-async request body timeout)
-         (set-body response body)))))
+   (let [request-map (assoc (servlet/build-request-map request)
+                            :parameters (.getParameterMap request)
+                            :attributes (map-juxt
+                                         identity #(.getAttribute request %)
+                                         (reify clojure.lang.IReduceInit
+                                           (reduce [_ f init]
+                                             (let [an (.getAttributeNames request)]
+                                               (loop [s init]
+                                                 (if (.hasMoreElements an)
+                                                   (recur (f s (.nextElement an)))
+                                                   s))))))
+                            :path-info (.getPathInfo request))
+         srh (header-map response)
+         {:keys [status headers body timeout] :as response-map} 
+         (try (handler request-map)
+              (catch Exception e
+                (log/error e "Uncaught exception during request"
+                           (:request-method request-map)
+                           (:uri request-map))
+                (throw (ServletException. "Uncaught exception from handler" e))))]
+     (when status
+       (set-status response status))
+     (when-not (empty? headers)
+       (set-headers response headers))
+     #_(log/debug (pprint-str {:ring-resp-h headers
+                               :start-resp-h srh
+                               :end-resp-h (header-map response)}))
+     (if (fn? body)
+       (start-async request body timeout)
+       (set-body response body)))))
 
 
 
