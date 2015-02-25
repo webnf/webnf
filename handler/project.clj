@@ -1,4 +1,4 @@
-(defproject webnf/handler "0.1.0-alpha6"
+(defproject webnf/handler "0.1.0-SNAPSHOT"
   :plugins [[lein-modules "0.3.10"]]
   :description "The first minor release of webnf handler, a collection
   of code to aid web handler development. There is:
@@ -7,7 +7,8 @@
     - for extremely pretty exception printing, with source locations
     - user agent parsing
   - Timer helpers
-  - Common dependencies"
+  - Common dependencies
+  - Dataflow / Validation"
   :source-paths ["src/clj"]
   :dependencies [[org.clojure/clojure "_"]
                  [webnf/base "_"]

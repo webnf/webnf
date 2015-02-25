@@ -1,4 +1,4 @@
-(defproject webnf.deps/web "0.1.0-alpha6"
+(defproject webnf.deps/web "0.1.0-SNAPSHOT"
   :plugins [[lein-modules "0.3.10"]]
   :description "Common dependencies for web apps"
   :url "http://github.com/webnf/webnf"
@@ -13,5 +13,6 @@
                  [ring-mock "0.1.5"]
                  [net.cgrand/moustache "1.2.0-alpha2"
                   :exclusions [ring/ring-core]]
+                 [hiccup "1.0.5"]
                  [liberator "0.12.2"]
                  [prone "0.8.0"]])
