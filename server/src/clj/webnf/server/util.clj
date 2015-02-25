@@ -65,7 +65,7 @@
      (into {} (for [H# (to-seq# (.getHeaderNames re#))
                     :let [h# (.toLowerCase ^String H#)]
                     :when (not (ex?# h#))]
-                [h# (to-seq# (.getHeaders re# h#))]))))
+                [h# (doall (to-seq# (.getHeaders re# h#)))]))))
 
 (defn make-lifecycle-listener [& {:keys [^Runnable starting
                                          ^Runnable started
@@ -89,7 +89,8 @@
       (log/debug cause "LifeCycle Failure" event)
       (when failure (.run failure)))))
 
-(defn ensure-uuids [req resp client-cookie session-cookie request-id-header uuid-provider]
+(defn ensure-uuids [^HttpServletRequest req ^HttpServletResponse resp
+                    client-cookie session-cookie request-id-header uuid-provider]
   (try
     (when (and client-cookie (nil? (.getAttribute req "webnf.client.id")))
       (ensure-uuid-cookie! req resp client-cookie "webnf.client.id" (* 60 60 24 356) uuid-provider))
