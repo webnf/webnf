@@ -1,4 +1,4 @@
-(defproject webnf.deps/universe "0.1.0-alpha6"
+(defproject webnf.deps/universe "0.1.0-SNAPSHOT"
   :plugins [[lein-modules "0.3.10"]]
   :description "The uber dependency to get a full set of popular
   dependencies. For development or when you have room in your .m2 repo."
@@ -30,4 +30,4 @@
                  ;; APIs
                  [clj-http "1.0.1"]
                  [amazonica "0.3.15" :exclusions [joda-time]]
-                 [javax.mail/mail "1.4"]])
+                 [javax.mail/mail-api "1.5.2"]])
