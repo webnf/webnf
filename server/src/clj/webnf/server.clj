@@ -96,12 +96,15 @@
 
 ;; Construct a jetty component
 
-(defn server [& {:keys [host port idle-timeout header-size
+(defn server [& {:keys [host http? http-port https? https-port
+                        idle-timeout header-size
                         default-handler min-threads max-threads
-                        ssl? ssl-port keystore key-password
+                        keystore keystore-password key-password
                         truststore trust-password client-auth
                         identify logging-queue]
-                 :or {port 80 idle-timeout 200000 header-size 16384
+                 :or {http? true http-port 80
+                      https? false https-port 443
+                      idle-timeout 200000 header-size 16384
                       min-threads 4 max-threads 42}}]
   (let [container (HandlerCollection. true)
         conn-facts (into-array ConnectionFactory
@@ -112,16 +115,19 @@
                                    (.setRequestHeaderSize header-size)
                                    (.setResponseHeaderSize header-size)))])
         server (Server. (QueuedThreadPool. max-threads min-threads))]
-    (.addConnector server (doto (ServerConnector. server conn-facts)
-                            (.setPort port)
-                            (.setHost host)
-                            (.setIdleTimeout idle-timeout)))
-    (when (or ssl? ssl-port)
+    (when http?
+      (.addConnector server (doto (ServerConnector. server conn-facts)
+                              (.setPort http-port)
+                              (.setHost host)
+                              (.setIdleTimeout idle-timeout))))
+    (when https?
       (let [ssl-context-fact (SslContextFactory.)]
         (when keystore
           (.setKeyStorePath ssl-context-fact keystore))
+        (when keystore-password
+          (.setKeyStorePassword ssl-context-fact keystore-password))
         (when key-password
-          (.setKeyStorePassword ssl-context-fact key-password))
+          (.setKeyManagerPassword ssl-context-fact key-password))
         (when truststore
           (.setTrustStorePath ssl-context-fact truststore))
         (when trust-password
@@ -131,7 +137,7 @@
           :want (.setWantClientAuth ssl-context-fact true)
           nil)
         (.addConnector server (doto (ServerConnector. server ssl-context-fact conn-facts)
-                                (.setPort (or ssl-port 443))
+                                (.setPort https-port)
                                 (.setHost host)
                                 (.setIdleTimeout idle-timeout)))))
     (scmp/map->ServerComponent
@@ -178,7 +184,7 @@
 
 (defn quick-serve! [handler & {:keys [vhosts port]
                                :or {port 8080}}]
-  (-> (server :port port)
+  (-> (server :http-port port)
       (add-host (cond-> (ring-handler handler)
                         (seq vhosts)
                         (doto (.setVirtualHosts
