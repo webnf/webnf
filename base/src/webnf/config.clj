@@ -13,7 +13,7 @@
   ([default-config] (update-with-defaults! default-config merge))
   ([default-config merge-fn]
    (alter-var-root
-    #'configuration (constantly
-                     (if (= ::unbound #'configuration)
-                       default-config
-                       (merge-fn default-config configuration))))))
+    #'configuration (fn [cur-config]
+                      (if (= ::unbound cur-config)
+                        default-config
+                        (merge-fn default-config cur-config))))))

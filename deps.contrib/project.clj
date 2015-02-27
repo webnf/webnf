@@ -1,4 +1,4 @@
-(defproject webnf.deps/contrib "0.1.0-alpha7"
+(defproject webnf.deps/contrib "0.1.0-alpha8"
   :plugins [[lein-modules "0.3.10"]]
   :description "Depend on projects covered by clojure's CA"
   :dependencies [[org.clojure/algo.generic "0.1.2"]
@@ -12,7 +12,7 @@
                  [org.clojure/core.match "0.3.0-alpha4"]
                  [org.clojure/core.memoize "0.5.7" :exclusions [org.clojure/core.cache]]
                  [org.clojure/core.rrb-vector "0.0.11"]
-                 [org.clojure/core.typed "0.2.83"]
+                 [org.clojure/core.typed "0.2.83" :classifier "slim"]
                  [org.clojure/core.unify "0.5.6"]
                  [org.clojure/data.avl "0.0.12"]
                  [org.clojure/data.codec "0.1.0"]

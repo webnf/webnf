@@ -1,4 +1,4 @@
-(defproject webnf/parent "0.1.0-alpha7"
+(defproject webnf/parent "0.1.0-alpha8"
   ;; lein -f modules change version leiningen.release/bump-version alpha
   :plugins [[lein-modules "0.3.10"]]
 
@@ -22,6 +22,6 @@
              :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
                     "async-servlet" "base" "cljs" "datomic" "enlive.clj" "enlive.cljs" "handler" "server"]
              :versions {org.clojure/clojure           "1.7.0-alpha5"
-                        webnf                         "0.1.0-alpha7"
-                        webnf.deps                    "0.1.0-alpha7"
-                        webnf/async-servlet           "0.1.9"}})
+                        webnf                         "0.1.0-alpha8"
+                        webnf.deps                    "0.1.0-alpha8"
+                        webnf/async-servlet           "0.1.10"}})
