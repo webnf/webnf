@@ -27,7 +27,7 @@
    (org.eclipse.jetty.util.thread QueuedThreadPool)
    (org.eclipse.jetty.util.ssl SslContextFactory)))
 
-(set! *warn-on-reflection* false)
+; (set! *warn-on-reflection* true)
 
 ;; Use this to add fcgi services, such as php apps via php-fpm
 

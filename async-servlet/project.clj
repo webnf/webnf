@@ -1,12 +1,12 @@
-(defproject webnf/async-servlet "0.2.0-SNAPSHOT"
+(defproject webnf/async-servlet "0.1.9"
   :plugins [[lein-modules "0.3.10"]]
   :description "A servlet 3.0 implementation, that enables the async api for ring applications"
   :java-source-paths ["src/jvm"]
   :source-paths ["src/clj"]
   :dependencies [[org.clojure/clojure "_"]
                  [webnf.deps/logback "_"]
-                 [webnf/base "0.1.0-SNAPSHOT"]
-                 [ring/ring-servlet "1.3.1"
+                 [webnf/base "_"]
+                 [ring/ring-servlet "1.3.2"
                   :exclusions [javax.servlet/servlet-api]]
                  [javax.servlet/javax.servlet-api "3.1.0" :scope "provided"]]
 

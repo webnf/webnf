@@ -1,4 +1,4 @@
-(defproject webnf.deps/logback "0.1.0-alpha6"
+(defproject webnf.deps/logback "0.1.0-alpha7"
   :plugins [[lein-modules "0.3.10"]]
   :description "Basic slf4j logging config in form of a default logback.xml"
   :dependencies [[ch.qos.logback/logback-classic "1.1.2"]

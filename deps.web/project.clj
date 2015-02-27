@@ -1,4 +1,4 @@
-(defproject webnf.deps/web "0.1.0-SNAPSHOT"
+(defproject webnf.deps/web "0.1.0-alpha7"
   :plugins [[lein-modules "0.3.10"]]
   :description "Common dependencies for web apps"
   :url "http://github.com/webnf/webnf"
@@ -15,4 +15,4 @@
                   :exclusions [ring/ring-core]]
                  [hiccup "1.0.5"]
                  [liberator "0.12.2"]
-                 [prone "0.8.0"]])
+                 [prone "0.8.1"]])
