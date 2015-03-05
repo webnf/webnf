@@ -20,7 +20,8 @@
                              "-f" ["with-profile" "+fast"]}
               :scm          {:dir ".."}}
              :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
-                    "async-servlet" "base" "cljs" "datomic" "enlive.clj" "enlive.cljs" "handler" "server"]
+                    "async-servlet" "base" "cljs" "datomic" "enlive.clj" "enlive.cljs"
+                    "handler" "server" "filestore"]
              :versions {org.clojure/clojure           "1.7.0-alpha5"
                         webnf                         "0.1.0-alpha8"
                         webnf.deps                    "0.1.0-alpha8"
