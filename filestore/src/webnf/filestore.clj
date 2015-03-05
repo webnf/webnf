@@ -121,16 +121,16 @@ Storage is uncompressed to make zero-copy possible."}
 
 ;; ## Reading
 
-(defn find-file
+(defn find-blob
   "Returns java.io.File by sha or nil."
   ^File [store sha]
   (let [f (sha-file store sha)]
     (when (.isFile f) f)))
 
-(defn get-file
+(defn get-blob
   "Returns java.io.File by sha. Throws if not found."
   ^File [store sha]
-  (if-let [f (find-file store sha)]
+  (if-let [f (find-blob store sha)]
     f
     (throw (ex-info (str "File not found: '" (sha-file store sha) "'"
                          {:store store :sha sha})))))
@@ -138,7 +138,7 @@ Storage is uncompressed to make zero-copy possible."}
 (defn open-stream
   "Returns java.io.InputStream by sha. Throws if not found."
   ^InputStream [store sha]
-  (input-stream (get-file store sha)))
+  (input-stream (get-blob store sha)))
 
 (defn open-reader
   "Returns java.io.Reader by sha"
