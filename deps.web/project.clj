@@ -1,4 +1,4 @@
-(defproject webnf.deps/web "0.1.0-alpha9"
+(defproject webnf.deps/web "0.1.0-alpha10"
   :plugins [[lein-modules "0.3.11"]]
   :description "Common dependencies for web apps"
   :url "http://github.com/webnf/webnf"
