@@ -1,9 +1,9 @@
-(defproject webnf.deps/contrib "0.1.0-alpha8"
-  :plugins [[lein-modules "0.3.10"]]
+(defproject webnf.deps/contrib "0.1.0-alpha9"
+  :plugins [[lein-modules "0.3.11"]]
   :description "Depend on projects covered by clojure's CA"
   :dependencies [[org.clojure/algo.generic "0.1.2"]
                  [org.clojure/algo.monads "0.1.5"]
-                 [org.clojure/clojurescript "0.0-2913"]
+                 [org.clojure/clojurescript "0.0-3030"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [org.clojure/core.cache "0.6.4"]
                  [org.clojure/core.contracts "0.0.5"]
@@ -21,7 +21,7 @@
                  [org.clojure/data.fressian "0.2.0"]
                  [org.clojure/data.generators "0.1.2"]
                  [org.clojure/data.int-map "0.1.0"]
-                 [org.clojure/data.json "0.2.5"]
+                 [org.clojure/data.json "0.2.6"]
                  [org.clojure/data.priority-map "0.0.5"]
                  [org.clojure/data.xml "0.0.8"]
                  [org.clojure/data.zip "0.1.1"]
@@ -43,5 +43,5 @@
                  [org.clojure/tools.macro "0.1.5"]
                  [org.clojure/tools.namespace "0.2.10"]
                  [org.clojure/tools.nrepl "0.2.7"]
-                 [org.clojure/tools.reader "0.8.15"]
+                 [org.clojure/tools.reader "0.8.16"]
                  [org.clojure/tools.trace "0.7.8"]])

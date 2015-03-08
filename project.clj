@@ -1,6 +1,6 @@
-(defproject webnf/parent "0.1.0-alpha8"
+(defproject webnf/parent "0.1.0-alpha9"
   ;; lein -f modules change version leiningen.release/bump-version alpha
-  :plugins [[lein-modules "0.3.10"]]
+  :plugins [[lein-modules "0.3.11"]]
 
   :profiles {:provided
              {:dependencies [[org.clojure/clojure "_"]]}
@@ -14,7 +14,8 @@
              {:url "http://github.com/webnf/webnf"
               :license {:name "Eclipse Public License"
                         :url "http://www.eclipse.org/legal/epl-v10.html"}
-              :repositories [["bendlas-nexus" {:url "http://nexus.bendlas.net/content/groups/public"
+              :javac-options ["-source" "1.7"]
+              #_#_:repositories [["bendlas-nexus" {:url "http://nexus.bendlas.net/content/groups/public"
                                                :username "fetch" :password :gpg}]]
               :aliases      {"all" ^:displace ["do" "clean," "test," "install"]
                              "-f" ["with-profile" "+fast"]}
@@ -23,6 +24,6 @@
                     "async-servlet" "base" "cljs" "datomic" "enlive.clj" "enlive.cljs"
                     "handler" "server" "filestore"]
              :versions {org.clojure/clojure           "1.7.0-alpha5"
-                        webnf                         "0.1.0-alpha8"
-                        webnf.deps                    "0.1.0-alpha8"
-                        webnf/async-servlet           "0.1.10"}})
+                        webnf                         "0.1.0-alpha9"
+                        webnf.deps                    "0.1.0-alpha9"
+                        webnf/async-servlet           "0.1.11"}})

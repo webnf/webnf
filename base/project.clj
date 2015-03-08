@@ -1,6 +1,6 @@
-(defproject webnf/base "0.1.0-alpha8"
+(defproject webnf/base "0.1.0-alpha9"
   :description "Collection org.clojure libs and essential others"
-  :plugins [[lein-modules "0.3.10"]]
+  :plugins [[lein-modules "0.3.11"]]
   :dependencies [[org.clojure/clojure "_"]
                  [webnf.deps/logback "_"]
                  ;; a few essential contribs

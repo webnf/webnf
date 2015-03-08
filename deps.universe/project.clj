@@ -1,5 +1,5 @@
-(defproject webnf.deps/universe "0.1.0-SNAPSHOT"
-  :plugins [[lein-modules "0.3.10"]]
+(defproject webnf.deps/universe "0.1.0-alpha9"
+  :plugins [[lein-modules "0.3.11"]]
   :description "The uber dependency to get a full set of popular
   dependencies. For development or when you have room in your .m2 repo."
   :dependencies [[webnf.deps/logback "_"]
@@ -24,7 +24,7 @@
                  [cheshire "5.4.0"]
 
                  ;; Evaluation controllers
-                 [com.stuartsierra/component "0.2.2"]
+                 [com.stuartsierra/component "0.2.3"]
                  [de.kotka/lazymap "3.1.1"]
 
                  ;; APIs

@@ -1,8 +1,7 @@
-(defproject webnf/server "0.1.0-alpha8"
-  :plugins [[lein-modules "0.3.10"]]
+(defproject webnf/server "0.1.0-alpha9"
+  :plugins [[lein-modules "0.3.11"]]
   :description "Vhost functionality with servlets and a jetty runner"
   :java-source-paths ["src/jvm"]
-  :javac-options ["-source" "1.7"]
   :source-paths ["src/clj"]
   :dependencies [[org.clojure/clojure "_"]
                  [webnf/async-servlet "_"]
@@ -14,4 +13,4 @@
                  [org.eclipse.jetty/jetty-servlet "9.2.8.v20150217"]
                  [org.eclipse.jetty/jetty-webapp "9.2.8.v20150217"]
                  [org.eclipse.jetty.fcgi/fcgi-server "9.2.8.v20150217"]
-                 [com.stuartsierra/component "0.2.2"]])
+                 [com.stuartsierra/component "0.2.3"]])

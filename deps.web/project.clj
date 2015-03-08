@@ -1,5 +1,5 @@
-(defproject webnf.deps/web "0.1.0-SNAPSHOT"
-  :plugins [[lein-modules "0.3.10"]]
+(defproject webnf.deps/web "0.1.0-alpha9"
+  :plugins [[lein-modules "0.3.11"]]
   :description "Common dependencies for web apps"
   :url "http://github.com/webnf/webnf"
   :dependencies [[nl.bitwalker/UserAgentUtils "1.2.4"]
