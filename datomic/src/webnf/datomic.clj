@@ -354,19 +354,7 @@
                                    (dtm/basis-t db)))
                      qdb db))]
       (log/trace "Delivery step")
-      (alt! report-chan ([{:as report :keys [db-after]}]
-                         (cond (nil? report)
-                               (do (log/error "Report chan closed, closing control-chan")
-                                   (close! ctl-chan)
-                                   {:error :report-chan-died})
-
-                               (> (dtm/basis-t db-after)
-                                  (dtm/basis-t db))
-                               (do (log/trace "Delivering TX report" report)
-                                   (>! out-chan report)
-                                   (recur db-after))
-
-                               :else (recur db)))
+      (alt! :priority true
             ctl-chan ([ctl-msg]
                       (log/trace "Receiving CTL message" ctl-msg)
                       (match [ctl-msg]
@@ -379,4 +367,17 @@
                                                                  (recur db))
                              :else (do (log/error "Unknown control message" ctl-msg)
                                        (log/info "Resuming control loop")
-                                       (recur db))))))))
+                                       (recur db))))
+            report-chan ([{:as report :keys [db-after]}]
+                         (cond (nil? report)
+                               (do (log/error "Report chan closed, closing control-chan")
+                                   (close! ctl-chan)
+                                   {:error :report-chan-died})
+
+                               (> (dtm/basis-t db-after)
+                                  (dtm/basis-t db))
+                               (do (log/trace "Delivering TX report" report)
+                                   (>! out-chan report)
+                                   (recur db-after))
+
+                               :else (recur db)))))))
