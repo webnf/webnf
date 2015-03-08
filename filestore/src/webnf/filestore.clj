@@ -67,7 +67,7 @@ Storage is uncompressed to make zero-copy possible."}
     (binding [*out* o]
       (pprint (into {} (compat-props res))))))
 
-(defn make-blob-store!
+(defn make-store!
   "Constructor for a file store.
   Takes a path to a directory to store blobs in.
   Creates root if nessecary.
