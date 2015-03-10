@@ -1,10 +1,10 @@
-(defproject webnf.deps/contrib "0.1.0-alpha10"
+(defproject webnf.deps/contrib "0.1.0-alpha11"
   :plugins [[lein-modules "0.3.11"]]
   :description "Depend on projects covered by clojure's CA"
   :dependencies [[org.clojure/algo.generic "0.1.2"]
                  [org.clojure/algo.monads "0.1.5"]
                  [org.clojure/clojurescript "0.0-3030"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 [org.clojure/core.async "_"]
                  [org.clojure/core.cache "0.6.4"]
                  [org.clojure/core.contracts "0.0.5"]
                  [org.clojure/core.incubator "0.1.3"]
