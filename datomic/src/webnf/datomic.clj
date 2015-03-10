@@ -4,7 +4,7 @@
   (:import datomic.db.Db
            (java.util.concurrent BlockingQueue TimeUnit))
   (:require [clojure.core.async :as async :refer [go go-loop <! <!! >! >!! close! chan mult tap untap alt! put!]]
-            [clojure.core.async.impl.protocols :refer [closed?]]
+            #_[clojure.core.async.impl.protocols :refer [closed?]]
             [clojure.core.match :refer [match]]
             [clojure.core.typed :as typed :refer [ann Any All Keyword List defalias Map HMap HVec I U Seqable]]
             [clojure.repl]
@@ -333,11 +333,12 @@
         q (dtm/tx-report-queue conn)
         report-chan (chan)
         out-chan (chan)
-        out-mult (mult out-chan)]
+        out-mult (mult out-chan)
+        closed (volatile! false)]
     ;; Set up loop to pull tx updates from the report queue and put them on report-chan
     (go (try (loop []
                (log/trace "TX Q step")
-               (when-not (closed? ctl-chan)
+               (when-not @closed
                  (when-let [report (.poll ^BlockingQueue q 10 TimeUnit/SECONDS)]
                    (log/trace "Received TX report from Q" report)
                    (>! report-chan report))
@@ -359,6 +360,7 @@
                       (log/trace "Receiving CTL message" ctl-msg)
                       (match [ctl-msg]
                              [nil] (do (close! out-chan)
+                                       (vreset! closed true)
                                        {:success :shutdown})
                              [{:control :tap :channel ch}] (do (put! ch {:db db})
                                                                (tap out-mult ch)
