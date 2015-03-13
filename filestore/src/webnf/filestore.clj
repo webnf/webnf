@@ -13,9 +13,9 @@ Storage is uncompressed to make zero-copy possible."}
 
 (set! *warn-on-reflection* true)
 
-(defn- sha-file ^File [{:keys [root-dir]} ^String sha]
+(defn- sha-file ^java.io.File [{:keys [blob-dir]} ^String sha]
   (let [sha (.toLowerCase sha)
-        dir (file root-dir (subs sha 0 2))]
+        dir (file blob-dir (subs sha 0 2))]
     (file dir (subs sha 2))))
 
 ;; ## Lowlevel API
@@ -23,8 +23,8 @@ Storage is uncompressed to make zero-copy possible."}
 (defn bytes->hex [^bytes b]
   (.toLowerCase (DatatypeConverter/printHexBinary b)))
 
-(defn store-temp! [{:keys [root-dir secure-hash] :as store} f]
-  (let [tf (File/createTempFile "temp-" ".part" root-dir)
+(defn store-temp! [{:keys [store-dir secure-hash] :as store} f]
+  (let [tf (File/createTempFile "temp-" ".part" store-dir)
         digest (MessageDigest/getInstance secure-hash)]
     (try
       (with-open [os (DigestOutputStream. (output-stream tf) digest)]
@@ -123,13 +123,13 @@ Storage is uncompressed to make zero-copy possible."}
 
 (defn find-blob
   "Returns java.io.File by sha or nil."
-  ^File [store sha]
+  ^java.io.File [store sha]
   (let [f (sha-file store sha)]
     (when (.isFile f) f)))
 
 (defn get-blob
   "Returns java.io.File by sha. Throws if not found."
-  ^File [store sha]
+  ^java.io.File [store sha]
   (if-let [f (find-blob store sha)]
     f
     (throw (ex-info (str "File not found: '" (sha-file store sha) "'"
@@ -137,10 +137,10 @@ Storage is uncompressed to make zero-copy possible."}
 
 (defn open-stream
   "Returns java.io.InputStream by sha. Throws if not found."
-  ^InputStream [store sha]
+  ^java.io.InputStream [store sha]
   (input-stream (get-blob store sha)))
 
 (defn open-reader
   "Returns java.io.Reader by sha"
-  ^Reader [store sha]
+  ^java.io.Reader [store sha]
   (reader (open-stream store sha)))
