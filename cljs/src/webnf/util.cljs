@@ -63,19 +63,23 @@
 
   Request data can also be passed in ring format
   {:method :params :headers :body :always-refresh}
-  :auto-refresh true triggers a request on every read"
+  :auto-refresh true triggers a request on every read
+  :parse-response can be a custom response parser working directly on the XmlHttpRequest"
   ([uri] (xhr uri nil))
-  ([uri {:keys [method body headers params auto-refresh]}]
-     (let [uri (Uri/parse uri)
-           _ (reduce-kv (fn [_ param value]
-                          (.setParameterValue uri param value))
-                        nil params)
-           headers (and headers (to-js headers))
-           rp (callback-read-port (fn [result]
-                                    (XhrIo/send uri (comp result parse-xhr-response)
-                                                (as-str method) body headers)))]
-       (if auto-refresh
-         rp (promise rp)))))
+  ([uri {:keys [method body headers params auto-refresh parse-response]}]
+   (let [uri (Uri/parse uri)
+         parser (if parse-response
+                  (comp parse-response #(.-target %))
+                  parse-xhr-response)
+         _ (reduce-kv (fn [_ param value]
+                        (.setParameterValue uri param value))
+                      nil params)
+         headers (and headers (to-js headers))
+         rp (callback-read-port (fn [result]
+                                  (XhrIo/send uri (comp result parser)
+                                              (as-str method) body headers)))]
+     (if auto-refresh
+       rp (promise rp)))))
 
 (defn urlenc-params
   "Encode a map into a form-params string"

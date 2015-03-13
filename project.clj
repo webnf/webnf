@@ -14,7 +14,7 @@
              {:url "http://github.com/webnf/webnf"
               :license {:name "Eclipse Public License"
                         :url "http://www.eclipse.org/legal/epl-v10.html"}
-              :javac-options ["-source" "1.7"]
+              :javac-options ["-source" "1.7" "-target" "1.7"]
               #_#_:repositories [["bendlas-nexus" {:url "http://nexus.bendlas.net/content/groups/public"
                                                :username "fetch" :password :gpg}]]
               :aliases      {"all" ^:displace ["do" "clean," "test," "install"]
@@ -23,10 +23,10 @@
              :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
                     "async-servlet" "base" "cljs" "datomic" "enlive.clj" "enlive.cljs"
                     "handler" "server" "filestore"]
-             :versions {org.clojure/clojure           "1.7.0-alpha5"
-                        webnf                         "0.1.0-alpha11"
-                        webnf.deps                    "0.1.0-alpha11"
-                        webnf/async-servlet           "0.1.12"
+             :versions {org.clojure/clojure              "1.7.0-alpha5"
+                        webnf                            "0.1.0-alpha12"
+                        webnf.deps                       "0.1.0-alpha12"
+                        webnf/async-servlet              "0.1.13"
                         ;;  is seriously broken
                         ;; "0.1.242.0-44b1e3-alpha"
-                        org.clojure/core.async        "0.1.346.0-17112a-alpha"}})
+                        org.clojure/core.async           "0.1.346.0-17112a-alpha"}})

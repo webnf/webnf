@@ -186,9 +186,9 @@
                                :or {port 8080}}]
   (-> (server :http-port port)
       (add-host (cond-> (ring-handler handler)
-                        (seq vhosts)
-                        (doto (.setVirtualHosts
-                               (into-array String (into #{"127.0.0.1" "localhost"
-                                                          (hostname) (local-ip)}
-                                                        vhosts))))))
+                  (seq vhosts)
+                  (doto (.setVirtualHosts
+                         (into-array String (into #{"127.0.0.1" "localhost"}
+                                                  (list* (hostname) (local-ip)
+                                                         vhosts)))))))
       cmp/start))

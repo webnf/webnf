@@ -1,4 +1,4 @@
-(defproject webnf.deps/universe "0.1.0-alpha11"
+(defproject webnf.deps/universe "0.1.0-alpha12"
   :plugins [[lein-modules "0.3.11"]]
   :description "The uber dependency to get a full set of popular
   dependencies. For development or when you have room in your .m2 repo."
