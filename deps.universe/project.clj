@@ -19,7 +19,7 @@
                  [clj-time "0.9.0" :exclusions [joda-time]]
                  [net.mikera/vectorz-clj "0.29.0"]
                  [org.reflections/reflections "0.9.9"]
-                 [danlentz/clj-uuid "0.1.2-20150217.010720-1"]
+                 [danlentz/clj-uuid "0.1.5"]
                  [org.fressian/fressian "0.6.5"]
                  [cheshire "5.4.0"]
 

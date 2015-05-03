@@ -29,9 +29,9 @@
         :webnf.promise/pending (do (set! waiters (cons handler waiters))
                                    nil)
         :webnf.promise/error (do (async/commit handler)
-                                 error)
+                                 (volatile! error))
         (do (async/commit handler)
-            value))))
+            (volatile! value)))))
 
   IDeref
   (-deref [p]
