@@ -17,9 +17,9 @@
    (org.eclipse.jetty.server Server Request)
    (org.eclipse.jetty.servlet ServletContextHandler ServletHolder DefaultServlet FilterHolder)
    (org.eclipse.jetty.server HttpConfiguration ServerConnector HttpConnectionFactory
-                             ConnectionFactory RequestLog)
-                                        ;   (org.eclipse.jetty.spdy.server.http HTTPSPDYServerConnector)
-   (org.eclipse.jetty.server.handler HandlerCollection HandlerList RequestLogHandler)
+                             ConnectionFactory RequestLog SslConnectionFactory)
+   ;; (org.eclipse.jetty.alpn.server ALPNServerConnectionFactory)
+   (org.eclipse.jetty.server.handler ContextHandler HandlerCollection HandlerList RequestLogHandler)
    (org.eclipse.jetty.util.thread ExecutorThreadPool)
    (org.eclipse.jetty.util.component LifeCycle LifeCycle$Listener)
    (org.eclipse.jetty.server.handler AbstractHandler)
@@ -27,7 +27,7 @@
    (org.eclipse.jetty.util.thread QueuedThreadPool)
    (org.eclipse.jetty.util.ssl SslContextFactory)))
 
-; (set! *warn-on-reflection* true)
+(set! *warn-on-reflection* false)
 
 ;; Use this to add fcgi services, such as php apps via php-fpm
 
@@ -96,7 +96,44 @@
 
 ;; Construct a jetty component
 
-(defn server [& {:keys [host http? http-port https? https-port
+(defn http-connector-factory [server connection-factories host idle-timeout]
+  (fn [port]
+    (doto (ServerConnector. server connection-factories)
+      (.setPort port)
+      (.setHost host)
+      (.setIdleTimeout idle-timeout))))
+
+(defn https-connector-factory [server connection-factories
+                               host idle-timeout
+                               {:keys [keystore keystore-password key-password
+                                       truststore trust-password client-auth]}]
+  (let [ssl-context-fact (SslContextFactory.)]
+    (when keystore
+      (.setKeyStorePath ssl-context-fact keystore))
+    (when keystore-password
+      (.setKeyStorePassword ssl-context-fact keystore-password))
+    (when key-password
+      (.setKeyManagerPassword ssl-context-fact key-password))
+    (when truststore
+      (.setTrustStorePath ssl-context-fact truststore))
+    (when trust-password
+      (.setTrustStorePassword ssl-context-fact trust-password))
+    (case client-auth
+      :need (.setNeedClientAuth ssl-context-fact true)
+      :want (.setWantClientAuth ssl-context-fact true)
+      nil)
+    (fn [port]
+      (doto (ServerConnector. server ssl-context-fact connection-factories)
+        (.setPort port)
+        (.setHost host)
+        (.setIdleTimeout idle-timeout)))))
+
+(defn to-coll [value]
+  (if (instance? java.util.Collection value)
+    value (list value)))
+
+(defn server [& {:as opts
+                 :keys [host http? http-port https? https-port
                         idle-timeout header-size
                         default-handler min-threads max-threads
                         keystore keystore-password key-password
@@ -107,39 +144,22 @@
                       idle-timeout 200000 header-size 16384
                       min-threads 4 max-threads 42}}]
   (let [container (HandlerCollection. true)
-        conn-facts (into-array ConnectionFactory
-                               [(HttpConnectionFactory. 
-                                 (doto (HttpConfiguration.)
-                                   (.setSendDateHeader true)
-                                   (.setSendServerVersion false)
-                                   (.setRequestHeaderSize header-size)
-                                   (.setResponseHeaderSize header-size)))])
-        server (Server. (QueuedThreadPool. max-threads min-threads))]
+        connection-factories (into-array ConnectionFactory
+                                         [(HttpConnectionFactory. 
+                                           (doto (HttpConfiguration.)
+                                             (.setSendDateHeader true)
+                                             (.setSendServerVersion false)
+                                             (.setRequestHeaderSize header-size)
+                                             (.setResponseHeaderSize header-size)))])
+        server (Server. (QueuedThreadPool. max-threads min-threads))
+        http-cf (http-connector-factory server connection-factories host idle-timeout)
+        https-cf (https-connector-factory server connection-factories host idle-timeout opts)]
     (when http?
-      (.addConnector server (doto (ServerConnector. server conn-facts)
-                              (.setPort http-port)
-                              (.setHost host)
-                              (.setIdleTimeout idle-timeout))))
+      (doseq [port (to-coll http-port)]
+        (.addConnector server (http-cf port))))
     (when https?
-      (let [ssl-context-fact (SslContextFactory.)]
-        (when keystore
-          (.setKeyStorePath ssl-context-fact keystore))
-        (when keystore-password
-          (.setKeyStorePassword ssl-context-fact keystore-password))
-        (when key-password
-          (.setKeyManagerPassword ssl-context-fact key-password))
-        (when truststore
-          (.setTrustStorePath ssl-context-fact truststore))
-        (when trust-password
-          (.setTrustStorePassword ssl-context-fact trust-password))
-        (case client-auth
-          :need (.setNeedClientAuth ssl-context-fact true)
-          :want (.setWantClientAuth ssl-context-fact true)
-          nil)
-        (.addConnector server (doto (ServerConnector. server ssl-context-fact conn-facts)
-                                (.setPort https-port)
-                                (.setHost host)
-                                (.setIdleTimeout idle-timeout)))))
+      (doseq [port (to-coll https-port)]
+        (.addConnector server (https-cf port))))
     (scmp/map->ServerComponent
      {:jetty (doto server
                (.setStopTimeout 1000)
