@@ -1,4 +1,4 @@
-(defproject webnf/cljs "0.1.0-SNAPSHOT"
+(defproject webnf/cljs "0.1.0-alpha13"
   :plugins [[lein-modules "0.3.11"]
             [lein-cljsbuild "1.0.5"]]
   :description "ClojureScript functionality

@@ -1,4 +1,4 @@
-(defproject webnf/datomic "0.1.0-alpha12"
+(defproject webnf/datomic "0.1.0-alpha13"
   :plugins [[lein-modules "0.3.11"]]
   :description "Missing datomic pieces"
   :dependencies [[webnf/base "_"]

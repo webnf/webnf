@@ -1,13 +1,13 @@
-(defproject webnf.deps/web "0.1.0-alpha12"
+(defproject webnf.deps/web "0.1.0-alpha13"
   :plugins [[lein-modules "0.3.11"]]
   :description "Common dependencies for web apps"
   :url "http://github.com/webnf/webnf"
   :dependencies [[nl.bitwalker/UserAgentUtils "1.2.4"]
-                 [net.sourceforge.cssparser/cssparser "0.9.14"]                 
+                 [net.sourceforge.cssparser/cssparser "0.9.15"]
                  [org.lesscss/lesscss "1.7.0.1.1"
                   :exclusions [org.slf4j/slf4j-simple]]
                  [commons-codec "1.10"]
-                 [com.sun.mail/javax.mail "1.5.2"]
+                 [com.sun.mail/javax.mail "1.5.3"]
                  [commons-net "3.3"]
                  [ring/ring-core "1.3.2"]
                  [ring-mock "0.1.5"]
