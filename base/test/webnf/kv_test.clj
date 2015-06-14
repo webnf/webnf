@@ -16,10 +16,13 @@
                          (assoc-kv! t k (inc v)))
                        [[:got 1]] [[:some 1] [:more 2]])
            [[:got 1] [:some 2] [:more 3]]))
-    (is (= (map-juxt inc dec {0 2 1 3 2 4})
+    (is (= (map-juxt-kv inc dec {0 2 1 3 2 4})
            {1 1 2 2 3 3}))
-    (is (= (map-juxt inc dec [[0 2] [1 3] [2 4]])
-           [[1 1] [2 2] [3 3]]))))
+    (is (= (map-juxt-kv inc dec [[0 2] [1 3] [2 4]])
+           [[1 1] [2 2] [3 3]]))
+    (is (= (map-juxt (comp inc first) (comp dec second)
+                     {0 2 1 3 2 4})
+           {1 1 2 2 3 3}))))
 
 (deftest apply-kw-test
   (is (= (apply-kw (fn [a & {b :a}] (+ a b))

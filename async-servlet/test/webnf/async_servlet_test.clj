@@ -20,7 +20,7 @@
 
 (deftest roundtrip
   (send-off server cmp/start)
-  (send-off server srv/add-host
+  (send-off server srv/add-handler
             :roundtrip (srv/servlet-handler
                         webnf.AsyncServlet {"webnf.handler.service"
                                             "webnf.async-servlet-test/handler-fn"

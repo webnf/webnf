@@ -1,4 +1,4 @@
-(defproject webnf/handler "0.1.0-alpha13"
+(defproject webnf/handler "0.1.15"
   :plugins [[lein-modules "0.3.11"]]
   :description "The first minor release of webnf handler, a collection
   of code to aid web handler development. There is:
