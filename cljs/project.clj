@@ -5,10 +5,12 @@
   - port of strint from clojure.core.incubator
   - Event delecation helper in webnf.event"
   :dependencies [[org.clojure/clojurescript "_"]
-                 [webnf/base "_"]]
+                 [webnf/base "_"]
+                 [org.webjars/jszip "2.4.0"]]
   :cljsbuild {:builds
               {:test
                {:source-paths ["src" "test"]
+                :libs ["src-js"]
                 :compiler {:optimizations :advanced
                            :output-to  "target/tests/main.js"
                            :output-dir "target/tests"

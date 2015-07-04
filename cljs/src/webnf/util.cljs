@@ -12,7 +12,8 @@
    [cljs.core.async.impl.protocols :as asyncp :refer [ReadPort WritePort]]
    [webnf.channel :refer [callback-read-port]]
    [webnf.promise :refer [promise]]
-   [webnf.impl :as impl])
+   [webnf.impl :as impl]
+   webnfjs.jszip webnfjs.file-saver)
   (:require-macros 
    [cljs.core.async.macros :refer [go]]))
 
@@ -106,14 +107,23 @@
     (map #(.cloneNode % true) node-or-nodes)
     (.cloneNode node-or-nodes true)))
 
-(declare random-uuid)
+(def random-uuid cljs.core/random-uuid)
 
-(let [rex (js/RegExp. "[018]" "g")
-      replacer #(.toString (bit-xor % (bit-shift-right
-                                       (* 16 (js/Math.random))
-                                       (/ % 4)))
-                           16)
-      ;; short for "10000000-1000-4000-8000-100000000000"
-      init-string (str 1e7 -1e3 -4e3 -8e3 -1e11)]
-  (defn random-uuid "Return a random UUID as string"
-    [] (.replace init-string rex replacer)))
+(comment
+  (declare random-uuid)
+
+  (let [rex (js/RegExp. "[018]" "g")
+        replacer #(.toString (bit-xor % (bit-shift-right
+                                         (* 16 (js/Math.random))
+                                         (/ % 4)))
+                             16)
+        ;; short for "10000000-1000-4000-8000-100000000000"
+        init-string (str 1e7 -1e3 -4e3 -8e3 -1e11)]
+    (defn random-uuid "Return a random UUID as string"
+      [] (.replace init-string rex replacer))))
+
+(defn save-as [name file]
+  (js/saveAs name file))
+
+(defn make-js-zip []
+  (js/JSZip.))

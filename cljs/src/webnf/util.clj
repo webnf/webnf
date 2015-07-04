@@ -20,3 +20,8 @@
                `[~(pr-str e) "=>" (cljs.core/pr-str ~e) \newline])
              (butlast exprs)))
      ret-exp#))
+
+(defmacro forcat
+  "Concat the return value of a for expression"
+  [bindings body]
+  `(cljs.core/apply cljs.core/concat (cljs.core/for ~bindings ~body)))

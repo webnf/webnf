@@ -1,0 +1,3 @@
+var String = {
+    endsWith : function(){}
+};
