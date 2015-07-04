@@ -200,7 +200,7 @@
     (cmp/stop cmp)
     (-> server
         (remove-host handler)
-        (cmp/update-system [:handlers] dissoc id))))
+        (update :handlers dissoc id))))
 
 (defn quick-serve! [handler & {:keys [vhosts port]
                                :or {port 8080}}]
