@@ -1,4 +1,4 @@
-(defproject webnf/parent "0.1.16"
+(defproject webnf/parent "0.1.17"
   ;; lein -f modules change version leiningen.release/bump-version alpha
   :plugins [[lein-modules "0.3.11"]]
 
@@ -25,11 +25,13 @@
                     "async-servlet" "base" "cljs" "datomic" "enlive.clj" "enlive.cljs"
                     "handler" "server" "filestore"]
              :versions {org.clojure/clojure              "1.7.0"
-                        webnf                            "0.1.16"
-                        webnf.deps                       "0.1.16"
+                        webnf                            "0.1.17"
+                        webnf.deps                       "0.1.17"
                         ;;  is seriously broken
                         ;; "0.1.242.0-44b1e3-alpha"
                         org.clojure/core.async           "0.1.346.0-17112a-alpha"
                         org.clojure/clojurescript        "0.0-3308"
                         org.clojure/tools.reader         "0.10.0-alpha1"
-                        org.clojure/core.typed           "0.3.6"}})
+                        org.clojure/core.typed           "0.3.6"
+                        org.mozilla/rhino                "1.7R4"
+                        com.google.code.findbugs/jsr305  "3.0.0"}})

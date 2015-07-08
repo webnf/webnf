@@ -1,4 +1,4 @@
-(defproject webnf.deps/web "0.1.16"
+(defproject webnf.deps/web "0.1.17"
   :plugins [[lein-modules "0.3.11"]]
   :description "Common dependencies for web apps"
   :url "http://github.com/webnf/webnf"
@@ -16,4 +16,5 @@
                  [hiccup "1.0.5"]
                  [liberator "0.13"]
                  [prone "0.8.2"]
-                 [garden "1.2.6"]])
+                 [garden "1.2.6"
+                  :exclusions [com.yahoo.platform.yui/yuicompressor]]])

@@ -1,4 +1,4 @@
-(defproject webnf.deps/universe "0.1.16"
+(defproject webnf.deps/universe "0.1.17"
   :plugins [[lein-modules "0.3.11"]]
   :description "The uber dependency to get a full set of popular
   dependencies. For development or when you have room in your .m2 repo."
@@ -16,9 +16,11 @@
                  [net.polyc0l0r/hasch "0.3.0-beta2"]
 
                  ;; Data formats
-                 [clj-time "0.9.0" :exclusions [joda-time]]
+                 [clj-time "0.10.0" :exclusions [joda-time]]
                  [net.mikera/vectorz-clj "0.30.1"]
-                 [org.reflections/reflections "0.9.10"]
+                 [com.google.code.findbugs/jsr305  "_"] ;; reflections
+                 [org.reflections/reflections "0.9.10"
+                  :exclusions [com.google.code.findbugs/annotations]]
                  [danlentz/clj-uuid "0.1.6"]
                  [org.fressian/fressian "0.6.5"]
                  [cheshire "5.5.0"]
@@ -29,5 +31,6 @@
 
                  ;; APIs
                  [joda-time "2.8.1"]
-                 [clj-http "1.1.2"]
-                 [amazonica "0.3.28" :exclusions [joda-time]]])
+                 [clj-http "1.1.2"
+                  :exclusions [commons-logging]]
+                 [amazonica "0.3.28" :exclusions [joda-time commons-logging]]])

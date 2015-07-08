@@ -1,4 +1,4 @@
-(defproject webnf/base "0.1.16"
+(defproject webnf/base "0.1.17"
   :description "Collection org.clojure libs and essential others"
   :plugins [[lein-modules "0.3.11"]]
   :dependencies [[org.clojure/clojure "_"]
