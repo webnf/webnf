@@ -93,13 +93,19 @@
            (cond (.isDirectory e) (dir-entries e want-file?)
                  (want-file? e)   [e]))))
 
+(set! *warn-on-reflection* true)
+
+(defn- ze-name ^String [^java.util.zip.ZipEntry ze]
+  (.getName ze))
+
 (defn zip-entries
   ([zip] (zip-entries zip (constantly true)))
   ([zip want-entry?]
    (with-open [zf (java.util.zip.ZipFile. (io/file zip))]
-     (filterv want-entry?
-              (enumeration-seq
-               (.entries zf))))))
+     (into [] (remove #_(do (println (ze-name %) "=>" (.endsWith (ze-name %) "/")))
+                      #(.endsWith (ze-name %) "/")
+                      (enumeration-seq
+                       (.entries zf)))))))
 
 #_(defn relativize [base-path target-path]
     (.getPath
@@ -114,42 +120,33 @@
       (recur (cons (.getName path') acc)
              (.getParentFile path')))))
 
+(defn system-classpath-roots []
+  (str/split (System/getProperty "java.class.path") #":"))
+
 (defn classpath-resources
-  ([] (classpath-resources (System/getProperty "java.class.path")))
+  ([] (classpath-resources (system-classpath-roots)))
   ([roots] (if (string? roots)
              (recur (str/split roots #":"))
              (forcat [r roots
-                      :let [f (io/file r)]]
+                      :let [f (io/file r)
+                            ze-meta {:classpath-entry f}]]
                      (cond
                        (.isDirectory f) (for [de (dir-entries f)]
                                           (with-meta (relativize f de)
-                                            {:classpath-entry f}))
+                                            ze-meta))
                        (.isFile f)      (for [ze (zip-entries f)]
                                           (with-meta (relativize nil (str ze))
-                                            {:classpath-entry f})))))))
+                                            ze-meta)))))))
 
 (defn find-ambigous-resources
   ([] (find-ambigous-resources (classpath-resources)))
   ([pathes]
    (loop [[p0 & [p1 :as pn]] (sort pathes)
-          duplicate-files {}
-          duplicate-folders {}]
+          duplicate-files {}]
      (let [cpe0 (:classpath-entry (meta p0))
            cpe1 (:classpath-entry (meta p1))]
        (cond
-         (empty? pn) (merge duplicate-files duplicate-folders)
+         (empty? pn) duplicate-files
          (= p0 p1)
-         (recur pn
-                (update-in duplicate-files [p0] (fnil into #{}) [cpe0 cpe1])
-                duplicate-folders)
-         (and
-          (< 1 (count p0))
-          (< 1 (count p1))
-          (not= cpe0 cpe1)
-          (= (butlast p0)
-             (butlast p1)))
-         (recur pn
-                duplicate-files
-                (-> duplicate-folders
-                    (update-in [(butlast p0)] (fnil into #{}) [cpe0 cpe1])))
-         :else (recur pn duplicate-files duplicate-folders))))))
+         (recur pn (update-in duplicate-files [p0] (fnil into #{}) [cpe0 cpe1]))
+         :else (recur pn duplicate-files))))))
