@@ -113,12 +113,25 @@
                   (.toURI (io/file target-path)))))
 
 (defn relativize [base path]
-  (loop [acc ()
-         ^java.io.File path' (io/file path)]
-    (if (= base path')
-      (vec acc)
-      (recur (cons (.getName path') acc)
-             (.getParentFile path')))))
+  (let [base (when base (.getCanonicalFile (io/file base)))
+        path (io/file path)]
+    (loop [acc ()
+           ^java.io.File path' path]
+      (when-not path'
+        (throw (ex-info (str "Resource dir not contained in project root"
+                             {:base base :path path})
+                        {:base base :path path})))
+      (if (= base path')
+        (vec acc)
+        (recur (cons (.getName path') acc)
+               (.getParentFile path'))))))
+
+(defn split-path [path]
+  (loop [acc () ^java.io.File path (io/file path)]
+    (if path
+      (recur (cons (.getName path) acc)
+             (.getParentFile path))
+      (vec acc))))
 
 (defn system-classpath-roots []
   (str/split (System/getProperty "java.class.path") #":"))
@@ -128,14 +141,14 @@
   ([roots] (if (string? roots)
              (recur (str/split roots #":"))
              (forcat [r roots
-                      :let [f (io/file r)
+                      :let [f (.getCanonicalFile (io/file r))
                             ze-meta {:classpath-entry f}]]
                      (cond
                        (.isDirectory f) (for [de (dir-entries f)]
                                           (with-meta (relativize f de)
                                             ze-meta))
                        (.isFile f)      (for [ze (zip-entries f)]
-                                          (with-meta (relativize nil (str ze))
+                                          (with-meta (split-path (str ze))
                                             ze-meta)))))))
 
 (defn find-ambigous-resources
@@ -147,6 +160,7 @@
            cpe1 (:classpath-entry (meta p1))]
        (cond
          (empty? pn) duplicate-files
-         (= p0 p1)
+         (and (= p0 p1)
+              (not= cpe0 cpe1))
          (recur pn (update-in duplicate-files [p0] (fnil into #{}) [cpe0 cpe1]))
          :else (recur pn duplicate-files))))))
