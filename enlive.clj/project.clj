@@ -1,4 +1,4 @@
-(defproject webnf/enlive.clj "0.1.17"
+(defproject webnf/enlive.clj "0.1.18"
   :plugins [[lein-modules "0.3.11"]]
   :description "Helpers and wrappers to make enlive even more versatile
   - provides alternate version of load-html, that caches on last-modified to provide dynamic recompilation

@@ -1,10 +1,12 @@
-(defproject webnf/cljs "0.1.17"
+(defproject webnf/cljs "0.1.18"
   :plugins [[lein-modules "0.3.11"]
             [lein-cljsbuild "1.0.6"]]
   :description "ClojureScript functionality
   - port of strint from clojure.core.incubator
   - Event delecation helper in webnf.event"
-  :dependencies [[org.clojure/clojurescript "_"]
+  :dependencies [[org.clojure/clojurescript "_"
+                  :exclusions [org.clojure/tools.reader]]
+                 [org.clojure/tools.reader "_"]
                  [webnf/base "_"]
                  [org.webjars/jszip "2.4.0"]]
   :cljsbuild {:builds
