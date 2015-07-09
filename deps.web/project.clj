@@ -16,5 +16,6 @@
                  [hiccup "1.0.5"]
                  [liberator "0.13"]
                  [prone "0.8.2"]
-                 [garden "1.2.6"
+                 [webnf.compat/yuicompressor "_"]
+                 [garden "1.2.5" ;; 1.2.6 is botched
                   :exclusions [com.yahoo.platform.yui/yuicompressor]]])

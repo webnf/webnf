@@ -27,6 +27,7 @@
              :versions {org.clojure/clojure              "1.7.0"
                         webnf                            "0.1.17"
                         webnf.deps                       "0.1.17"
+                        webnf.compat/yuicompressor       "2.4.8"
                         ;;  is seriously broken
                         ;; "0.1.242.0-44b1e3-alpha"
                         org.clojure/core.async           "0.1.346.0-17112a-alpha"
