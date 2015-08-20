@@ -33,15 +33,15 @@
           ids (filter-prefix \# segments)
           preds (when-not (contains? #{nil \* \# \.}
                                      (.charAt tag-name 0))
-                  (list `(lib.select/tag= ~tag-name)))
+                  (list `(tag= ~tag-name)))
           preds (if (seq classes)
-                  (conj preds `(lib.select/has-class ~@classes))
+                  (conj preds `(has-class ~@classes))
                   preds)
           preds (case (count ids)
                   0 preds
-                  1 (conj preds `(lib.select/id= ~(first ids)))
+                  1 (conj preds `(id= ~(first ids)))
                   (throw (ex-info "More than one id specified" {:selector kw})))]
-      (if (seq preds) (intersection preds) `lib.select/any))))
+      (if (seq preds) (intersection preds) `any))))
 
 (defn compile-step* [step]
   (cond

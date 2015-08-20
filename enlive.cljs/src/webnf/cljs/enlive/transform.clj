@@ -16,7 +16,7 @@
 
 (defmacro clone-for [seq-comprehension & body]
   (let [rules (if (= 1 (count body))
-                (cons `lib.select/root body)
+                (cons `sel/root body)
                 body)]
     `(fn [node#]
        (let [frag# (.createDocumentFragment js/document)]
@@ -30,7 +30,7 @@
                            (fn ~argt ~@body))))
 
 (defmacro defsnippet [name path selector params & tf]
-  `(let [snip-holder# (webnf.enlive/load-html ~path :selector ~selector)]
+  `(let [snip-holder# (sel/load-html ~path :selector ~selector)]
      (defn ~name ~params
        (let [tf# #(at % ~@tf)]
          (cljs.core.async.macros/go
