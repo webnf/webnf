@@ -1,4 +1,4 @@
-(defproject webnf.deps/dev "0.1.18"
+(defproject webnf.deps/dev "0.1.19-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]]
   :description "Development dependencies"
   :dependencies [[clj-stacktrace "0.2.8"]

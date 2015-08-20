@@ -1,4 +1,4 @@
-(defproject webnf.deps/contrib "0.1.18"
+(defproject webnf.deps/contrib "0.1.19-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]]
   :description "Depend on projects covered by clojure's CA"
   :dependencies [[org.clojure/algo.generic "0.1.2"]

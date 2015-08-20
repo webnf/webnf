@@ -1,4 +1,4 @@
-(defproject webnf/parent "0.1.18"
+(defproject webnf/parent "0.1.19-SNAPSHOT"
   ;; lein -f modules change version leiningen.release/bump-version alpha
   :plugins [[lein-modules "0.3.11"]]
 
@@ -26,8 +26,8 @@
                     "handler" "server" "filestore"
                     "compat.yuicompressor"]
              :versions {org.clojure/clojure              "1.7.0"
-                        webnf                            "0.1.18"
-                        webnf.deps                       "0.1.18"
+                        webnf                            "0.1.19-SNAPSHOT"
+                        webnf.deps                       "0.1.19-SNAPSHOT"
                         webnf.compat/yuicompressor       "2.4.8"
                         ;;  is seriously broken
                         ;; "0.1.242.0-44b1e3-alpha"
