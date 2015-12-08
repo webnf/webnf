@@ -127,3 +127,44 @@
 
 (defn make-js-zip []
   (js/JSZip.))
+
+;; ## Two new core operations
+
+;; ### pretial -- partial for the first param
+
+;; This is the main proposition: introduce an operation that lets one
+;; partially bind clojure's collection functions
+
+(defn pretial* [f & args]
+  (fn [o] (apply f o args)))
+
+;; ### ap -- start chains of pretials
+
+;; This is the entry point for update functions
+;; it's like a reverse comp, that fits in the update-fn slot:
+;; (update-in x [y z] ap
+;;            (pretial assoc :a :b)
+;;            (pretial dissoc :c))
+
+(defn ap* [x & fs]
+  (reduce #(%2 %1) x fs))
+
+;; ### rcomp seems to naturally fall out
+
+(defn rcomp* [& fs]
+  (apply pretial* ap* fs))
+
+(defunrolled pretial
+  :min 1
+  :more-arities ([args] `(apply pretial* ~args))
+  ([f] f)
+  ([f & args] `(fn* [o#] (~f o# ~@args))))
+
+(defunrolled ap
+  :min 1
+  :more-arities ([args] `(apply ap* ~args))
+  ([x & fs] (clojure.core/reduce #(clojure.core/list %2 %1) x fs)))
+
+(defunrolled rcomp
+  :more-arities ([args] `(apply rcomp* ~args))
+  ([& fs] `(pretial ap ~@fs)))

@@ -9,4 +9,6 @@
 (autoload-some ^:static (clojure.repl pst source doc))
 (autoload-some ^:static (webnf.base.platform hostname local-ip reset-logging-config! pr-cls))
 (autoload-some ^:static (webnf.base.utils to-many squelch pprint-str
-                                          ^:macro forcat ^:macro static-case))
+                                          ^:macro forcat ^:macro static-case
+                                          ^:macro defunrolled
+                                          pretial ap rcomp))
