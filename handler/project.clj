@@ -10,8 +10,9 @@
   - Common dependencies
   - Dataflow / Validation"
   :source-paths ["src/clj"]
-  :dependencies [[org.clojure/clojure "_"]
-                 [webnf/base "_"]
-                 [webnf/async-servlet "_"]
-                 [webnf.deps/web "_"]
+  :dependencies [[org.clojure/clojure "_" :upgrade false]
+                 [webnf/base "_" :upgrade false]
+                 [webnf/async-servlet "_" :upgrade false]
+                 [webnf.deps/web "_" :upgrade false]
+                 [webnf/enlive.clj "_" :upgrade false]
                  [com.lambdaworks/scrypt "1.4.0"]])

@@ -2,5 +2,5 @@
   :description "Avoid repackaging of rhino in yuicompressor
     repackaging of com.yahoo.platform.yui/yuicompressor"
   :plugins [[lein-modules "0.3.11"]]
-  :dependencies [[org.mozilla/rhino "_"]])
+  :dependencies [[org.mozilla/rhino "_" :upgrade false]])
 
