@@ -1,5 +1,7 @@
 (ns webnf.util
   (:require
+   [clojure.string :as str]
+   [cljs.pprint :as pp]
    [clojure.string :refer [split-lines split join]]
    [goog.dom :as dom]
    [goog.events :as evt]
@@ -8,14 +10,17 @@
    [goog.net.EventType :as NET]
    [goog.net.XhrIo :as XhrIo]
    [goog.Uri :as Uri]
+   [goog.crypt.base64 :as b64]
    [cljs.core.async :refer [chan >! close!]]
    [cljs.core.async.impl.protocols :as asyncp :refer [ReadPort WritePort]]
    [webnf.channel :refer [callback-read-port]]
    [webnf.promise :refer [promise]]
    [webnf.impl :as impl]
    webnfjs.jszip webnfjs.file-saver)
-  (:require-macros 
-   [cljs.core.async.macros :refer [go]]))
+  (:require-macros
+   [webnf.base :refer [defunrolled]]
+   [cljs.core.async.macros :refer [go]])
+  (:import goog.string.StringBuffer))
 
 (def log impl/log)
 (def log-pr impl/log-pr)
@@ -53,6 +58,13 @@
      :headers (hmap (.getAllResponseHeaders t))
      :body (.getResponseText t)}))
 
+(defn- parse-xhr-response-xml [evt]
+  (let [t (.-target evt)]
+    {:uri (.getLastUri t)
+     :status (.getStatus t)
+     :headers (hmap (.getAllResponseHeaders t))
+     :body (.getResponseXml t)}))
+
 (defn- as-str [o]
   (if (keyword? o)
     (name o)
@@ -67,11 +79,11 @@
   :auto-refresh true triggers a request on every read
   :parse-response can be a custom response parser working directly on the XmlHttpRequest"
   ([uri] (xhr uri nil))
-  ([uri {:keys [method body headers params auto-refresh parse-response]}]
+  ([uri {:keys [method body headers params auto-refresh parse-response xml]}]
    (let [uri (Uri/parse uri)
          parser (if parse-response
                   (comp parse-response #(.-target %))
-                  parse-xhr-response)
+                  (if xml parse-xhr-response-xml parse-xhr-response))
          _ (reduce-kv (fn [_ param value]
                         (.setParameterValue uri param value))
                       nil params)
@@ -168,3 +180,40 @@
 (defunrolled rcomp
   :more-arities ([args] `(apply rcomp* ~args))
   ([& fs] `(pretial ap ~@fs)))
+
+(defn basic-auth-str [login password]
+  (str "Basic " (b64/encodeString (str login ":" password) true)))
+
+(defn pprint-str [o]
+  (let [sb (StringBuffer.)]
+    (binding [pp/*out* (StringBufferWriter. sb)]
+      (pp/pprint o pp/*out*)
+      (str sb))))
+
+(def pprint pp/pprint)
+
+(let [escape-regex (js/RegExp. "[&<>\"']" "g")
+      escape (fn [s]
+               (case s
+                 "&" "&amp;"
+                 "<" "&lt;"
+                 ">" "&gt;"
+                 "\"" "&quot;"
+                 "'" "&#39;"))]
+  (defn escape-html [s]
+    (.replace escape-regex escape)))
+
+(defn is-html? [content-type]
+  (re-matches #"text/html\s*(;.*)?" (str content-type)))
+
+;; FIXME url escape
+
+(defn path-str
+  ([p abs]
+   (if abs
+     (path-str p)
+     (str/join "/" p)))
+  ([p] (str/join "/" (cons nil p))))
+
+(defn parse-path [p]
+  (remove str/blank? (str/split p #"/")))

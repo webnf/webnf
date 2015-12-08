@@ -23,7 +23,7 @@
                   (if kvr
                     f
                     #(let [[k v] %2] (f %1 k v)))
-                  (transient init) coll))))
+                  (transient (or init (if kvr {} []))) coll))))
 
 (defn map-to-kv
   "Maps (f assoc! v) over a coll to build up a map
