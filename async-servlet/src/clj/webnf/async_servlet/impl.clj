@@ -1,12 +1,15 @@
 (ns webnf.async-servlet.impl
   (:import
+   (webnf AsyncServlet)
    (java.io InputStream File FileInputStream OutputStream)
    (javax.servlet AsyncListener AsyncContext AsyncEvent ServletConfig ServletException)
    (javax.servlet.http HttpServlet HttpServletRequest HttpServletResponse))
   (:require [ring.util.servlet :as servlet]
             [clojure.tools.logging :as log]
             [clojure.java.io :as io]
-            [webnf.kv :refer [map-juxt]]))
+            [webnf.kv :refer [map-juxt]]
+            [clojure.core.async :as async]
+            [webnf.async-servlet.websocket :as ws]))
 
 (set! *warn-on-reflection* true)
 
@@ -40,7 +43,7 @@
   (cond
    (string? body)
    (with-open [writer (.getWriter response)]
-     (.print writer body))
+     (.print writer ^String body))
    (seq? body)
    (with-open [writer (.getWriter response)]
      (doseq [chunk body]
@@ -100,7 +103,7 @@
       (when complete
         (complete event)))))
 
-(defn start-async [^HttpServletRequest request make-callbacks timeout]
+(defn start-async-http [^HttpServletRequest request make-callbacks timeout]
   (let [ctx (.startAsync request)]
     (when timeout
       (.setTimeout ctx timeout))
@@ -136,38 +139,44 @@
     (to-header-map resp (.getHeaderNames resp))))
 
 #_(require '[webnf.base :refer [pprint-str]])
-(defn handle-servlet-request 
-  ([handler ^HttpServletRequest request response]
-   (let [request-map (assoc (servlet/build-request-map request)
-                            :parameters (.getParameterMap request)
-                            :attributes (map-juxt
-                                         identity #(.getAttribute request %)
-                                         (reify clojure.lang.IReduceInit
-                                           (reduce [_ f init]
-                                             (let [an (.getAttributeNames request)]
-                                               (loop [s init]
-                                                 (if (.hasMoreElements an)
-                                                   (recur (f s (.nextElement an)))
-                                                   s))))))
-                            :path-info (.getPathInfo request))
-         srh (header-map response)
-         {:keys [status headers body timeout] :as response-map} 
-         (try (handler request-map)
-              (catch Exception e
-                (log/error e "Uncaught exception during request"
-                           (:request-method request-map)
-                           (:uri request-map))
-                (throw (ServletException. "Uncaught exception from handler" e))))]
-     (when status
-       (set-status response status))
-     (when-not (empty? headers)
-       (set-headers response headers))
-     #_(log/debug (pprint-str {:ring-resp-h headers
-                               :start-resp-h srh
-                               :end-resp-h (header-map response)}))
-     (if (fn? body)
-       (start-async request body timeout)
-       (set-body response body)))))
 
+(defn- make-request-map [^HttpServletRequest request]
+  (assoc (servlet/build-request-map request)
+         :parameters (.getParameterMap request)
+         :attributes (map-juxt
+                      identity #(.getAttribute request %)
+                      (reify clojure.lang.IReduceInit
+                        (reduce [_ f init]
+                          (let [an (.getAttributeNames request)]
+                            (loop [s init]
+                              (if (.hasMoreElements an)
+                                (recur (f s (.nextElement an)))
+                                s))))))
+         :path-info (.getPathInfo request)))
+
+(defn- do-request [handler request-map]
+  (try (handler request-map)
+       (catch Exception e
+         (log/error e "Uncaught exception during request"
+                    (:request-method request-map)
+                    (:uri request-map))
+         (throw (ServletException. "Uncaught exception from handler" e)))))
+
+(defn- http-response [{:keys [status headers body timeout websocket]}
+                      request response]
+  (when status
+    (set-status response status))
+  (when-not (empty? headers)
+    (set-headers response headers))
+  (if (fn? body)
+    (if websocket
+      (ws/start-async-ws request response body timeout)
+      (start-async-http request body timeout))
+    (set-body response body)))
+
+(defn handle-servlet-request 
+  ([handler request response]
+   (http-response (do-request handler (make-request-map request))
+                  request response)))
 
 
