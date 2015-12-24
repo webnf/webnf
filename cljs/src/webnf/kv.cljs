@@ -36,24 +36,28 @@
                   (if kvr
                     f
                     #(let [[k v] %2] (f %1 k v)))
-                  (transient init) coll))))
+                  (transient (or init (if kvr {} []))) coll))))
 
 (defn map-to-kv
   "Maps (f assoc! v) over a coll to build up a map
-   f should return the result of (assoc! k* v*)"
+   f should return the result of (assoc! k* v*)
+     or nil to skip the value (don't call assoc! then)"
   [f coll]
   (persistent!
    (reduce (fn [t v]
-             (f #(assoc! t %1 %2) v))
+             (or (f #(assoc! t %1 %2) v)
+                 t))
            (transient {}) coll)))
 
 (defn map-kv
   "Maps (f assoc! k v) over a map, where
    [k v] are MapEntry pairs from coll.
-   f should return the result of (assoc! k* v*)"
+   f should return the result of (assoc! k* v*)
+     or nil to skil the kv-pair (don't call assoc! then)"
   [f coll]
   (treduce-kv (fn [t k v]
-                (f #(assoc-kv! t %1 %2) k v))
+                (or (f #(assoc-kv! t %1 %2) k v)
+                    t))
               (empty coll) coll))
 
 (defn map-juxt
