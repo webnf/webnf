@@ -82,6 +82,10 @@
                     `(let [~vararg (list* ~@args ~vararg)]
                        ~(gen vararg)))])))))
 
+(defmacro or* "Variant of or, that only skips nils"
+  [v d]
+  `(let [v# ~v] (if (nil? v#) ~d v#)))
+
 ;; ## Two new core operations
 
 ;; ### pretial -- partial for the first param
@@ -101,7 +105,7 @@
 ;;            (pretial dissoc :c))
 
 (defn ap* [x & fs]
-  (reduce #(%2 %1) x fs))
+  (reduce #((or* %2 identity) %1) x fs))
 
 ;; ### rcomp seems to naturally fall out
 
@@ -117,7 +121,7 @@
 (defunrolled ap
   :min 1
   :more-arities ([args] `(apply ap* ~args))
-  ([x & fs] (reduce #(list %2 %1) x fs)))
+  ([x & fs] (reduce  #(list `(or* ~%2 identity) %1) x fs)))
 
 (defunrolled rcomp
   :more-arities ([args] `(apply rcomp* ~args))
