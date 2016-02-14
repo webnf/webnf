@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+gra () {
+    local repo="webnf/$1"
+    git remote add $repo $3:$repo
+    git fetch $repo
+    git-new-workdir . $1 $repo/$2
+}
+
+for dir in dwn lein-nix lein-collisions
+ do gra $dir master git@github.com; done
