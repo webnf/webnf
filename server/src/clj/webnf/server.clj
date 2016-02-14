@@ -43,6 +43,11 @@
                    (.setInitParameters {"dirAllowed" "true"}))
                  "/")))
 
+(declare add-path-filter)
+(defn fcgi-handler-filtering [address fcgi-mapping cwd allow-path?]
+  (add-path-filter (fcgi-handler address fcgi-mapping cwd)
+                   "/" allow-path?))
+
 ;; This is the main workhorse, wrapping servlets into jetty handlers
 
 (defn servlet-handler [servlet-class params mapping
@@ -66,6 +71,22 @@
 
 ;; Preferrably only use this for small service pages within the app server
 ;; Web apps should be loaded within their own classloader and added via servlet handler
+
+(defn add-servlet-filter [handler mapping predicate?]
+  (doto handler
+    (.addFilter (FilterHolder.
+                 (reify Filter
+                   (init [_ _])
+                   (destroy [_])
+                   (doFilter [_ req resp chain]
+                     (if (predicate? req)
+                       (.doFilter chain req resp)
+                       (.setStatus resp 403)))))
+                mapping (EnumSet/allOf DispatcherType))))
+
+(defn add-path-filter [handler mapping path-predicate?]
+  (add-servlet-filter handler mapping (fn [^HttpServletRequest req]
+                                        (path-predicate? (.getPathInfo req)))))
 
 (defn ring-handler [service & {:keys [init destroy]}]
   (let [cbs [init destroy service]
