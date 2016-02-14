@@ -24,14 +24,14 @@
              :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
                     "async-servlet" "base" "cljs" "datomic" "enlive.clj" "enlive.cljs"
                     "handler" "server" "filestore" "server.undertow"
-                    "compat.yuicompressor"]
-             :versions {org.clojure/clojure              "1.8.0-RC3"
+                    "compat.yuicompressor" "cats"]
+             :versions {org.clojure/clojure              "1.8.0"
                         webnf                            "0.1.19-SNAPSHOT"
                         webnf.deps                       "0.1.19-SNAPSHOT"
                         webnf.compat/yuicompressor       "2.4.8"
                         org.clojure/core.async           "0.2.374"
-                        org.clojure/clojurescript        "1.7.189"
-                        org.clojure/tools.reader         "1.0.0-alpha2"
+                        org.clojure/clojurescript        "1.7.228"
+                        org.clojure/tools.reader         "1.0.0-alpha3"
                         org.clojure/tools.nrepl          "0.2.12"
                         org.clojure/tools.analyzer.jvm   "0.6.9"
                         org.clojure/core.typed           "0.3.19"
@@ -41,4 +41,5 @@
                         joda-time                        "2.9.1"
                         javax.servlet/javax.servlet-api  "3.1.0"
                         "JETTY"                          "9.3.6.v20151106"
-                        "LOGBACK"                        "1.7.13"}})
+                        "LOGBACK"                        "1.7.13"
+                        "MAIL-API"                       "1.5.5"}})

@@ -17,7 +17,8 @@
                   :exclusions [ring/ring-core]]
                  [hiccup "1.0.5"]
                  [liberator "0.14.0"]
-                 [prone "0.8.2"]
+                 [prone "0.8.3"]
                  [webnf.compat/yuicompressor "_" :upgrade false]
-                 [garden "1.3.0" ;; 1.2.6 is botched
-                  :exclusions [com.yahoo.platform.yui/yuicompressor]]])
+                 [garden "1.3.0"
+                  :exclusions [com.yahoo.platform.yui/yuicompressor]]
+                 [http-kit "2.1.19"]])
