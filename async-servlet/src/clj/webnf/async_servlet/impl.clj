@@ -88,10 +88,8 @@
 (defn make-listener [{:keys [error timeout complete]}]
   (reify AsyncListener
     (onStartAsync [this event]
-      ;; we won't react to this, since
-      ;; 1. it's name is confusing
-      ;; 2. reusing context between requests
-      ;;    doesn't fit into ring's request-response model
+      ;; we won't react to this, since reusing context between requests
+      ;; doesn't fit into ring's request-response model
       nil)
     (onError [this event]
       (when error
