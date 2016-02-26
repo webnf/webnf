@@ -4,9 +4,12 @@ set -e
 
 gra () {
     local repo="webnf/$1"
+    local rbranch="$repo/$2"
     git remote add $repo $3:$repo
     git fetch $repo
-    git-new-workdir . $1 $repo/$2
+    git-new-workdir . $1
+    (cd $1
+     git checkout -b $repo $rbranch)
 }
 
 for dir in dwn lein-nix lein-collisions
