@@ -23,7 +23,7 @@
               :scm          {:dir ".."}}
              :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
                     "async-servlet" "base" "cljs" "datomic" "enlive.clj" "enlive.cljs"
-                    "handler" "server" "filestore" "server.undertow"
+                    "handler" "server" "filestore" ; "server.undertow"
                     "compat.yuicompressor" "cats"]
              :versions {org.clojure/clojure              "1.8.0"
                         webnf                            "0.1.19-SNAPSHOT"
