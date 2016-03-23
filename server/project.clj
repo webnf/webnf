@@ -12,4 +12,5 @@
                  [org.eclipse.jetty/jetty-webapp "JETTY" :upgrade false]
                  [org.eclipse.jetty.fcgi/fcgi-server "JETTY" :upgrade false]
                  [org.eclipse.jetty/jetty-alpn-server "JETTY" :upgrade false]
+                 [org.eclipse.jetty/jetty-servlets "JETTY" :upgrade false]
                  [com.stuartsierra/component "_" :upgrade false]])
