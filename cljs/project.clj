@@ -1,6 +1,6 @@
 (defproject webnf/cljs "0.1.19-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]
-            [lein-cljsbuild "1.1.2"]]
+            [lein-cljsbuild "1.1.3"]]
   :description "ClojureScript functionality
   - port of strint from clojure.core.incubator
   - Event delecation helper in webnf.event"
@@ -8,7 +8,7 @@
                  [webnf.deps/contrib "_" :upgrade false]
                  [webnf.deps/web "_" :upgrade false]
                  [org.webjars/jszip "2.4.0"]
-                 [org.omcljs/om "1.0.0-alpha30"]
+                 [org.omcljs/om "1.0.0-alpha31"]
                  [prismatic/om-tools "0.4.0"]]
   :cljsbuild {:builds
               {:test

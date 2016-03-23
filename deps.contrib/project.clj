@@ -48,7 +48,7 @@
                  [org.clojure/tools.emitter.jvm "0.1.0-beta5"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.macro "0.1.5"]
-                 [org.clojure/tools.namespace "0.3.0-alpha2"]
+                 [org.clojure/tools.namespace "0.3.0-alpha3"]
                  [org.clojure/tools.nrepl "_" :upgrade false]
                  [org.clojure/tools.reader "_" :upgrade false]
                  [org.clojure/tools.trace "0.7.9"]])

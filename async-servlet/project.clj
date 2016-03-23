@@ -11,4 +11,4 @@
                  [javax.servlet/javax.servlet-api "_" :scope "provided" :upgrade false]]
   :aot [webnf.async-servlet.UpgradeHandler]
   :profiles {:test {:dependencies [[webnf/server "_" :upgrade false]
-                                   [clj-http "2.0.0"]]}})
+                                   [clj-http "2.1.0"]]}})
