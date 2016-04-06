@@ -1,4 +1,4 @@
-(defproject webnf/base "0.1.19-SNAPSHOT"
+(defproject webnf/base "0.2.0-SNAPSHOT"
   :description "Collection org.clojure libs and essential others"
   :plugins [[lein-modules "0.3.11"]]
   :dependencies [[org.clojure/clojure "_" :upgrade false]
