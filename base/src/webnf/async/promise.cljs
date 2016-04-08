@@ -1,6 +1,6 @@
-(ns webnf.promise
+(ns webnf.async.promise
   (:require
-   [webnf.channel :refer [serve-read-waiters]]
+   [webnf.async :refer [serve-read-waiters]]
    [cljs.core.async.impl.dispatch :as dispatch]
    [cljs.core.async.impl.protocols :as async]
    [cljs.core.async :refer [<!]])

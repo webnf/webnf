@@ -1,4 +1,4 @@
-(ns webnf.event
+(ns webnf.js.event
   (:require
    [goog.dom :as dom]
    [goog.events :as evt]))
@@ -23,3 +23,5 @@
                 (doseq [dsc (delimited-parents (.-target evt) element)]
                   (when (select-descendant? dsc)
                     (handler dsc evt))))))
+
+

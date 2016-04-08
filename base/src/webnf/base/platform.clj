@@ -3,7 +3,7 @@
             [clojure.string :as str]
             [clojure.tools.logging :as log]
             [webnf.base.autoload :refer [autoload]]
-            [webnf.base.utils :refer [forcat]]))
+            [webnf.base.util :refer [forcat]]))
 
 (defn hostname
   "Get the hostname of localhost"
@@ -106,11 +106,6 @@
                       #(.endsWith (ze-name %) "/")
                       (enumeration-seq
                        (.entries zf)))))))
-
-#_(defn relativize [base-path target-path]
-    (.getPath
-     (.relativize (.toURI (io/file base-path))
-                  (.toURI (io/file target-path)))))
 
 (defn relativize [base path]
   (let [base (when base (.getCanonicalFile (io/file base)))

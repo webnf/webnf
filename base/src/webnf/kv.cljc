@@ -1,15 +1,28 @@
 (ns webnf.kv
   "Functions to efficiently handle associatives with reducers and transients.")
+#?
+(:clj
+ (do
+   (defprotocol TKV
+     "Protocol to build up a transient collection of MapEntries"
+     (assoc-kv! [coll k v]))
 
-(defprotocol TKV
-  "Protocol to build up a transient collection of MapEntries"
-  (assoc-kv! [coll k v]))
-
-(extend-protocol TKV
-  clojure.lang.ITransientMap
-  (assoc-kv! [m k v] (assoc! m k v))
-  clojure.lang.ITransientCollection
-  (assoc-kv! [c k v] (conj! c (clojure.lang.MapEntry. k v))))
+   (extend-protocol TKV
+     clojure.lang.ITransientMap
+     (assoc-kv! [m k v] (assoc! m k v))
+     clojure.lang.ITransientCollection
+     (assoc-kv! [c k v] (conj! c (clojure.lang.MapEntry. k v)))))
+ 
+ :cljs
+ (defn assoc-kv! [tc k v]
+   (cond
+     (satisfies? ITransientAssociative tc)
+     (assoc! tc k v)
+     (satisfies? ITransientCollection tc)
+     (conj! tc (reify IMapEntry
+                 (-key [_] k)
+                 (-val [_] v)))
+     :else (throw (ex-info (str "No implementation of assoc-kv! for " tc) {:coll tc})))))
 
 (defn treduce-kv 
   "use reduce(-kv) over collection of map-entries for building up a transient of init.
