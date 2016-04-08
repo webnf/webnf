@@ -14,5 +14,5 @@
                  [webnf/base "_" :upgrade false]
                  [webnf/async-servlet "_" :upgrade false]
                  [webnf.deps/web "_" :upgrade false]
-                 [webnf/enlive.clj "_" :upgrade false]
+                 [webnf/enlive "_" :upgrade false]
                  [com.lambdaworks/scrypt "1.4.0"]])

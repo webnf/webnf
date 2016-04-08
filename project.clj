@@ -22,19 +22,21 @@
                              "-f" ["with-profile" "+fast"]}
               :scm          {:dir ".."}}
              :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
-                    "async-servlet" "base" "cljs" "datomic" "enlive.clj" "enlive.cljs"
-                    "handler" "server" "filestore" ; "server.undertow"
-                    "compat.yuicompressor" "cats"]
+                    "async-servlet" "base" "datomic" "enlive"
+                    "handler" "server" "filestore" "compat.yuicompressor" "cats" "js" "mui"]
              :versions {org.clojure/clojure              "1.8.0"
                         webnf                            "0.2.0-SNAPSHOT"
                         webnf.deps                       "0.2.0-SNAPSHOT"
                         webnf.compat/yuicompressor       "2.4.8"
                         org.clojure/core.async           "0.2.374"
-                        org.clojure/clojurescript        "1.8.34"
+                        org.clojure/clojurescript        "1.8.40"
                         org.clojure/tools.reader         "1.0.0-alpha4"
                         org.clojure/tools.nrepl          "0.2.12"
                         org.clojure/tools.analyzer.jvm   "0.6.9"
                         org.clojure/core.typed           "0.3.22"
+                        org.clojure/core.match           "0.3.0-alpha4"
+                        org.clojure/core.unify           "0.5.6"
+                        org.clojure/tools.logging        "0.3.1"
                         org.mozilla/rhino                "1.7.7.1"
                         com.google.code.findbugs/jsr305  "3.0.1"
                         com.stuartsierra/component       "0.3.1"
