@@ -12,7 +12,9 @@
    (fn [sheet-or-val theme]
      (cond (satisfies? IThemeSelector sheet-or-val)
            (recur (-select sheet-or-val theme) theme)
-           (map? sheet-or-val)
+           ;; (map? sheet-or-val)
+           (or (instance? PersistentArrayMap sheet-or-val)
+               (instance? PersistentHashMap sheet-or-val))
            (persistent!
             (reduce-kv (fn [tr k v]
                          (let [v' (resolve-selectors v theme)]

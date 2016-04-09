@@ -4,7 +4,9 @@
                         [om.next :refer [ui defui]])
        (:require [om.next :as om]
                  [om-tools.dom :as dom]
-                 [webnf.base.util :include-macros true :as util])]))
+                 [webnf.base.util :include-macros true :as util]
+                 [webnf.mui.style :refer [style-class]]
+                 [clojure.string :as str])]))
 
 #?
 (:clj
@@ -36,4 +38,8 @@
  (do (defn get-query [factory]
        (if-let [cls (::class (meta factory))]
          (om/get-query cls)
-         (om/get-query factory)))))
+         (om/get-query factory)))
+     (defn add-styles [props & styles]
+       (let [cls (apply style-class styles)]
+         (update props :class #(if (str/blank? %)
+                                 cls (str % " " cls)))))))
