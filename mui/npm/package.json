@@ -1,0 +1,19 @@
+{
+    "name": "material-ui-webpack",
+    "version": "0.0.1",
+    "scripts": {
+        "dist": "webpack --config webpack.config.js"
+    },
+    "dependencies": {
+        "material-ui": "0.14.4"
+    },
+    "peerDependencies": {
+        "react": "0.14.8",
+        "react-dom": "0.14.8"
+    },
+    "devDependencies": {
+        "react": "0.14.8",
+        "react-dom": "0.14.8",
+        "webpack": "1.12.14"
+    }
+}

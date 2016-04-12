@@ -102,9 +102,9 @@
       :z5top {:box-shadow "0 40px 77px 0 rgba(0, 0, 0, 0.22)"}
       :z5bottom {:box-shadow "0 27px 24px 0 rgba(0, 0, 0, 0.2)"}}
      :sizes
-     {:app-bar-sizing {:height (px 56)}
-      :button-sizing  {:height (px 36)
-                       :min-width (px 88)}}
+     {:app-bar {:height (px 56)}
+      :button  {:height (px 18)
+                :min-width (px 88)}}
      :typography
      {:display4 {:color "rgba(0, 0, 0, .54)",
                  :font-family sans-serif,
@@ -213,15 +213,15 @@
      {:normal {:webkit-tap-highlight-color "rgba(0,0,0,0)"
                :cursor :pointer
                :position :relative
-               :height (px 18)
-               :min-width (px 88)
+               :height (theme-value :sizes :button :height)
+               :min-width (theme-value :sizes :button :min-width)
                :border-radius (px 3)
                :display :inline-block
                :outline :none
                :padding (px 9)
                :text-align :center
                :user-select :none
-               :line-height (px 0)
+               :line-height (px 16)
                :border :none
                :background-color "rgba(255,255,255,0)"}
       :raised {:background-color (get-color :grey :p300)}
@@ -232,21 +232,23 @@
      {:normal {:background-color (get-color :cyan :a700)
                :box-sizing :border-box
                :position :relative
-               :height (px 56)
+               :height (theme-value :sizes :app-bar :height)
                :top 0
                :width (percent 100)
-               :z-index 1}
+               :z-index 1
+               :margin 0
+               :padding 0}
       :title {:display :inline-block
               :opacity :inherit
               :cursor :default
-              :line-height (px 56)
+              :line-height (theme-value :sizes :app-bar :height)
               :position :absolute
               :top 0
               :left (px 16)}
       :children {:display :inline-block
                  :position :absolute
                  :right (px 16)
-                 :top 0}}
+                 :top (px 10)}}
      :colors
      {:red 
       {:p50 "#fde0dc"
