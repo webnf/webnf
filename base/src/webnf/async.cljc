@@ -45,9 +45,13 @@
            (let [f (commit handler)]
              (dispatch/run #(f value)))
            (put! handler value (fn [])))
-         (catch :default e
+         (catch #?(:clj Exception :cljs :default) e
            (log/error "during serving of read handler" handler \newline
                       "with value" value \newline e)))))
+
+(defprotocol ICbRp
+  (add-handler [p h])
+  (finish-handlers [p]))
 
 (deftype CallbackReadPort
     #?(:clj  [read-callback
@@ -56,31 +60,24 @@
        :cljs [read-callback
               ^:mutable read-waiters
               ^:mutable read-running])
+    ICbRp
+    (add-handler [p handler]
+      (#?@(:clj [locking p] :cljs [do])
+        (set! read-waiters (cons handler read-waiters))
+        (when-not read-running
+          (set! read-running true)
+          true)))
+    (finish-handlers [p]
+      (#?@(:clj [locking p] :cljs [do])
+        (let [rw read-waiters]
+          (set! read-running false)
+          (set! read-waiters nil)
+          rw)))
     ReadPort
     (take! [p handler]
       (when (active? handler)
-        #?(:clj
-           ;; DRAGONS: untested locking code; this originated from the CLJS impl
-           (when (locking p
-                   (set! read-waiters (cons handler read-waiters))
-                   (when-not read-running
-                     (set! read-running true)
-                     true))
-             (read-callback (fn [res]
-                              (let [rw read-waiters]
-                                (locking p
-                                  (set! read-running false)
-                                  (set! read-waiters nil))
-                                (serve-read-waiters rw res)))))
-           :cljs
-           (do (set! read-waiters (cons handler read-waiters))
-               (when-not read-running
-                 (set! read-running true)
-                 (read-callback (fn [res]
-                                  (let [rw read-waiters]
-                                    (set! read-running false)
-                                    (set! read-waiters nil)
-                                    (serve-read-waiters rw res))))))))
+        (when (add-handler p handler)
+          (read-callback #(serve-read-waiters (finish-handlers p) %))))
       nil))
 
 (defn callback-read-port [f]

@@ -1,7 +1,7 @@
 (ns webnf.base.autoload
   (:require #?(:clj  [clojure.tools.logging :as log]
                :cljs [webnf.base.logging :as log])
-            [webnf.base.cljc :refer-macros [defmacro*]]))
+            [webnf.base.cljc #?(:clj :refer :cljs :refer-macros) [defmacro*]]))
 #?
 (:clj
  (defn make-autoloader
