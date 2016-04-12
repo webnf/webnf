@@ -50,7 +50,25 @@
        :clj
        `(defmacro ~(symbol (name level)) [& args#]
           (when (contains? (get log-levels *root-log-level*) ~level)
-            (list `do-log ~level (vec args#)))))))
+            (list `do-log ~level (vec args#)))))
+     (defmacro spy* [& exprs]
+         `(let [ret-exp# ~(last exprs)]
+            (trace "Result of" '~(last exprs) "=>"
+                   ret-exp# \newline
+                   ~@(mapcat
+                      (fn [e]
+                        `['~e "=>" ~e \newline])
+                      (butlast exprs)))
+            ret-exp#))
+     (defmacro spy [& exprs]
+       `(let [ret-exp# ~(last exprs)]
+          (trace "Result of" ~(pr-str (last exprs)) "=>"
+                 (cljs.core/pr-str ret-exp#) \newline
+                 ~@(mapcat
+                    (fn [e]
+                      `[~(pr-str e) "=>" (cljs.core/pr-str ~e) \newline])
+                    (butlast exprs)))
+          ret-exp#))))
 
 (deflogfn :trace)
 (deflogfn :debug)
