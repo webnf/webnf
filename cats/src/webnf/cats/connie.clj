@@ -1,4 +1,4 @@
-(ns webnf.connie
+(ns webnf.cats.connie
   "CPS library")
 
 (defprotocol Continuation
@@ -17,10 +17,12 @@
   ([m] (run-cont* m vector))
   ([m f] (run-cont* m f)))
 
-(defmacro defcontinuation* [rec-name [k & args] & body]
+(defmacro defcontinuation* [rec-name [k & args :as argt] & body]
   `(defrecord ~rec-name ~(vec args)
      Continuation
-     (continue* [_# ~k]
+     (continue* [~(:self-as (meta argt)
+                            (gensym "_"))
+                 ~k]
        ~@body)))
 
 (defmacro defcontinuation [rec-name cons-name args & body]
