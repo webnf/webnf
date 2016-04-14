@@ -1,7 +1,7 @@
-(ns webnf.katie
+(ns webnf.cats.katie
   "Top-Level Categories:
     - Applicative (pure, fmap)"
-  (:require [webnf.connie :refer
+  (:require [webnf.cats.connie :refer
              [Continuation cont* defcontinuation defcontinuation* continue*]]))
 
 (defcontinuation* Pure1 [k v1] (k v1))

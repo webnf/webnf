@@ -1,7 +1,7 @@
-(ns webnf.monie
+(ns webnf.cats.monie
   "CPS based monads"
-  (:require [webnf.katie :refer [pure *>]]
-            [webnf.connie :refer [cont* defcontinuation* defcontinuation continue*]]))
+  (:require [webnf.cats.katie :refer [pure *>]]
+            [webnf.cats.connie :refer [cont* defcontinuation* defcontinuation continue*]]))
 
 (comment
   ;; IFn as Continuation
