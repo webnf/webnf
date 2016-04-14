@@ -4,7 +4,7 @@
             [lein-shell "0.5.0"]]
   :dependencies [[webnf/base "_" :upgrade false]
                  [org.clojure/clojurescript "_" :upgrade false]
-                 [cljsjs/react-with-addons "0.14.7-0"]
+                 ;; [cljsjs/react-with-addons "0.14.7-0"]
                  [org.omcljs/om "1.0.0-alpha32"
                   :exclusions [cljsjs/react]]
                  [prismatic/om-tools "0.4.0"]]

@@ -42,4 +42,6 @@
      (defn add-styles [props & styles]
        (let [cls (apply style-class styles)]
          (update props :class #(if (str/blank? %)
-                                 cls (str % " " cls)))))))
+                                 cls (str % " " cls)))))
+     (defn component-class [cmp]
+       (::class (meta cmp)))))
