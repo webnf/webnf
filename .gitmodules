@@ -1,0 +1,3 @@
+[submodule "davstore"]
+	path = davstore
+	url = /home/herwig/Dropbox/src.git

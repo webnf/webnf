@@ -13,5 +13,5 @@ gra () {
      git checkout -b "$lbranch" "$rbranch")
 }
 
-for dir in dwn lein-nix lein-collisions
+for dir in dwn lein-nix lein-collisions davstore
  do gra $dir master git@github.com; done

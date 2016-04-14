@@ -38,6 +38,7 @@
                         org.clojure/core.unify           "0.5.6"
                         org.clojure/tools.logging        "0.3.1"
                         org.mozilla/rhino                "1.7.7.1"
+                        org.clojure/data.xml             "0.1.0-beta1"
                         com.google.code.findbugs/jsr305  "3.0.1"
                         com.stuartsierra/component       "0.3.1"
                         joda-time                        "2.9.2"

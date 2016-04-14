@@ -30,7 +30,7 @@
                  [org.clojure/data.int-map "0.2.2"]
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/data.priority-map "0.0.7"]
-                 [org.clojure/data.xml "0.1.0-beta1"]
+                 [org.clojure/data.xml "_" :upgrade false]
                  [org.clojure/data.zip "0.1.1"]
                  [org.clojure/java.classpath "0.2.3"]
                  [org.clojure/java.data "0.1.1"]
