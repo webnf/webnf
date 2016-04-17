@@ -1,10 +1,12 @@
 (ns webnf.base.util
   #?(:cljs (:require-macros [webnf.base.util :refer [defunrolled or*]]))
   (:require
+   [clojure.string :as str]
    #?@(:clj  [[webnf.base.autoload :refer [autoload]]
               [webnf.base.cljc :refer [defmacro*]]]
        :cljs [[cljs.pprint :refer [pprint]]
-              [webnf.base.logging :as log :include-macros true]])))
+              [webnf.base.logging :as log :include-macros true]]))
+  #?(:clj (:import (java.net URLEncoder URLDecoder))))
 #?
 (:clj
  (do
@@ -140,3 +142,29 @@
   :more-arities ([args] `(apply rcomp* ~args))
   ([& fs] `(pretial ap ~@fs)))
 
+#?
+(:clj
+ (do (defn encode-uri-component [s]
+       (when s
+         (URLEncoder/encode s "UTF-8")))
+     (defn decode-uri-component [s]
+       (when s
+         (URLDecoder/decode s "UTF-8"))))
+ :cljs
+ (do (def encode-uri-component js/encodeURIComponent)
+     (def decode-uri-component js/decodeURIComponent)))
+
+(defn path->href
+  "Joins path segments (each a seq) into an absolute url path"
+  [& path-fragments]
+  (str/join "/" (cons "" (map encode-uri-component
+                              (apply concat path-fragments)))))
+
+(defn href->path
+  "Splits an absolute href into a path segment"
+  [href]
+  (let [p (map decode-uri-component
+               (str/split (str/replace href "+" " ")
+                          #"/"))]
+    (assert (= "" (first p)) "Not an absolute path")
+    (vec (rest p))))

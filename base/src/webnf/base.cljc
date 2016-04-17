@@ -16,5 +16,7 @@
    (autoload-some ^:static (webnf.base.util
                             ^:macro forcat ^:macro static-case
                             ^:macro defunrolled ^:macro squelch))))
+
 (autoload-some ^:static (webnf.base.util to-many pprint-str
-                                         pretial ap rcomp scat))
+                                         pretial ap rcomp scat
+                                         path->href href->path))
