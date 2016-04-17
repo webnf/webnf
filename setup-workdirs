@@ -2,16 +2,24 @@
 
 set -ex
 
+has_remote () {
+    git remote show -n "$1" &> /dev/null
+}
+
 gra () {
-    local lbranch="webnf/$1"
+    local lbranch="webnf/$1/master"
     local rname="origin-$1"
-    local rbranch="$rname/$2"
-    git remote add "$rname"  "$3:$lbranch.git"
-    git fetch "$rname"
-    git-new-workdir . $1
-    (cd $1
-     git checkout -b "$lbranch" "$rbranch")
+    local rbranch="$rname/$2/master"
+    if ! has_remote "$rname"; then
+        git remote add "$rname"  "$3:$lbranch.git"
+        git fetch "$rname"
+        git branch "$lbranch" "$rbranch"
+    fi
+    if [ ! -d $dir ]; then
+        git-new-workdir . $1 "$lbranch"
+    fi
 }
 
 for dir in dwn lein-nix lein-collisions davstore
  do gra $dir master git@github.com; done
+
