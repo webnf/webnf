@@ -36,11 +36,9 @@
         vns (symbol (namespace var-name))]
     `(def ~vn (make-autoloader #'~vn '~vns '~vn ~(:static mm) ~(:macro mm))))
   :cljs
-  (do
-    (println "CLJS was here")
-    (let [mm (meta var-name)
-          vn (with-meta (symbol (name var-name)) mm)]
-      `(def ~vn ~var-name))))
+  (let [mm (meta var-name)
+        vn (with-meta (symbol (name var-name)) mm)]
+    `(def ~vn ~var-name)))
 
 (defmacro autoload-some
   "Autoload multiple vars like in import:
