@@ -6,4 +6,4 @@
   :dependencies [[org.clojure/clojure "_" :upgrade false]
                  [webnf/base "_" :upgrade false]
                  [enlive "1.1.6"]
-                 [org.clojure/core.cache "0.6.4"]])
+                 [org.clojure/core.cache "_" :upgrade false]])

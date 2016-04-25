@@ -9,7 +9,7 @@
 
                  ;; Algorithms
                  [com.lambdaworks/scrypt "1.4.0"]
-                 [net.mikera/core.matrix "0.50.1"]
+                 [net.mikera/core.matrix "0.51.0"]
                  [instaparse "1.4.1"]
                  [nf.fr.eraasoft/objectpool "1.1.2"]
                  [clojurewerkz/meltdown "1.1.0"]
@@ -17,13 +17,13 @@
 
                  ;; Data formats
                  [clj-time "0.11.0" :exclusions [joda-time]]
-                 [net.mikera/vectorz-clj "0.43.1"]
+                 [net.mikera/vectorz-clj "0.44.0"]
                  [com.google.code.findbugs/jsr305  "_" :upgrade false] ;; reflections
                  [org.reflections/reflections "0.9.10"
                   :exclusions [com.google.code.findbugs/annotations com.google.guava/guava]]
                  [danlentz/clj-uuid "0.1.6"]
                  [org.fressian/fressian "0.6.6"]
-                 [cheshire "5.5.0"]
+                 [cheshire "5.6.1"]
 
                  ;; Evaluation controllers
                  [com.stuartsierra/component "_" :upgrade false]
@@ -31,5 +31,5 @@
 
                  ;; APIs
                  [joda-time "_" :upgrade false]
-                 [clj-http "2.1.0" :exclusions [commons-logging]]
-                 [amazonica "0.3.52" :exclusions [joda-time commons-logging]]])
+                 [clj-http "_" :exclusions [commons-logging] :upgrade false]
+                 [amazonica "0.3.55" :exclusions [joda-time commons-logging]]])
