@@ -92,18 +92,11 @@
    (defn- wrapper-body [cls opts children]
      (if (dom/literal? opts)
        (let [[opts children] (dom/element-args opts children)]
-         (log/trace "PRE" cls opts children)
          (if (every? (complement dom/possible-coll?) children)
-           `(do
-              (webnf.base.logging/trace "B1" ~(str cls) ~(pr-str opts) ~(pr-str children))
-              (create-element ~cls ~opts ~(vec children)))
-           `(do
-              (webnf.base.logging/trace "B2" ~(str cls) ~(pr-str opts) ~(pr-str (flatten (vec children))))
-              (create-element ~cls ~opts (flatten ~(vec children))))))
-       (do (log/trace "RT" cls opts children)
-           `(let [[opts# children#] (dom/element-args ~opts ~(vec children))]
-              (webnf.base.logging/trace "B3" ~(str cls) opts# children#)
-              (create-element ~cls opts# (flatten children#))))))
+           `(create-element ~cls ~opts ~(vec children))
+           `(create-element ~cls ~opts (flatten ~(vec children)))))
+       `(let [[opts# children#] (dom/element-args ~opts ~(vec children))]
+          (create-element ~cls opts# (flatten children#)))))
    
    (defn gen-wrapper-macro [[fname cname]]
      `(defmacro ~fname [& [opts# & children#]]
