@@ -26,32 +26,23 @@
 (:clj
  (do
    (def widgets
-     '{nav-menu-icon Icons.NavigationMenu
-       nav-left-icon Icons.NavigationChevronLeft
-       nav-right-icon Icons.NavigationChevronRight
-       app-bar AppBar
-       app-canvas AppCanvas
+     '{app-bar AppBar
        auto-complete AutoComplete
        avatar Avatar
        badge Badge
-       before-after-wrapper BeforeAfterWrapper
        card Card
        card-actions CardActions
-       card-expandable CardExpandable
        card-header CardHeader
        card-media CardMedia
-       card-text CardText
        card-title CardTitle
+       card-text CardText
        checkbox Checkbox
        circular-progress CircularProgress
-       clear-fix ClearFix
        date-picker DatePicker
-       date-picker-dialog DatePickerDialog
        dialog Dialog
        divider Divider
-       drop-down-icon DropDownIcon
+       drawer Drawer
        drop-down-menu DropDownMenu
-       enhanced-button EnhancedButton
        flat-button FlatButton
        floating-action-button FloatingActionButton
        font-icon FontIcon
@@ -59,30 +50,30 @@
        grid-tile GridTile
        icon-button IconButton
        icon-menu IconMenu
-       left-nav LeftNav
        linear-progress LinearProgress
        list List
-       list-divider ListDivider
        list-item ListItem
+       make-selectable MakeSelectable
        menu Menu
        menu-item MenuItem
-       mixins Mixins
-       overlay Overlay
        paper Paper
-       pop-over Popover
+       popover Popover
        radio-button RadioButton
        radio-button-group RadioButtonGroup
        raised-button RaisedButton
        refresh-indicator RefreshIndicator
-       ripples Ripples
        select-field SelectField
-       selectable-container-enhance SelectableContainerEnhance
        slider Slider
+       subheader Subheader
        svg-icon SvgIcon
-       styles Styles
+       step Step
+       step-button StepButton
+       step-content StepContent
+       step-label StepLabel
+       stepper Stepper
        snackbar Snackbar
-       tab Tab
        tabs Tabs
+       tab Tab
        table Table
        table-body TableBody
        table-footer TableFooter
@@ -90,16 +81,13 @@
        table-header-column TableHeaderColumn
        table-row TableRow
        table-row-column TableRowColumn
-       toggle Toggle
-       theme-wrapper ThemeWrapper
-       time-picker TimePicker
        text-field TextField
+       time-picker TimePicker
+       toggle Toggle
        toolbar Toolbar
        toolbar-group ToolbarGroup
        toolbar-separator ToolbarSeparator
-       toolbartitle ToolbarTitle
-       tooltip Tooltip
-       utils Utils})
+       toolbar-title ToolbarTitle})
 
    (defn- wrapper-body [cls opts children]
      (if (dom/literal? opts)
