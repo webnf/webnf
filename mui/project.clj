@@ -4,7 +4,7 @@
             [lein-shell "0.5.0"]]
   :dependencies [[webnf/base "_" :upgrade false]
                  [org.clojure/clojurescript "_" :upgrade false]
-                 [org.omcljs/om "1.0.0-alpha34"
+                 [org.omcljs/om "1.0.0-alpha35"
                   :exclusions [cljsjs/react cljsjs/react-dom]]
                  [prismatic/om-tools "0.4.0"]]
   :prep-tasks [["shell" "npm" "--prefix" "npm" "install"]

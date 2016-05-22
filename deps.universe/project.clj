@@ -9,8 +9,8 @@
 
                  ;; Algorithms
                  [com.lambdaworks/scrypt "1.4.0"]
-                 [net.mikera/core.matrix "0.51.0"]
-                 [instaparse "1.4.1"]
+                 [net.mikera/core.matrix "0.52.0"]
+                 [instaparse "1.4.2"]
                  [nf.fr.eraasoft/objectpool "1.1.2"]
                  [clojurewerkz/meltdown "1.1.0"]
                  [net.polyc0l0r/hasch "0.3.0-beta2" :exclusions [org.clojure/clojurescript com.google.guava/guava]]
@@ -32,4 +32,4 @@
                  ;; APIs
                  [joda-time "_" :upgrade false]
                  [clj-http "_" :exclusions [commons-logging] :upgrade false]
-                 [amazonica "0.3.55" :exclusions [joda-time commons-logging]]])
+                 [amazonica "0.3.57" :exclusions [joda-time commons-logging]]])

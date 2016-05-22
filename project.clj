@@ -45,6 +45,6 @@
                         clj-http                         "3.0.1"
                         joda-time                        "2.9.3"
                         javax.servlet/javax.servlet-api  "3.1.0"
-                        "JETTY"                          "9.3.8.v20160314"
+                        "JETTY"                          "9.3.9.v20160517"
                         "LOGBACK"                        "1.7.21"
                         "MAIL-API"                       "1.5.5"}})
