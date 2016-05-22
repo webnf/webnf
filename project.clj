@@ -16,8 +16,6 @@
               :license {:name "Eclipse Public License"
                         :url "http://www.eclipse.org/legal/epl-v10.html"}
               :javac-options ["-source" "1.7" "-target" "1.7"]
-              #_#_:repositories [["bendlas-nexus" {:url "http://nexus.bendlas.net/content/groups/public"
-                                                   :username "fetch" :password :gpg}]]
               :aliases      {"all" ^:displace ["do" "clean," "test," "install"]
                              "-f" ["with-profile" "+fast"]}
               :scm          {:dir ".."}}
