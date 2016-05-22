@@ -9,6 +9,19 @@
               [webnf.base.logging :as log :include-macros true]]))
   #?(:clj (:import (java.net URLEncoder URLDecoder))))
 
+#?(:clj (autoload clojure.pprint/pprint))
+
+(defn pprint-str
+  "Return value pretty-printed into a string.
+   Allows for clojure.pprint/*print-right-margin* to be passed as second argument"
+  ([o] (with-out-str (pprint o)))
+  ([o right-margin]
+   #?(:clj (require 'clojure.pprint))
+   (binding [#?(:clj  clojure.pprint/*print-right-margin*
+                :cljs cljs.pprint/*print-right-margin*)
+             right-margin]
+     (pprint-str o))))
+
 #?
 (:clj
  (do
@@ -20,17 +33,16 @@
      `(try ~@body (catch Exception e#
                     (let [val# ~val]
                       (log/trace e# "during execution of"
-                                 ~(pprint-str `(try ~@body (catch Exception e ...)))
+                                 ~(pprint-str `(try ~@body ~'(catch Exception e ...)))
                                  "\n used replacement value:" val#)
                       val#)))
      :cljs
      `(try ~@body (catch js/Error e#
                     (let [val# ~val]
                       (webnf.base.logging/trace e# "during execution of"
-                                                ~(pprint-str `(try ~@body (catch js/Error ~'e ...)))
+                                                ~(pprint-str `(try ~@body ~'(catch js/Error e ...)))
                                                 "\n used replacement value:" val#)
                       val#))))
-   (autoload clojure.pprint/pprint)
    (defmacro* forcat
      "Concat the return value of a for expression"
      [bindings body]
@@ -100,17 +112,6 @@
   and not nil, it is put into an empty collection"
   [v]
   (if (or (nil? v) (coll? v)) v (cons v nil)))
-
-(defn pprint-str
-  "Return value pretty-printed into a string.
-   Allows for clojure.pprint/*print-right-margin* to be passed as second argument"
-  ([o] (with-out-str (pprint o)))
-  ([o right-margin]
-   #?(:clj (require 'clojure.pprint))
-   (binding [#?(:clj  clojure.pprint/*print-right-margin*
-                :cljs cljs.pprint/*print-right-margin*)
-             right-margin]
-     (pprint-str o))))
 
 ;; ## Two new core operations
 
