@@ -10,4 +10,7 @@
                  [org.clojure/core.typed "_" :classifier "slim" :upgrade false]
                  [org.clojure/core.unify "_" :upgrade false]
                  [org.clojure/tools.logging "_" :upgrade false]
-                 [org.clojure/tools.nrepl "_" :upgrade false]])
+                 [org.clojure/tools.nrepl "_" :upgrade false]]
+  :profiles
+  {:dev {:dependencies [[org.clojure/clojurescript "_" :upgrade false]
+                        [webnf.deps/dev "_" :upgrade false]]}})

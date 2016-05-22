@@ -3,22 +3,32 @@
   (:require
    [clojure.string :as str]
    #?@(:clj  [[webnf.base.autoload :refer [autoload]]
-              [webnf.base.cljc :refer [defmacro*]]]
+              [webnf.base.cljc :refer [defmacro*]]
+              [clojure.tools.logging :as log]]
        :cljs [[cljs.pprint :refer [pprint]]
               [webnf.base.logging :as log :include-macros true]]))
   #?(:clj (:import (java.net URLEncoder URLDecoder))))
+
 #?
 (:clj
  (do
-   (defmacro squelch 
+   (defmacro* squelch
      "Eval body with a handler for Exception that returns a default expression val.
   Logs exceptions on trace priority."
      [val & body]
-     `(try ~@body (catch #?(:clj Exception :cljs :default) e#
+     :clj
+     `(try ~@body (catch Exception e#
                     (let [val# ~val]
-                      (log/trace e# "during execution of" 
-                                 (pprint-str '(try ~@body (catch Exception e ...)))
+                      (log/trace e# "during execution of"
+                                 ~(pprint-str `(try ~@body (catch Exception e ...)))
                                  "\n used replacement value:" val#)
+                      val#)))
+     :cljs
+     `(try ~@body (catch js/Error e#
+                    (let [val# ~val]
+                      (webnf.base.logging/trace e# "during execution of"
+                                                ~(pprint-str `(try ~@body (catch js/Error ~'e ...)))
+                                                "\n used replacement value:" val#)
                       val#))))
    (autoload clojure.pprint/pprint)
    (defmacro* forcat
@@ -74,7 +84,7 @@
                 [(list (into args ['& vararg])
                        `(let [~vararg (list* ~@args ~vararg)]
                           ~(gen vararg)))])))))
-   
+
    (defmacro or* "Variant of or, that only skips nils"
      [v d]
      `(let [v# ~v] (if (nil? v#) ~d v#)))))
