@@ -1,4 +1,5 @@
 (ns webnf.base.util
+  (:refer-clojure :exclude [update-in])
   #?(:cljs (:require-macros [webnf.base.util :refer [defunrolled or*]]))
   (:require
    [clojure.string :as str]
@@ -8,6 +9,14 @@
        :cljs [[cljs.pprint :refer [pprint]]
               [webnf.base.logging :as log :include-macros true]]))
   #?(:clj (:import (java.net URLEncoder URLDecoder))))
+
+(defn update-in
+  "Version of {clojure,cljs}.core/update-in, fixed for empty paths
+  see http://dev.clojure.org/jira/browse/CLJ-1623"
+  [m ks f & args]
+  (if-let [[k & ks*] (seq ks)]
+    (assoc m k (apply update-in (get m k) ks* f args))
+    (apply f m args)))
 
 #?(:clj (autoload clojure.pprint/pprint))
 

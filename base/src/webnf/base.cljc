@@ -1,5 +1,6 @@
 (ns webnf.base
   "Various primitive core operations that should be 'just there'"
+  (:refer-clojure :exclude [update-in])
   (:require [webnf.base.autoload
              #?@(:cljs [:refer-macros [autoload autoload-some]])]
             #?@(:cljs [webnf.base.util cljs.pprint cljs.repl])))
@@ -19,4 +20,5 @@
 
 (autoload-some ^:static (webnf.base.util to-many pprint-str
                                          pretial ap rcomp scat
-                                         path->href href->path))
+                                         path->href href->path
+                                         update-in))
