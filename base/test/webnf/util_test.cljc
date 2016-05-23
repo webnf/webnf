@@ -39,3 +39,16 @@
   (t/is (= :match-one (match-static 1)))
   (t/is (= :match-two (match-static 2)))
   (t/is (= :match-default (match-static nil))))
+
+(t/deftest test-href-path
+  (t/is (= [] (u/href->path "/")))
+  (t/is (= ["foo"] (u/href->path "/foo")))
+  (t/is (= ["foo"] (u/href->path "/foo/")))
+  (t/is (= ["foo" "bar"] (u/href->path "/foo/bar")))
+  (t/is (= ["foo" "bar"] (u/href->path "/foo/bar/")))
+  (t/is (thrown? #?(:clj Exception :cljs js/Error)
+                 (u/href->path "")))
+  (t/is (thrown? #?(:clj Exception :cljs js/Error)
+                 (u/href->path "foo")))
+  (t/is (thrown? #?(:clj Exception :cljs js/Error)
+                 (u/href->path "foo/path"))))

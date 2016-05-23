@@ -183,8 +183,12 @@
 (defn href->path
   "Splits an absolute href into a path segment"
   [href]
-  (let [p (map decode-uri-component
-               (str/split (str/replace href "+" " ")
-                          #"/"))]
-    (assert (= "" (first p)) "Not an absolute path")
-    (vec (rest p))))
+  (case href
+    ""  (throw (ex-info "Not an absolute path" {:href href}))
+    "/" []
+    (let [p (map decode-uri-component
+                 (str/split (str/replace href "+" " ")
+                            #"/"))]
+      (when-not (= "" (first p))
+        (throw (ex-info "Not an absolute path" {:href href})))
+      (vec (rest p)))))
