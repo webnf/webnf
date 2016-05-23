@@ -117,6 +117,11 @@
      :cljs `(do ~@(map gen-wrapper-fn widgets))))
  :cljs
  (defn create-element [cls opts children]
-   (js/React.createElement cls opts (into-array children))))
+   (js/React.createElement
+    cls opts
+    (case (count children)
+      0 nil
+      1 (first children)
+      (into-array children)))))
 
 (gen-wrappers)
