@@ -17,7 +17,7 @@
 
                  ;; Data formats
                  [clj-time "0.11.0" :exclusions [joda-time]]
-                 [net.mikera/vectorz-clj "0.44.0"]
+                 [net.mikera/vectorz-clj "0.44.1"]
                  [com.google.code.findbugs/jsr305  "_" :upgrade false] ;; reflections
                  [org.reflections/reflections "0.9.10"
                   :exclusions [com.google.code.findbugs/annotations com.google.guava/guava]]
@@ -32,4 +32,4 @@
                  ;; APIs
                  [joda-time "_" :upgrade false]
                  [clj-http "_" :exclusions [commons-logging] :upgrade false]
-                 [amazonica "0.3.57" :exclusions [joda-time commons-logging]]])
+                 [amazonica "0.3.58" :exclusions [joda-time commons-logging]]])
