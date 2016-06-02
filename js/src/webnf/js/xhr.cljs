@@ -5,7 +5,8 @@
             [webnf.async :refer [callback-read-port]]
             [webnf.base.logging :as log]
             [clojure.string :refer [split-lines]]
-            [webnf.js :refer [to-js]]))
+            [webnf.js :refer [to-js]]
+            [clojure.string :as str]))
 
 ;; ### XHR
 
@@ -17,7 +18,7 @@
   (persistent!
    (reduce (fn [res l]
              (if-let [[_ k v] (re-matches #"([^:]*):(.*)" l)]
-               (assoc! res (.trim k) (.trim v))
+               (assoc! res (str/lower-case (.trim k)) (.trim v))
                (do
                  (log/error "Not a header" l)
                  res)))
