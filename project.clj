@@ -21,10 +21,11 @@
               :scm          {:dir ".."}}
              :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
                     "async-servlet" "base" "datomic" "enlive"
-                    "handler" "server" "filestore" "compat.yuicompressor" "cats" "js" #_"mui"]
+                    "handler" "server" "filestore" "compat.yuicompressor" "cats" "js" "handler.auth"]
              :versions {org.clojure/clojure              "1.9.0-alpha6"
                         webnf                            "0.2.0-SNAPSHOT"
                         webnf.deps                       "0.2.0-SNAPSHOT"
+                        webnf.handler                    "0.2.0-SNAPSHOT"
                         webnf.compat/yuicompressor       "2.4.8"
                         org.clojure/core.async           "0.2.382"
                         org.clojure/clojurescript        "1.9.36"
