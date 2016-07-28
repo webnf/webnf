@@ -27,7 +27,7 @@
                         webnf.deps                       "0.2.0-SNAPSHOT"
                         webnf.handler                    "0.2.0-SNAPSHOT"
                         webnf.compat/yuicompressor       "2.4.8"
-                        ring                             "1.6.0-beta4"
+                        ring                             "1.5.0"
                         ring/ring-mock                   "0.3.0"
                         org.clojure/core.async           "0.2.385"
                         org.clojure/clojurescript        "1.9.93"
