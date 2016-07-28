@@ -6,8 +6,7 @@
    (java.io ByteArrayOutputStream ByteArrayInputStream)
    (java.util.zip Deflater Inflater DeflaterOutputStream InflaterInputStream))
   (:require
-   [clojure.data.fressian :as fress]
-   [clojure.test :refer [deftest are is]]))
+   [clojure.data.fressian :as fress]))
 
 (defn enc16 [ba]
   (.toLowerCase
@@ -34,12 +33,6 @@
   (let [bis (ByteArrayInputStream. (dec64 object-str))]
     (with-open [rdr (fress/create-reader bis #_(InflaterInputStream. bis (Inflater. true)))]
       (fress/read-object rdr))))
-
-(deftest codec-roundtrip
-  (defrecord Foo [a b])
-  (are [same] (= same (decode-object (encode-object same)))
-    {:ticket 1}
-    (->Foo 1 2)))
 
 (defn encode-args [data & {:keys [to-seq compress]
                            :or {to-seq seq

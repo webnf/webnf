@@ -6,11 +6,14 @@
   Server policy). Ticket Client then establishes user capabilities (as
   roles and grants) from its own data source."
   (:require
+   [webnf.base :refer [str-quote]]
+   [ring.middleware.cookies :refer [wrap-cookies]]
    [clojure.edn :as edn]
    [clojure.spec :as s]
    [webnf.handler.auth.crypto :as crypt]
    [webnf.handler.auth.codec :as codec]
-   [clojure.test :refer :all])
+   [instaparse.core :as insta]
+   [clojure.string :as str])
   (:import (java.util Date)))
 
 (s/def ::app-id uuid?)
@@ -52,6 +55,8 @@
 (s/def ::grant-failure
   (s/keys :req-un [::ticket-request ::failure-reason]))
 
+(def failure? :failure-reason)
+
 (defrecord GrantFailure
     [ticket-request failure-reason])
 
@@ -87,12 +92,6 @@
 
 (defn date> [d1 d2]
   (pos? (compare d1 d2)))
-
-(deftest date-comparison
-  (is (date< #inst "2015" #inst "2016"))
-  (is (date> #inst "2016" #inst "2015"))
-  (is (not (date< #inst "2015" #inst "2015")))
-  (is (not (date> #inst "2015" #inst "2015"))))
 
 (defn validate-grant [auth-pub-identity timestamp expect-app-id
                       {:as ticket
@@ -132,35 +131,6 @@
   (defn decode-ticket-request [etr]
     (codec/decode-args etr :from-seq from-seq)))
 
-(deftest ticket-validation
-  (let [ti {:public-key "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4Wt9keq71vtffMK2KtUfTBb3dvvg7dvGN3dXiLlS4zFTAbL+nap55aHhmpVKTF2cmEotvkt3dTRQ+4wcKfaMqQ==",
-            :private-key "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCDUKuVmLhSVupWDzT208DFnW3n9ebx1Hl/2vgk3tnjMRg=="}
-        aid #uuid "4aafa30f-e8a6-4364-9610-d00700fd773b"
-        r (->TicketRequest aid
-                           #inst "2016-01-01"
-                           #inst "2016-01-02")
-        gra (sign-grant ti #uuid "54100d61-7e85-4266-b0eb-e52ffcb79055" {:name "U Ser"}
-                        #inst "2016-01-01T02"
-                        #inst "2016-01-02"
-                        r)]
-    (is (grant-signature-valid? ti gra))
-    (is (s/valid? ::granted-ticket
-                  (validate-grant ti #inst "2016-01-01T03" aid gra)))
-    (is (= :expired
-           (:failure-reason
-            (validate-grant ti #inst "2016-01-02T03" aid gra))))
-    (is (= :not-yet-valid
-           (:failure-reason
-            (validate-grant ti #inst "2015-12-30" aid gra))))
-    (is (= :app-mismatch
-           (:failure-reason
-            (validate-grant ti #inst "2016-01-01T03"
-                            #uuid "54100d61-7e85-4266-b0eb-e52ffcb79056"
-                            gra))))
-    (is (= :signature-mismatch
-           (:failure-reason
-            (validate-grant ti #inst "2016-01-01T03" aid (assoc-in gra [:user-info :extra] :super)))))))
-
 (defn auth-client [auth-pub-identity expect-app-id ticket-exp-duration get-timestamp]
   (fn
     ([] (let [cur-ts (get-timestamp)]
@@ -188,34 +158,6 @@
                          ticket-request)))
          (fn on-failure [reason] (->GrantFailure ticket-request reason)))))))
 
-(deftest grant-client-server
-  (let [ti {:public-key "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4Wt9keq71vtffMK2KtUfTBb3dvvg7dvGN3dXiLlS4zFTAbL+nap55aHhmpVKTF2cmEotvkt3dTRQ+4wcKfaMqQ==",
-            :private-key "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCDUKuVmLhSVupWDzT208DFnW3n9ebx1Hl/2vgk3tnjMRg=="}
-        aid #uuid "4aafa30f-e8a6-4364-9610-d00700fd773b"
-
-        cl (auth-client (dissoc ti :private-key) aid 100 #(Date.))
-        se (auth-server ti 800 #(Date.)
-                        (fn get-user-info [on-success on-failure]
-                          (on-success #uuid "4aafa30f-e8a6-4364-9610-d00700fd773b"
-                                      {:name "U Ser"})))
-
-        ticket-request (cl)
-        ticket (se ticket-request)]
-    (testing "ticket codec"
-      (is (= ticket (decode-ticket (encode-ticket ticket)))))
-    (testing "expiration"
-      (is (s/valid? ::granted-ticket (cl ticket)))
-      (Thread/sleep 120)
-      (is (= :expired (:failure-reason (cl ticket)))))
-    (testing "grant failures"
-      (is (= {:name "U Ser"} (:user-info ticket)))
-      (is (= :future-request
-             (:failure-reason
-              (se (assoc ticket-request :request-timestamp (Date. (+ (System/currentTimeMillis) 50)))))))
-      (is (= :expired-request
-             (:failure-reason
-              (se (assoc ticket-request :wanted-session-end-timestamp (Date. (- (System/currentTimeMillis) 50))))))))))
-
 (defn failure? [m]
   (contains? m :failure-reason))
 
@@ -230,14 +172,16 @@
    Takes POST request with ticket requests encoded as application/fressian+base64
 
    ticket-server: a signing function, as per `auth-server`"
-  [ticket-server]
-  (fn [{:keys [request-method headers body]}]
+  [ticket-server & {:keys [max-content-length]}]
+  (fn [{{:strs [content-length content-type]} :headers
+        :keys [request-method body]}]
     (cond (not= :post request-method)
           {:status 405}
-          (not= "application/fressian+base64" (get headers "content-type"))
-          {:status 406}
-          (> 10000 (Long/parseLong (get headers "content-length")))
-          {:status 400 :body "Size limit exceeded"}
+          (not= "application/fressian+base64" content-type)
+          {:status 406 :body "accepted: application/fressian+base64"}
+          (and max-content-length
+               (< max-content-length (Long/parseLong content-length)))
+          {:status 400 :body (str "Max Content-Length exceeded: " content-length " > " max-content-length)}
           :else
           (let [ticket-req (decode-ticket-request (slurp body))
                 grant (ticket-server ticket-req)]
@@ -246,10 +190,64 @@
               {:status 200
                :headers {"content-type" "application/fressian+base64"}
                :body (encode-ticket grant)})))))
-   
 
-(defn wrap-client [h ticket-client
-                   & {:keys [ticket-server-uri ]}]
-  (comment
-    (app
-     [app-uuid &] [["set-cookie"] (call back from ticket server with)])))
+(defn parse-auth-header [hdr]
+  (and hdr (second (re-find #"Webnf-Ticket (.*)" hdr))))
+
+(defn wrap-client [h ticket-client]
+  (-> (fn [{:as req
+            {auth-header "authorization"
+             x-auth-header "x-webnf-auth-ticket"} :headers
+            {{cookie-auth :value} "webnf-auth-ticket"} :cookies}]
+        (let [token (or x-auth-header cookie-auth
+                        (parse-auth-header auth-header))]
+          (-> req
+              (assoc ::ticket-requester (reify clojure.lang.IDeref
+                                          ;; encode freshly created ticket
+                                          (deref [_] (encode-ticket-request (ticket-client))))
+                     ::ticket nil ::auth-error nil)
+              (cond-> token (as-> req
+                                (let [ticket (ticket-client (decode-ticket token))]
+                                  (if (failure? ticket)
+                                    (assoc req ::auth-error ticket)
+                                    (assoc req ::ticket ticket)))))
+              h)))
+      wrap-cookies))
+
+(defn print-www-auth-kv [scheme kvs]
+  (apply str scheme " " (apply concat
+                               (interpose
+                                [", "]
+                                (for [[k v] kvs
+                                      :when v]
+                                  [k "=" (str-quote v)])))))
+
+(defn wrap-protect [h & {:keys [on-success realm goto]}]
+  (fn [{:as req :keys [::ticket-requester ::auth-error ::ticket]}]
+    (if ticket
+      (if on-success
+        (on-success h req ticket)
+        (h req))
+      {:status 401
+       :headers {"WWW-Authenticate" (print-www-auth-kv "Webnf-Ticket" {"realm" realm
+                                                                       "token" @ticket-requester
+                                                                       "error" (:failure-reason auth-error)
+                                                                       "goto"  goto})}})))
+
+(def auth-header-parser
+  (insta/parser
+   "<HEADER> = PREFIX (KVPAIR <#'\\s*,\\s*'>)* KVPAIR
+    <PREFIX> = #'\\S+' <#'\\s+'>
+    <KVPAIR> = KEY <#'\\s*=\\s*\"'> VALUE <#'\"\\s*'>
+    <KEY>    = #'[^=\\s]+'
+    <VALUE>  = #'(?:[^\"\\\\]|\\\\\"|\\\\\\\\)+'"))
+
+(defn parse-header [hv]
+  (let [res (insta/parse auth-header-parser hv)]
+    (when-not (insta/failure? res)
+      (loop [tres (transient {})
+             [k v & rst :as kvs] (next res)]
+        (if kvs
+          (recur (assoc! tres k (str/replace v #"\\\"|\\\\" #(case % "\\\"" "\"" "\\\\" "\\")))
+                 rst)
+          [(first res) (persistent! tres)])))))
