@@ -6,6 +6,7 @@
   Server policy). Ticket Client then establishes user capabilities (as
   roles and grants) from its own data source."
   (:require
+   [clojure.edn :as edn]
    [clojure.spec :as s]
    [webnf.handler.auth.crypto :as crypt]
    [webnf.handler.auth.codec :as codec]
@@ -124,6 +125,13 @@
   (defn decode-ticket [et]
     (codec/decode-args et :from-seq from-seq)))
 
+(let [to-seq (juxt :app-id :request-timestamp :wanted-session-end-timestamp)
+      from-seq ->TicketRequest]
+  (defn encode-ticket-request [tr]
+    (codec/encode-args tr :to-seq to-seq))
+  (defn decode-ticket-request [etr]
+    (codec/decode-args etr :from-seq from-seq)))
+
 (deftest ticket-validation
   (let [ti {:public-key "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4Wt9keq71vtffMK2KtUfTBb3dvvg7dvGN3dXiLlS4zFTAbL+nap55aHhmpVKTF2cmEotvkt3dTRQ+4wcKfaMqQ==",
             :private-key "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCDUKuVmLhSVupWDzT208DFnW3n9ebx1Hl/2vgk3tnjMRg=="}
@@ -159,7 +167,7 @@
           (->TicketRequest expect-app-id cur-ts (Date. (+ ticket-exp-duration (.getTime cur-ts))))))
     ([ticket] (validate-grant auth-pub-identity (get-timestamp) expect-app-id ticket))))
 
-(defn auth-server [auth-identity max-expire-duration get-timestamp get-user-id get-user-info]
+(defn auth-server [auth-identity max-expire-duration get-timestamp get-user-info]
   (fn [{:as ticket-request :keys [request-timestamp wanted-session-end-timestamp]}]
     (let [cur-ts (get-timestamp)]
       (cond
@@ -168,43 +176,80 @@
         (date> cur-ts wanted-session-end-timestamp)
         (->GrantFailure ticket-request :expired-request)
         :else
-        (let [expire-duration (min max-expire-duration
-                                   (- (.getTime wanted-session-end-timestamp)
-                                      (.getTime request-timestamp)
-                                      (- (.getTime cur-ts)
-                                         (.getTime request-timestamp))))]
-          (sign-grant auth-identity (get-user-id ticket-request) (get-user-info ticket-request)
-                      cur-ts (Date. (+ (.getTime cur-ts) expire-duration))
-                      ticket-request))))))
+        (get-user-info
+         (fn on-success [user-id user-info]
+           (let [expire-duration (min max-expire-duration
+                                      (- (.getTime wanted-session-end-timestamp)
+                                         (.getTime request-timestamp)
+                                         (- (.getTime cur-ts)
+                                            (.getTime request-timestamp))))]
+             (sign-grant auth-identity user-id user-info
+                         cur-ts (Date. (+ (.getTime cur-ts) expire-duration))
+                         ticket-request)))
+         (fn on-failure [reason] (->GrantFailure ticket-request reason)))))))
 
 (deftest grant-client-server
   (let [ti {:public-key "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4Wt9keq71vtffMK2KtUfTBb3dvvg7dvGN3dXiLlS4zFTAbL+nap55aHhmpVKTF2cmEotvkt3dTRQ+4wcKfaMqQ==",
             :private-key "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCDUKuVmLhSVupWDzT208DFnW3n9ebx1Hl/2vgk3tnjMRg=="}
         aid #uuid "4aafa30f-e8a6-4364-9610-d00700fd773b"
 
-        cl (auth-client (dissoc ti :private-key) aid 1000 #(Date.))
-        se (auth-server ti 800 #(Date.) (constantly #uuid "4aafa30f-e8a6-4364-9610-d00700fd773b")
-                        (constantly {:name "U Ser"}))
+        cl (auth-client (dissoc ti :private-key) aid 100 #(Date.))
+        se (auth-server ti 800 #(Date.)
+                        (fn get-user-info [on-success on-failure]
+                          (on-success #uuid "4aafa30f-e8a6-4364-9610-d00700fd773b"
+                                      {:name "U Ser"})))
 
         ticket-request (cl)
         ticket (se ticket-request)]
     (testing "ticket codec"
       (is (= ticket (decode-ticket (encode-ticket ticket)))))
-    (is (s/valid? ::granted-ticket ticket))
-    (is (= :future-request
-           (:failure-reason
-            (se (assoc ticket-request :request-timestamp (Date. (+ (System/currentTimeMillis) 100)))))))
-    (is (= :expired-request
-           (:failure-reason
-            (se (assoc ticket-request :wanted-session-end-timestamp (Date. (- (System/currentTimeMillis) 100)))))))))
+    (testing "expiration"
+      (is (s/valid? ::granted-ticket (cl ticket)))
+      (Thread/sleep 120)
+      (is (= :expired (:failure-reason (cl ticket)))))
+    (testing "grant failures"
+      (is (= {:name "U Ser"} (:user-info ticket)))
+      (is (= :future-request
+             (:failure-reason
+              (se (assoc ticket-request :request-timestamp (Date. (+ (System/currentTimeMillis) 50)))))))
+      (is (= :expired-request
+             (:failure-reason
+              (se (assoc ticket-request :wanted-session-end-timestamp (Date. (- (System/currentTimeMillis) 50))))))))))
 
-(comment
-  (defn server-handler
-    "Params:
-    ticket-server-id : UUID of this service
-    get-timestamp : Timestamp provider, a function of no args, returning milliseconds
-    get-client-id : Authentication function, [user-name password app-id] -> "
-    [ticket-server-id get-timestamp get-client-id]
-    (fn [req]
-      )))
+(defn failure? [m]
+  (contains? m :failure-reason))
+
+(defmulti failure-response :failure-reason)
+
+(defmethod failure-response :default
+  [{tr :ticket-request fr :failure-reason}]
+  {:status 400 :body (pr-str [fr tr])})
+
+(defn server-handler
+  "Construct ring handler for signing tickets
+   Takes POST request with ticket requests encoded as application/fressian+base64
+
+   ticket-server: a signing function, as per `auth-server`"
+  [ticket-server]
+  (fn [{:keys [request-method headers body]}]
+    (cond (not= :post request-method)
+          {:status 405}
+          (not= "application/fressian+base64" (get headers "content-type"))
+          {:status 406}
+          (> 10000 (Long/parseLong (get headers "content-length")))
+          {:status 400 :body "Size limit exceeded"}
+          :else
+          (let [ticket-req (decode-ticket-request (slurp body))
+                grant (ticket-server ticket-req)]
+            (if (failure? grant)
+              (failure-response grant)
+              {:status 200
+               :headers {"content-type" "application/fressian+base64"}
+               :body (encode-ticket grant)})))))
    
+
+(defn wrap-client [h ticket-client
+                   & {:keys [ticket-server-uri ]}]
+  (comment
+    (app
+     [app-uuid &] [["set-cookie"] (call back from ticket server with)])))
