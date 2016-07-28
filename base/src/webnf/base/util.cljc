@@ -214,7 +214,7 @@
                                       (cond
                                         (= ch e) (.. sb (append e) (append e))
                                         (= ch q) (.. sb (append e) (append q))
-                                        (.append sb ch))))
+                                        :else (.append sb ch))))
                            (.append (StringBuilder. (+ (count s) 6)) q)
                            s)
                           q))]
