@@ -192,3 +192,31 @@
       (when-not (= "" (first p))
         (throw (ex-info "Not an absolute path" {:href href})))
       (vec (rest p)))))
+
+(defn str-quote
+  "Quotes string with configurable quote and escape character (default \" and \\)"
+  ([s] (str-quote s \" \\))
+  ([s q] (str-quote s q \\))
+  ([s q e]
+   (let [s* (str (.append (reduce
+                           #?(:clj (eval
+                                    (if (= q e)
+                                      `(fn [sb# ch#]
+                                         (case ch#
+                                           ~e (.. sb# (append (char ~e)) (append (char ~e)))
+                                           (.append sb# ch#)))
+                                      `(fn [sb# ch#]
+                                         (case ch#
+                                           ~e (.. sb# (append (char ~e)) (append (char ~e)))
+                                           ~q (.. sb# (append (char ~e)) (append (char ~q)))
+                                           (.append sb# ch#)))))
+                              :cljs (fn [sb ch]
+                                      (cond
+                                        (= ch e) (.. sb (append e) (append e))
+                                        (= ch q) (.. sb (append e) (append q))
+                                        (.append sb ch))))
+                           (.append (StringBuilder. (+ (count s) 6)) q)
+                           s)
+                          q))]
+     (if (= s s*)
+       s s*))))

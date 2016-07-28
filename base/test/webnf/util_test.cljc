@@ -52,3 +52,8 @@
                  (u/href->path "foo")))
   (t/is (thrown? #?(:clj Exception :cljs js/Error)
                  (u/href->path "foo/path"))))
+
+(t/deftest test-str-quote
+  (t/is (= "\"fo'o\\\"ba'r\"" (u/str-quote "fo'o\"ba'r")))
+  (t/is (= "'fo\\'o\"ba\\'r'" (u/str-quote "fo'o\"ba'r" \')))
+  (t/is (= "$f$$o'o\"b$$a'r$" (u/str-quote "f$o'o\"b$a'r" \$ \$))))

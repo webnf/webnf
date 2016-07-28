@@ -21,4 +21,4 @@
 (autoload-some ^:static (webnf.base.util to-many pprint-str
                                          pretial ap rcomp scat
                                          path->href href->path
-                                         update-in))
+                                         update-in str-quote))
