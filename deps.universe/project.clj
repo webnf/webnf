@@ -10,7 +10,7 @@
                  ;; Algorithms
                  [com.lambdaworks/scrypt "1.4.0"]
                  [net.mikera/core.matrix "0.52.1"]
-                 [instaparse "1.4.2"]
+                 [instaparse "_" :upgrade false]
                  [nf.fr.eraasoft/objectpool "1.1.2"]
                  [clojurewerkz/meltdown "1.1.0"]
                  [net.polyc0l0r/hasch "0.3.0-beta2" :exclusions [org.clojure/clojurescript com.google.guava/guava]]

@@ -39,7 +39,7 @@
                  [org.clojure/jvm.tools.analyzer "0.6.1"]
                  [org.clojure/math.combinatorics "0.1.3"]
                  [org.clojure/math.numeric-tower "0.0.4"]
-                 [org.clojure/test.check "0.9.0"]
+                 [org.clojure/test.check "_" :upgrade false]
                  [org.clojure/test.generative "0.5.2"]
                  [org.clojure/tools.analyzer "0.6.9"]
                  [org.clojure/tools.analyzer.js "0.1.0-beta5" :exclusions [org.clojure/clojurescript]]
