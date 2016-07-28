@@ -9,7 +9,7 @@
 
                  ;; Algorithms
                  [com.lambdaworks/scrypt "1.4.0"]
-                 [net.mikera/core.matrix "0.52.1"]
+                 [net.mikera/core.matrix "0.52.2"]
                  [instaparse "_" :upgrade false]
                  [nf.fr.eraasoft/objectpool "1.1.2"]
                  [clojurewerkz/meltdown "1.1.0"]
@@ -23,7 +23,7 @@
                   :exclusions [com.google.code.findbugs/annotations com.google.guava/guava]]
                  [danlentz/clj-uuid "0.1.6"]
                  [org.fressian/fressian "0.6.6"]
-                 [cheshire "5.6.1"]
+                 [cheshire "5.6.3"]
 
                  ;; Evaluation controllers
                  [com.stuartsierra/component "_" :upgrade false]
@@ -32,4 +32,4 @@
                  ;; APIs
                  [joda-time "_" :upgrade false]
                  [clj-http "_" :exclusions [commons-logging] :upgrade false]
-                 [amazonica "0.3.59" :exclusions [joda-time commons-logging]]])
+                 [amazonica "0.3.73" :exclusions [joda-time commons-logging]]])

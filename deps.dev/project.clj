@@ -11,14 +11,14 @@
                                org.clojure/clojurescript]]
                  [org.clojure/tools.reader "_" :upgrade false] ; override reader from lein-light-repl
                  [org.clojure/tools.nrepl "_" :upgrade false]
-                 [cider/cider-nrepl "0.12.0"
+                 [cider/cider-nrepl "0.13.0"
                   :exclusions [org.clojure/tools.nrepl]]
                  [com.cemerick/piggieback "0.2.1" :exclusions [org.clojure/clojurescript]]
                  [weasel "0.7.0" :exclusions [org.clojure/clojurescript]]
-                 [figwheel-sidecar "0.5.4-3" :exclusions [org.clojure/clojurescript]]
-                 [binaryage/devtools "0.7.0"]
+                 [figwheel-sidecar "0.5.4-7" :exclusions [org.clojure/clojurescript]]
+                 [binaryage/devtools "0.7.2"]
                  [spyscope "0.1.5"]
                  [debugger "0.2.0"]
-                 [compliment "0.2.7"]
+                 [compliment "0.3.0"]
                  [cljs-tooling "0.2.0"]
                  [cljfmt "0.5.3"]])

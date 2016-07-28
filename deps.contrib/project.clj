@@ -27,7 +27,7 @@
                  [org.clojure/data.finger-tree "0.0.2"]
                  [org.clojure/data.fressian "0.2.1"]
                  [org.clojure/data.generators "0.1.2"]
-                 [org.clojure/data.int-map "0.2.2"]
+                 [org.clojure/data.int-map "0.2.3"]
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/data.priority-map "0.0.7"]
                  [org.clojure/data.xml "_" :upgrade false]

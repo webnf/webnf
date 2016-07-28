@@ -3,7 +3,7 @@
   :description "Common dependencies for web apps"
   :url "http://github.com/webnf/webnf"
   :dependencies [[eu.bitwalker/UserAgentUtils "1.20"]
-                 [net.sourceforge.cssparser/cssparser "0.9.19"]
+                 [net.sourceforge.cssparser/cssparser "0.9.20"]
                  [org.lesscss/lesscss "1.7.0.1.1"
                   :exclusions [org.slf4j/slf4j-simple
                                org.mozilla/rino]]
@@ -22,4 +22,4 @@
                  [webnf.compat/yuicompressor "_" :upgrade false]
                  [garden "1.3.2"
                   :exclusions [com.yahoo.platform.yui/yuicompressor]]
-                 [http-kit "2.2.0-alpha2"]])
+                 [http-kit "2.2.0"]])
