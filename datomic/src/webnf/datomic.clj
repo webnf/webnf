@@ -319,6 +319,26 @@
            :datomic/conn conn
            :datomic/db (dtm/db conn))))))
 
+(defn wrap-execute-tx
+  "Execute :webnf.datomic/tx keys on ring responses on connection"
+  [h conn]
+  (fn [{:as req :keys [request-method uri]}]
+    (let [{:keys [::tx] :as resp} (h req)]
+      (if (empty? tx)
+        resp
+        (try
+          (let [tx-res @(d/transact conn tx)]
+            (log/trace (format "Transaction Success %s %s"
+                               (str/upper-case (name request-method)) uri)
+                       tx tx-res)
+            resp)
+          (catch Exception e
+            ;; FIXME Retry on transient failure
+            (log/error e (format "Transaction Error %s %s"
+                                 (str/upper-case (name request-method)) uri)
+                       tx)
+            {:status 500}))))))
+
 ;; ### Race - free report queue
 
 (defn listen-reports
