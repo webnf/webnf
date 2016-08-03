@@ -16,9 +16,9 @@
                  [com.cemerick/piggieback "0.2.1" :exclusions [org.clojure/clojurescript]]
                  [weasel "0.7.0" :exclusions [org.clojure/clojurescript]]
                  [figwheel-sidecar "0.5.4-7" :exclusions [org.clojure/clojurescript]]
-                 [binaryage/devtools "0.7.2"]
+                 [binaryage/devtools "0.8.0"]
                  [spyscope "0.1.5"]
                  [debugger "0.2.0"]
-                 [compliment "0.3.0"]
+                 [compliment "0.3.1"]
                  [cljs-tooling "0.2.0"]
                  [cljfmt "0.5.3"]])
