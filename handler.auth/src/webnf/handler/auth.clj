@@ -242,7 +242,7 @@
                                     (assoc req ::auth-error ticket)
                                     (assoc req ::ticket ticket)))))
               h)))
-      wrap-cookies))
+      (wrap-cookies {:encoder identity :decoder identity})))
 
 (defn print-www-auth-kv [scheme kvs]
   (apply str scheme " " (apply concat
