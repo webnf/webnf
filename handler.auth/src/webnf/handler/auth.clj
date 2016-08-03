@@ -13,7 +13,8 @@
    [webnf.handler.auth.crypto :as crypt]
    [webnf.handler.auth.codec :as codec]
    [instaparse.core :as insta]
-   [clojure.string :as str])
+   [clojure.string :as str]
+   [clojure.tools.logging :as log])
   (:import (java.util Date)))
 
 (s/def ::app-id uuid?)
@@ -147,6 +148,7 @@
         (->GrantFailure ticket-request :expired-request)
         :else
         (get-user-info
+         ticket-request
          (fn on-success [user-id user-info]
            (let [expire-duration (min max-expire-duration
                                       (- (.getTime wanted-session-end-timestamp)
@@ -167,6 +169,24 @@
   [{tr :ticket-request fr :failure-reason}]
   {:status 400 :body (pr-str [fr tr])})
 
+(def auth-header-parser
+  (insta/parser
+   "<HEADER> = PREFIX (KVPAIR <#'\\s*,\\s*'>)* KVPAIR
+    <PREFIX> = #'\\S+' <#'\\s+'>
+    <KVPAIR> = KEY <#'\\s*=\\s*\"'> VALUE <#'\"\\s*'>
+    <KEY>    = #'[^=\\s]+'
+    <VALUE>  = #'(?:[^\"\\\\]|\\\\\"|\\\\\\\\)+'"))
+
+(defn parse-header [hv]
+  (let [res (insta/parse auth-header-parser hv)]
+    (when-not (insta/failure? res)
+      (loop [tres (transient {})
+             [k v & rst :as kvs] (next res)]
+        (if kvs
+          (recur (assoc! tres k (str/replace v #"\\\"|\\\\" #(case % "\\\"" "\"" "\\\\" "\\")))
+                 rst)
+          [(first res) (persistent! tres)])))))
+
 (defn server-handler
   "Construct ring handler for signing tickets
    Takes POST request with ticket requests encoded as application/fressian+base64
@@ -174,17 +194,27 @@
    ticket-server: a signing function, as per `auth-server`"
   [ticket-server & {:keys [max-content-length]}]
   (fn [{{:strs [content-length content-type]} :headers
-        :keys [request-method body]}]
+        :keys [request-method body]
+        :as req}]
     (cond (not= :post request-method)
           {:status 405}
-          (not= "application/fressian+base64" content-type)
-          {:status 406 :body "accepted: application/fressian+base64"}
+          (not (contains? #{"application/fressian+base64"
+                            "application/www-authenticate"}
+                          content-type))
+          {:status 406 :body "accepted: application/fressian+base64, application/www-authenticate"}
           (and max-content-length
                (< max-content-length (Long/parseLong content-length)))
           {:status 400 :body (str "Max Content-Length exceeded: " content-length " > " max-content-length)}
           :else
-          (let [ticket-req (decode-ticket-request (slurp body))
-                grant (ticket-server ticket-req)]
+          (let [ticket-req (case content-type
+                             "application/www-authenticate"
+                             (let [[method {:strs [token]} :as foo]
+                                   (parse-header (slurp body))]
+                               (when (= "Webnf-Ticket" method)
+                                 (decode-ticket-request token)))
+                             "application/fressian+base64"
+                             (decode-ticket-request (slurp body)))
+                grant (ticket-server (assoc ticket-req ::request req))]
             (if (failure? grant)
               (failure-response grant)
               {:status 200
@@ -234,20 +264,3 @@
                                                                        "error" (:failure-reason auth-error)
                                                                        "goto"  goto})}})))
 
-(def auth-header-parser
-  (insta/parser
-   "<HEADER> = PREFIX (KVPAIR <#'\\s*,\\s*'>)* KVPAIR
-    <PREFIX> = #'\\S+' <#'\\s+'>
-    <KVPAIR> = KEY <#'\\s*=\\s*\"'> VALUE <#'\"\\s*'>
-    <KEY>    = #'[^=\\s]+'
-    <VALUE>  = #'(?:[^\"\\\\]|\\\\\"|\\\\\\\\)+'"))
-
-(defn parse-header [hv]
-  (let [res (insta/parse auth-header-parser hv)]
-    (when-not (insta/failure? res)
-      (loop [tres (transient {})
-             [k v & rst :as kvs] (next res)]
-        (if kvs
-          (recur (assoc! tres k (str/replace v #"\\\"|\\\\" #(case % "\\\"" "\"" "\\\\" "\\")))
-                 rst)
-          [(first res) (persistent! tres)])))))
