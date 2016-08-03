@@ -195,10 +195,11 @@
 
 (defn str-quote
   "Quotes string with configurable quote and escape character (default \" and \\)"
-  ([s] (str-quote s \" \\))
-  ([s q] (str-quote s q \\))
-  ([s q e]
-   (let [s* (str (.append (reduce
+  ([v] (str-quote v \" \\))
+  ([v q] (str-quote v q \\))
+  ([v q e]
+   (let [s  (str v)
+         s* (str (.append (reduce
                            #?(:clj (eval
                                     (if (= q e)
                                       `(fn [sb# ch#]
