@@ -5,7 +5,8 @@
    [clojure.java.io :as io]
    [webnf.kv :refer [merge-deep]]
    [clojure.string :as str]
-   [webnf.base :refer [to-many]]))
+   [webnf.base :refer [to-many]]
+   [clojure.tools.logging :as log]))
 
 (defn kw-methods [meth]
   {:pre [(string? meth)]}
@@ -32,20 +33,22 @@
 (defn wrap-browser-http
   ([handler] (wrap-browser-http handler (constantly true)))
   ([handler adapt-request?] 
-     (fn [req]
-       (if (adapt-request? req)
-         (let [{{meth "_http_method"
-                 body "_http_body"
-                 head "_http_header"} :params}
-               req
+   (fn [req]
+     (when-not (contains? req :params)
+       (log/warn "No params found on request, please add ring.middleware.params/wrap-params before webnf.middleware.browser-http/wrap-browser-http"))
+     (if (adapt-request? req)
+       (let [{{meth "_http_method"
+               body "_http_body"
+               head "_http_header"} :params}
+             req
                
-               {status :status :as resp} 
-               (handler (cond-> req
-                                meth (assoc :request-method (kw-methods meth))
-                                body (merge-deep (replacement-body req body))
-                                head (add-headers head)))]
-           (cond-> resp
-                   (= 201 status) (r/status 303)
-                   (= 204 status) (-> (r/status 303)
-                                      (r/header "Location" (:uri req)))))
-         (handler req)))))
+             {status :status :as resp} 
+             (handler (cond-> req
+                        meth (assoc :request-method (kw-methods meth))
+                        body (merge-deep (replacement-body req body))
+                        head (add-headers head)))]
+         (cond-> resp
+           (= 201 status) (r/status 303)
+           (= 204 status) (-> (r/status 303)
+                              (r/header "Location" (:uri req)))))
+       (handler req)))))
