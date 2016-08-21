@@ -2,6 +2,7 @@
   :plugins [[lein-modules "0.3.11"]]
   :description "Development dependencies"
   :dependencies [[webnf.deps/contrib "_" :upgrade false]
+                 [webnf/server "_" :upgrade false]
                  [clj-stacktrace "0.2.8"]
                  [clojure-complete "0.2.4"]
                  [criterium "0.4.4"]
@@ -16,7 +17,9 @@
                  [com.cemerick/piggieback "0.2.1" :exclusions [org.clojure/clojurescript]]
                  [weasel "0.7.0" :exclusions [org.clojure/clojurescript]]
                  [figwheel-sidecar "0.5.4-7" :exclusions [org.clojure/clojurescript]]
-                 [binaryage/devtools "0.8.0"]
+                 [figwheel-sidecar "0.5.4-7"]
+                 [binaryage/devtools "0.8.1"]
+                 [ring "1.5.0"]
                  [spyscope "0.1.5"]
                  [debugger "0.2.0"]
                  [compliment "0.3.1"]
