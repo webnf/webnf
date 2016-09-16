@@ -2,7 +2,6 @@
   :plugins [[lein-modules "0.3.11"]]
   :description "Development dependencies"
   :dependencies [[webnf.deps/contrib "_" :upgrade false]
-                 [webnf/server "_" :upgrade false]
                  [clj-stacktrace "0.2.8"]
                  [clojure-complete "0.2.4"]
                  [criterium "0.4.4"]
