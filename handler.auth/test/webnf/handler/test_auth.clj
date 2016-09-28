@@ -6,7 +6,7 @@
               decode-ticket encode-ticket parse-header]]
             [clojure.spec :as s]
             [clojure.test :as t :refer
-             [deftest testing is are]]
+             [deftest testing is are assert-expr do-report]]
             [ring.mock.request :as mock]
             [ring.util.response :as rur]
             [ring.util.codec :as rcodec])
@@ -54,7 +54,7 @@
 
         cl (auth-client (dissoc ti :private-key) aid 100 #(Date.))
         se (auth-server ti 800 #(Date.)
-                        (fn get-user-info [on-success on-failure]
+                        (fn get-user-info [ticket-request on-success on-failure]
                           (on-success #uuid "4aafa30f-e8a6-4364-9610-d00700fd773b"
                                       {:name "U Ser"})))
 
@@ -83,14 +83,25 @@
   (are [hv] (nil? (parse-header (str "Webnf " hv)))
     "" "foo=bar" "foo=\"foo\"bar\"" "moo=\"m\\o\""))
 
+(defmethod assert-expr 'http-success? [msg form]
+  `(let [{status# :status :as resp#} (do ~@(next form))]
+     (if (and status# (<= 200 status# 299))
+       (do (do-report {:type :pass :message ~msg
+                       :expected '{:status "2**" ... ...}
+                       :actual resp#})
+           resp#)
+       (do-report {:type :fail :message ~msg
+                   :expected '{:status "2**" ... ...}
+                   :actual resp#}))))
+
 (deftest client-server-handlers
   (let [ti {:public-key "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4Wt9keq71vtffMK2KtUfTBb3dvvg7dvGN3dXiLlS4zFTAbL+nap55aHhmpVKTF2cmEotvkt3dTRQ+4wcKfaMqQ==",
             :private-key "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCDUKuVmLhSVupWDzT208DFnW3n9ebx1Hl/2vgk3tnjMRg=="}
         aid #uuid "4aafa30f-e8a6-4364-9610-d00700fd773b"
 
-        cl (auth-client (dissoc ti :private-key) aid 100 #(Date.))
+        cl (auth-client (dissoc ti :private-key) aid 1000 #(Date.))
         se (auth-server ti 800 #(Date.)
-                        (fn get-user-info [on-success on-failure]
+                        (fn get-user-info [ticket-request on-success on-failure]
                           (on-success #uuid "4aafa30f-e8a6-4364-9610-d00700fd773b"
                                       {:name "U Ser"})))
         server (server-handler se)
@@ -108,12 +119,12 @@
                                      (mock/body token)))
         _ (do (is (= (:status auth-server-resp) 200))
               (is (= (rur/get-header auth-server-resp "content-type") "application/fressian+base64")))]
-    (is (= 200 (:status (-> (mock/request :get "/")
-                            (mock/header "authorization" (str "Webnf-Ticket " (:body auth-server-resp)))
-                            client))))
-    (is (= 200 (:status (-> (mock/request :get "/")
-                            (mock/header "x-webnf-auth-ticket" (:body auth-server-resp))
-                            client))))
-    (is (= 200 (:status (-> (mock/request :get "/")
-                            (mock/header "cookie" (str "webnf-auth-ticket=" (rcodec/form-encode (:body auth-server-resp))))
-                            client))))))
+    (is (http-success? (-> (mock/request :get "/")
+                           (mock/header "authorization" (str "Webnf-Ticket " (:body auth-server-resp)))
+                           client)))
+    (is (http-success? (-> (mock/request :get "/")
+                           (mock/header "x-webnf-auth-ticket" (:body auth-server-resp))
+                           client)))
+    (is (http-success? (-> (mock/request :get "/")
+                           (mock/header "cookie" (str "webnf-auth-ticket=" (:body auth-server-resp)))
+                           client)))))
