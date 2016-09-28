@@ -4,7 +4,7 @@
   :dependencies [[org.clojure/clojure "_" :upgrade false]
                  [webnf.deps/logback "_" :upgrade false]
                  [webnf/base "_" :upgrade false]
-                 [io.replikativ/hasch "0.3.0"]
+                 [io.replikativ/hasch "0.3.1"]
                  [org.clojure/data.fressian "0.2.1"]
                  [ring/ring-core "_" :upgrade false]
                  [instaparse "_" :upgrade false]]

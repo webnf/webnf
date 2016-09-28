@@ -18,7 +18,7 @@
                   :exclusions [ring/ring-core]]
                  [hiccup "1.0.5"]
                  [liberator "0.14.1"]
-                 [prone "1.1.1"]
+                 [prone "1.1.2"]
                  [webnf.compat/yuicompressor "_" :upgrade false]
                  [garden "1.3.2"
                   :exclusions [com.yahoo.platform.yui/yuicompressor]]

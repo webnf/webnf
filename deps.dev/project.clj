@@ -15,12 +15,12 @@
                   :exclusions [org.clojure/tools.nrepl]]
                  [com.cemerick/piggieback "0.2.1" :exclusions [org.clojure/clojurescript]]
                  [weasel "0.7.0" :exclusions [org.clojure/clojurescript]]
-                 [figwheel-sidecar "0.5.4-7" :exclusions [org.clojure/clojurescript]]
-                 [figwheel-sidecar "0.5.4-7"]
-                 [binaryage/devtools "0.8.1"]
-                 [ring "1.5.0"]
-                 [spyscope "0.1.5"]
+                 [ring "_" :upgrade false]
+                 [figwheel-sidecar "0.5.8" :exclusions [org.clojure/clojurescript]]
+                 [figwheel-sidecar "0.5.8"]
+                 [binaryage/devtools "0.8.2"]
+                 [spyscope "0.1.6"]
                  [debugger "0.2.0"]
                  [compliment "0.3.1"]
                  [cljs-tooling "0.2.0"]
-                 [cljfmt "0.5.3"]])
+                 [cljfmt "0.5.5"]])
