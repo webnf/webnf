@@ -132,8 +132,8 @@ Storage is uncompressed to make zero-copy possible."}
   ^java.io.File [store sha]
   (if-let [f (find-blob store sha)]
     f
-    (throw (ex-info (str "File not found: '" (sha-file store sha) "'"
-                         {:store store :sha sha})))))
+    (throw (ex-info (str "File not found: '" (sha-file store sha) "'")
+                    {:store store :sha sha}))))
 
 (defn open-stream
   "Returns java.io.InputStream by sha. Throws if not found."
