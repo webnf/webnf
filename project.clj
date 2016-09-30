@@ -39,7 +39,7 @@
                         org.clojure/core.unify           "0.5.7"
                         org.clojure/tools.logging        "0.3.1"
                         org.mozilla/rhino                "1.7.7.1"
-                        org.clojure/data.xml             "0.1.0-beta1"
+                        org.clojure/data.xml             "0-UE-DEVELOPMENT"
                         org.clojure/core.cache           "0.6.5"
                         org.clojure/test.check           "0.9.0"
                         com.google.code.findbugs/jsr305  "3.0.1"
