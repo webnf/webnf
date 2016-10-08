@@ -7,6 +7,3 @@ pom.xml.asc
 target
 .lein-failures
 .nrepl-port
-/dwn/
-/lein-collisions/
-/lein-nix/

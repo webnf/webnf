@@ -1,3 +1,12 @@
 [submodule "davstore"]
 	path = davstore
-	url = /home/herwig/Dropbox/src.git
+	url = https://github.com/webnf/davstore.git
+[submodule "dwn"]
+	path = dwn
+	url = https://github.com/webnf/dwn.git
+[submodule "lein-collisions"]
+	path = lein-collisions
+	url = https://github.com/webnf/lein-collisions.git
+[submodule "lein-nix"]
+	path = lein-nix
+	url = https://github.com/webnf/lein-nix.git
