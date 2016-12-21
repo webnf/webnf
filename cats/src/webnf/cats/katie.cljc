@@ -60,3 +60,4 @@
 (defn <*
   ([m1 m2] (->SeqLeft m1 m2))
   ([m1 m2 & ms] (apply <* (<* m1 m2) ms)))
+

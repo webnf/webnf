@@ -22,7 +22,7 @@
              :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
                     "async-servlet" "base" "datomic" "enlive"
                     "handler" "server" "filestore" "compat.yuicompressor" "cats" "js" "handler.auth"]
-             :versions {org.clojure/clojure              "1.9.0-alpha13"
+             :versions {org.clojure/clojure              "1.9.0-alpha14"
                         webnf                            "0.2.0-SNAPSHOT"
                         webnf.deps                       "0.2.0-SNAPSHOT"
                         webnf.handler                    "0.2.0-SNAPSHOT"
@@ -30,7 +30,7 @@
                         ring                             "1.5.0"
                         ring/ring-mock                   "0.3.0"
                         org.clojure/core.async           "0.2.391"
-                        org.clojure/clojurescript        "1.9.229"
+                        org.clojure/clojurescript        "1.9.293"
                         org.clojure/tools.reader         "1.0.0-beta3"
                         org.clojure/tools.nrepl          "0.2.12"
                         org.clojure/tools.analyzer.jvm   "0.6.10"
