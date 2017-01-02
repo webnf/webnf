@@ -1,9 +1,13 @@
 (ns webnf.cats.connie
   "CPS library"
-  #?(:cljs (:require-macros [webnf.cats.connie :refer [defcontinuation]])))
+  #?(:cljs (:require-macros [webnf.cats.connie :refer [cont* defcontinuation defcontinuation*]])))
 
-(defprotocol Continuation
-  (continue* [c final]))
+(defprotocol Thunk
+  "Suspended computation"
+  (continue* [thunk continuation]
+    "Gets passed a continuation for passing result of thunk.
+     Generally returns result of applying continuation to thunk result.
+     The main purpose of this abstraction is to allow a concept of multiple return values."))
 
 #?
 (:clj
@@ -13,7 +17,7 @@
          (gensym "_")))
 
    (defmacro cont* [k & body]
-     `(reify Continuation
+     `(reify Thunk
         (continue* [~(self-sym k) ~k]
           ~@body)))
 
@@ -33,7 +37,7 @@
 
    (defmacro defcontinuation* [rec-name [k & args :as argt] & body]
      `(defrecord ~rec-name ~(vec args)
-        Continuation
+        Thunk
         (continue* [~(self-sym argt)
                     ~k]
           ~@body)))
@@ -77,22 +81,32 @@
 (defcontinuation Comp ccomp [k cf cg]
   (cfn (cfn k cf) cg))
 
-#_(def id
-    (fn
-      ([] (cont* k (k)))
-      ([a] (cont* k (k a)))
-      ([a b] (cont* k (k a b)))
-      ([a b c] (cont* k (k a b c)))
-      ([a b c & ds] (cont* k (apply k a b c ds)))))
+(defcontinuation* Pure1 [k v1] (k v1))
+(defcontinuation* Pure2 [k v1 v2] (k v1 v2))
+(defcontinuation* Pure3 [k v1 v2 v3] (k v1 v2 v3))
+(defcontinuation* Pure  [k v1 v2 v3 vals] (apply k v1 v2 v3 vals))
 
+(defn pure
+  "Pass args to continuation"
+  ([] (cont* k (k)))
+  ([a] (->Pure1 a))
+  ([a b] (->Pure2 a b))
+  ([a b c] (->Pure3 a b c))
+  ([a b c & ds] (->Pure a b c ds)))
 
-(comment
+(defn cfmap
+  "Like (continuation) fmap, but map a thunk-returning function."
+  [c cf]
+  (continue* c cf))
 
-  ((-> (ccomp (fn [a b]
-                (cont* k (k (* a b) (/ a b) (/ b a))))
-              (fn [b c]
-                (cont* k (k (+ b c) (- b c)))))
-       run-cont)
-   1 3)
+(defn join
+  "(continuation) monadic join"
+  [cc]
+  (cont* k
+         (continue* cc #(continue* % k))))
 
-  )
+(defn run-m
+  "Run monad stack based on the continuation monad"
+  ([cm final]
+   (continue* (cm pure cfmap join) final))
+  ([cm ts final] (run-m (ts cm) final)))

@@ -1,36 +1,35 @@
 (ns webnf.cats.katie
   "Top-Level Categories:
     - Applicative (pure, fmap)"
-  (:require [webnf.cats.connie :refer
-             [Continuation cont* defcontinuation defcontinuation* continue*]]))
+  (:require [webnf.cats.connie :as c :refer
+             [Thunk cont* defcontinuation defcontinuation* continue*]]))
 
-(defcontinuation* Pure1 [k v1] (k v1))
-(defcontinuation* Pure2 [k v1 v2] (k v1 v2))
-(defcontinuation* Pure3 [k v1 v2 v3] (k v1 v2 v3))
-(defcontinuation* Pure  [k args] (apply k args))
+(defn pure [& vals]
+  (fn [pure _ _]
+    (apply pure vals)))
 
-(defn- third [c] (nth c 2))
+(defn cfmap [m cf]
+  (fn [pure cfmap join]
+    (cfmap (m pure cfmap join)
+           cf)))
 
-(defn pure [& v]
-  (case (count v)
-    0 (cont* k (k))
-    1 (->Pure1 (first v))
-    2 (->Pure2 (first v) (second v))
-    3 (->Pure3 (first v) (second v) (third v))
-    (->Pure (vec v))))
+(defn fmap [m f]
+  (cfmap m (fn [& vals] (cont* k (k (apply f vals))))))
+
 
 (defcontinuation* SeqAp [k mf ma]
   (continue* mf (fn [f] (continue* ma (comp k f)))))
 
 (defn <*>
-  ([mf ma]       (->SeqAp mf ma))
-  ([mf ma & mbs] (apply <*> (->SeqAp mf ma) mbs)))
+  ([mf ma]       (fn [pure cfmap join] (->SeqAp (mf pure cfmap join)
+                                                (ma pure cfmap join))))
+  ([mf ma & mbs] (apply <*> (<*> mf ma) mbs)))
 
 (defcontinuation* FMap [k f ma]
   (continue* ma (comp k f)))
 
 (defn <$>
-  ([f ma]       (->FMap f ma))
+  ([f ma]       (fn [pure cfmap join] (->FMap f (ma pure cfmap join))))
   ([f ma & mbs] (apply <*> (<$> f ma) mbs)))
 
 (defcontinuation* Ap2 [k m1 m2] (continue*
@@ -42,10 +41,15 @@
                                               m2 (partial k v1)))))
 
 (defn <>
-  ([] (reify Continuation (continue* [_ k] (k))))
+  ([] (fn [_ _ _] (reify Thunk (continue* [_ k] (k)))))
   ([m1] m1)
-  ([m1 m2] (->Ap2 m1 m2))
-  ([m1 m2 & ms] (->Apc m1 (apply <> m2 ms))))
+  ([m1 m2] (fn [pure cfmap join]
+             (->Ap2 (m1 pure cfmap join)
+                    (m2 pure cfmap join))))
+  ([m1 m2 & ms] (fn [pure cfmap join]
+                  (->Apc (m1 pure cfmap join)
+                         ((apply <> m2 ms)
+                          pure cfmap join)))))
 
 (defcontinuation* SeqRight [k ma mb]
   (continue* ma (fn [& _] (continue* mb k))))
@@ -54,10 +58,13 @@
   (continue* ma (fn [& v] (continue* mb (fn [& _] (apply k v))))))
 
 (defn *>
-  ([m1 m2] (->SeqRight m1 m2))
+  ([m1 m2] (fn [pure cfmap join] (->SeqRight (m1 pure cfmap join)
+                                             (m2 pure cfmap join))))
   ([m1 m2 & ms] (*> m1 (apply *> m2 ms))))
 
 (defn <*
-  ([m1 m2] (->SeqLeft m1 m2))
+  ([m1 m2] (fn [pure cfmap join]
+             (->SeqLeft (m1 pure cfmap join)
+                        (m2 pure cfmap join))))
   ([m1 m2 & ms] (apply <* (<* m1 m2) ms)))
 
