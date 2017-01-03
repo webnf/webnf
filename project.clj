@@ -21,7 +21,8 @@
               :scm          {:dir ".."}}
              :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
                     "async-servlet" "base" "datomic" "enlive" "davstore"
-                    "handler" "server" "filestore" "compat.yuicompressor" "cats" "js" "handler.auth"]
+                    ;; "compat.yuicompressor"
+                    "handler" "server" "filestore" "cats" "js" "handler.auth"]
              :versions {org.clojure/clojure              "1.9.0-alpha14"
                         webnf                            "0.2.0-alpha1"
                         webnf.deps                       "0.2.0-alpha1"
