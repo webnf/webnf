@@ -18,7 +18,7 @@
                  [ring "_" :upgrade false]
                  [figwheel-sidecar "0.5.8" :exclusions [org.clojure/clojurescript]]
                  [figwheel-sidecar "0.5.8"]
-                 [binaryage/devtools "0.8.2"]
+                 [binaryage/devtools "0.8.3"]
                  [spyscope "0.1.6"]
                  [debugger "0.2.0"]
                  [compliment "0.3.2"]
