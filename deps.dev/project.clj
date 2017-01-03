@@ -1,4 +1,4 @@
-(defproject webnf.deps/dev "0.2.0-SNAPSHOT"
+(defproject webnf.deps/dev "0.2.0-alpha1"
   :plugins [[lein-modules "0.3.11"]]
   :description "Development dependencies"
   :dependencies [[webnf.deps/contrib "_" :upgrade false]

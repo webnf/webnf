@@ -20,12 +20,12 @@
                              "-f" ["with-profile" "+fast"]}
               :scm          {:dir ".."}}
              :dirs ["deps.logback" "deps.universe" "deps.dev" "deps.web" "deps.contrib"
-                    "async-servlet" "base" "datomic" "enlive"
+                    "async-servlet" "base" "datomic" "enlive" "davstore"
                     "handler" "server" "filestore" "compat.yuicompressor" "cats" "js" "handler.auth"]
              :versions {org.clojure/clojure              "1.9.0-alpha14"
-                        webnf                            "0.2.0-SNAPSHOT"
-                        webnf.deps                       "0.2.0-SNAPSHOT"
-                        webnf.handler                    "0.2.0-SNAPSHOT"
+                        webnf                            "0.2.0-alpha1"
+                        webnf.deps                       "0.2.0-alpha1"
+                        webnf.handler                    "0.2.0-alpha1"
                         webnf.compat/yuicompressor       "2.4.8"
                         ring                             "1.5.0"
                         ring/ring-mock                   "0.3.0"

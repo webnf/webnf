@@ -1,4 +1,4 @@
-(defproject webnf.handler/auth "0.2.0-SNAPSHOT"
+(defproject webnf.handler/auth "0.2.0-alpha1"
   :plugins [[lein-modules "0.3.11"]]
   :description "A zero-auth provider, based on a custom protocol"
   :dependencies [[org.clojure/clojure "_" :upgrade false]

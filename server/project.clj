@@ -1,4 +1,4 @@
-(defproject webnf/server "0.2.0-SNAPSHOT"
+(defproject webnf/server "0.2.0-alpha1"
   :plugins [[lein-modules "0.3.11"]]
   :description "Vhost functionality with servlets and a jetty runner"
   :java-source-paths ["src/jvm"]
