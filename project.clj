@@ -28,6 +28,7 @@
                         webnf.deps                       "0.2.0-alpha1"
                         webnf.handler                    "0.2.0-alpha1"
                         webnf.compat/yuicompressor       "2.4.8"
+                        webnf/davstore                   "0.2.0-alpha2"
                         ring                             "1.5.0"
                         ring/ring-mock                   "0.3.0"
                         org.clojure/core.async           "0.2.395"
