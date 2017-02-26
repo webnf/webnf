@@ -5,7 +5,7 @@
 (defprotocol Dataflow
   (flow [df in-value]))
 
-(defrecord DataflowError [message dataflow cause])
+(defrecord DataflowError [message dataflow cause stack])
 
 (defn error? [value]
   (instance? DataflowError value))
@@ -22,8 +22,9 @@
   (DataflowError. (:message error "Dataflow Error")
                   (:dataflow error dataflow-error)
                   (:cause error)
+                  (:stack error)
                   nil
-                  (dissoc error :dataflow :message :cause)))
+                  (dissoc error :dataflow :message :cause :stack)))
 
 (defmacro dataflow [[this-param value-param] & body]
   `(reify Dataflow
@@ -34,14 +35,14 @@
 
 (defmacro protect-flow
   "Protects forms with try-catch, raising validator errors instead"
-  ([body] `(dataflow {} ~body))
+  ([body] `(protect-flow {} ~body))
   ([ctx body]
    (let [frm (list 'quote &form)]
      `(let [ctx# ~ctx]
         (try (let [res# ~body]
-               (if (instance? DataflowError res#)
-                 (dataflow-error (merge {:dataflow ~frm :message "Wrapped error" :cause res#}
-                                        ~ctx))
+               (if (error? res#)
+                 (update res# :stack conj
+                         {:form ~frm})
                  res#))
              (catch Exception e#
                (dataflow-error (merge {:dataflow ~frm :message (.getMessage e#) :cause e#}
@@ -119,18 +120,14 @@
        validated))))
 
 (defn optional
-  "Transforms nils into a default value.
+  "Transforms non-existing values into a default value.
    If there is a value, applies inner validator on it."
-  ([] (optional identity nil))
-  ([inner & {:keys [default omittable]
-             :or {default nil
-                  omittable true}}]
+  ([inner & {:keys [default]
+             :or {default option-missing}}]
    (dataflow
     [_ value]
-    (cond
-      (and omittable (missing? value)) option-missing
-      (nil? value) default
-      :else (flow inner value)))))
+    (if (missing? value)
+      default (flow inner value)))))
 
 (defn pattern
   "Checks against a regular expression, optionally returning a subgroup"
