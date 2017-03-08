@@ -23,9 +23,9 @@
                     "async-servlet" "base" "datomic" "enlive" "davstore"
                     ;; "compat.yuicompressor"
                     "handler" "server" "filestore" "cats" "js" "handler.auth"]
-             :versions {webnf                            "0.2.0-alpha2-SNAPSHOT"
-                        webnf.deps                       "0.2.0-alpha2-SNAPSHOT"
-                        webnf.handler                    "0.2.0-alpha2-SNAPSHOT"
+             :versions {webnf                            "0.2.0-alpha2"
+                        webnf.deps                       "0.2.0-alpha2"
+                        webnf.handler                    "0.2.0-alpha2"
                         webnf.compat/yuicompressor       "2.4.8"
                         org.clojure/clojurescript        "1.9.473"
                         ring                             "1.5.0"
