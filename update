@@ -1,0 +1,3 @@
+#!/bin/sh -ex
+
+exec lein -f modules with-profiles +dev,+provided ancient upgrade :all :allow-qualified :check-clojure "$@"

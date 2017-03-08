@@ -1,4 +1,4 @@
-(defproject webnf/js "0.2.0-alpha1"
+(defproject webnf/js "0.2.0-alpha2-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]
             [lein-cljsbuild "1.1.5"]]
   :dependencies [[org.webjars/jszip "3.1.0"]

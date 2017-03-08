@@ -1,0 +1,3 @@
+#!/bin/sh -ex
+
+exec lein -f modules test "$@"

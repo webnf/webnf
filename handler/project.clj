@@ -1,4 +1,4 @@
-(defproject webnf/handler "0.2.0-SNAPSHOT"
+(defproject webnf/handler "0.2.0-alpha2-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]]
   :description "The first minor release of webnf handler, a collection
   of code to aid web handler development. There is:
@@ -10,7 +10,7 @@
   - Common dependencies
   - Dataflow / Validation"
   :source-paths ["src/clj"]
-  :dependencies [[org.clojure/clojure "_" :upgrade false]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
                  [webnf/base "_" :upgrade false]
                  [webnf/async-servlet "_" :upgrade false]
                  [webnf.deps/web "_" :upgrade false]

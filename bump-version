@@ -1,0 +1,10 @@
+#!/bin/sh -ex
+
+WHAT="$1"
+
+if [ -z "$WHAT" ]; then
+    WHAT="qualifier"
+fi
+
+exec lein -f modules change version leiningen.release/bump-version $WHAT
+
