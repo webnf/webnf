@@ -165,6 +165,7 @@
 (defmethod coercion [String Double] [^String value _] (Double/valueOf value))
 (defmethod coercion [String BigInteger] [^String value _] (BigInteger. value))
 (defmethod coercion [String BigDecimal] [^String value _] (BigDecimal. value))
+(defmethod coercion [String clojure.lang.BigInt] [^String value _] (clojure.lang.BigInt/fromBigInteger (BigInteger. value)))
 
 (defmethod coercion [Object String] [value _] (.toString ^Object value))
 (defmethod coercion [Number Number] [value to] (coercion (str value) to))
