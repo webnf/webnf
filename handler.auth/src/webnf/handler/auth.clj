@@ -9,7 +9,7 @@
    [webnf.base :refer [str-quote]]
    [ring.middleware.cookies :refer [wrap-cookies]]
    [clojure.edn :as edn]
-   [clojure.spec :as s]
+   [clojure.spec.alpha :as s]
    [webnf.handler.auth.crypto :as crypt]
    [webnf.handler.auth.codec :as codec]
    [instaparse.core :as insta]

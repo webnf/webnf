@@ -4,7 +4,7 @@
               ->TicketRequest sign-grant auth-server auth-client
               server-handler wrap-client wrap-protect
               decode-ticket encode-ticket parse-header]]
-            [clojure.spec :as s]
+            [clojure.spec.alpha :as s]
             [clojure.test :as t :refer
              [deftest testing is are assert-expr do-report]]
             [ring.mock.request :as mock]

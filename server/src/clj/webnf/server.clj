@@ -17,7 +17,7 @@
    (org.eclipse.jetty.server Server Request)
    (org.eclipse.jetty.servlet ServletContextHandler ServletHolder DefaultServlet FilterHolder)
    (org.eclipse.jetty.server HttpConfiguration ServerConnector HttpConnectionFactory
-                             ConnectionFactory RequestLog SslConnectionFactory)
+                             ConnectionFactory RequestLog SslConnectionFactory Handler)
    ;; (org.eclipse.jetty.alpn.server ALPNServerConnectionFactory)
    (org.eclipse.jetty.server.handler ContextHandler HandlerCollection HandlerList RequestLogHandler)
    (org.eclipse.jetty.util.thread ExecutorThreadPool)
@@ -161,10 +161,10 @@
                         truststore trust-password client-auth
                         identify logging-queue]
                  :or {http? true http-port 80
-                      https? false https-port 443
+                      https? (contains? opts :https-port) https-port 443
                       idle-timeout 200000 header-size 16384
                       min-threads 4 max-threads 42}}]
-  (let [container (HandlerCollection. true)
+  (let [container (HandlerCollection. true (into-array Handler []))
         connection-factories (into-array ConnectionFactory
                                          [(HttpConnectionFactory. 
                                            (doto (HttpConfiguration.)

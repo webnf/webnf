@@ -3,7 +3,7 @@
    [hasch.benc :as benc]
    [hasch.platform :refer [sha512-message-digest]]
    [webnf.handler.auth.codec :as codec]
-   [clojure.spec :as s])
+   [clojure.spec.alpha :as s])
   (:import
    (java.security KeyPairGenerator KeyFactory Signature SecureRandom
                   KeyPair)

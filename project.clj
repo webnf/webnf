@@ -1,9 +1,9 @@
-(defproject webnf/parent "0.2.0-alpha1"
+(defproject webnf/parent "0.2.0-alpha3-SNAPSHOT"
   ;; lein -f modules change version leiningen.release/bump-version alpha
   :plugins [[lein-modules "0.3.11"]]
 
   :profiles {:provided
-             {:dependencies [[org.clojure/clojure "1.9.0-alpha14"]]}
+             {:dependencies [[org.clojure/clojure "1.9.0-alpha17"]]}
              
              :dist
              {:modules {:dirs ["../dist"]}}
@@ -23,10 +23,9 @@
                     "async-servlet" "base" "datomic" "enlive" "davstore"
                     ;; "compat.yuicompressor"
                     "handler" "server" "filestore" "cats" "js" "handler.auth"]
-             :versions {webnf                            "0.2.0-alpha2"
-                        webnf.deps                       "0.2.0-alpha2"
-                        webnf.handler                    "0.2.0-alpha2"
+             :versions {webnf                            "0.2.0-alpha3-SNAPSHOT"
+                        webnf.deps                       "0.2.0-alpha3-SNAPSHOT"
+                        webnf.handler                    "0.2.0-alpha3-SNAPSHOT"
                         webnf.compat/yuicompressor       "2.4.8"
-                        org.clojure/clojurescript        "1.9.473"
                         ring                             "1.5.0"
                         ring/ring-mock                   "0.3.0"}})
