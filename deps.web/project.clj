@@ -22,4 +22,5 @@
                  [webnf.compat/yuicompressor "_" :upgrade false]
                  [garden "1.3.2"
                   :exclusions [com.yahoo.platform.yui/yuicompressor]]
-                 [webnf/enlive "_" :upgrade false]])
+                 [webnf/enlive "_" :upgrade false]
+                 [camel-snake-kebab "0.4.0"]])
