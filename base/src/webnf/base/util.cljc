@@ -8,7 +8,8 @@
               [clojure.tools.logging :as log]]
        :cljs [[cljs.pprint :refer [pprint]]
               [webnf.base.logging :as log :include-macros true]]))
-  #?(:clj (:import (java.net URLEncoder URLDecoder))))
+  #?(:clj  (:import (java.net URLEncoder URLDecoder))
+     :cljs (:import (goog.string StringBuffer))))
 
 (defn update-in
   "Version of {clojure,cljs}.core/update-in, fixed for empty paths
@@ -199,25 +200,26 @@
   ([v q] (str-quote v q \\))
   ([v q e]
    (let [s  (str v)
-         s* (str (.append (reduce
-                           #?(:clj (eval
-                                    (if (= q e)
-                                      `(fn [sb# ch#]
-                                         (case ch#
-                                           ~e (.. sb# (append (char ~e)) (append (char ~e)))
-                                           (.append sb# ch#)))
-                                      `(fn [sb# ch#]
-                                         (case ch#
-                                           ~e (.. sb# (append (char ~e)) (append (char ~e)))
-                                           ~q (.. sb# (append (char ~e)) (append (char ~q)))
-                                           (.append sb# ch#)))))
-                              :cljs (fn [sb ch]
-                                      (cond
-                                        (= ch e) (.. sb (append e) (append e))
-                                        (= ch q) (.. sb (append e) (append q))
-                                        :else (.append sb ch))))
-                           (.append (StringBuilder. (+ (count s) 6)) q)
-                           s)
-                          q))]
+         s* (-> #?(:clj (eval
+                         (if (= q e)
+                           `(fn [sb# ch#]
+                              (case ch#
+                                ~e (.. sb# (append (char ~e)) (append (char ~e)))
+                                (.append sb# ch#)))
+                           `(fn [sb# ch#]
+                              (case ch#
+                                ~e (.. sb# (append (char ~e)) (append (char ~e)))
+                                ~q (.. sb# (append (char ~e)) (append (char ~q)))
+                                (.append sb# ch#)))))
+                   :cljs (fn [sb ch]
+                           (cond
+                             (= ch e) (.. sb (append e) (append e))
+                             (= ch q) (.. sb (append e) (append q))
+                             :else (.append sb ch))))
+                (reduce #?(:clj  (.append (StringBuilder. (+ (count s) 6)) q)
+                           :cljs (StringBuffer. q))
+                        s)
+                (.append q)
+                str)]
      (if (= s s*)
        s s*))))
