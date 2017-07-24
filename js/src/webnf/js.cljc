@@ -30,7 +30,7 @@
   (re-matches #"text/html\s*(;.*)?" (str content-type)))
 
 (defn basic-auth-str [login password]
-  (str "Basic " (b64/encodeString (str login ":" password) true)))
+  (str "Basic " (b64/encodeString (str login ":" password) false)))
 
 (def to-js
   "Makes a js object from a map"
