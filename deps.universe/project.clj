@@ -16,7 +16,7 @@
                  [net.polyc0l0r/hasch "0.3.0-beta2" :exclusions [org.clojure/clojurescript com.google.guava/guava]]
 
                  ;; Data formats
-                 [clj-time "0.13.0" :exclusions [joda-time]]
+                 [clj-time "0.14.0" :exclusions [joda-time]]
                  [net.mikera/vectorz-clj "0.47.0"]
                  [com.google.code.findbugs/jsr305  "3.0.2"] ;; reflections
                  [org.reflections/reflections "0.9.11"
@@ -32,7 +32,7 @@
                  ;; APIs
                  [joda-time "2.9.9"]
                  [clj-http "3.6.1" :exclusions [commons-logging]]
-                 [amazonica "0.3.104" :exclusions [joda-time commons-logging]]
+                 [amazonica "0.3.108" :exclusions [joda-time commons-logging]]
 
                  ;; Services
                  [http-kit "2.3.0-alpha2"]])

@@ -6,8 +6,8 @@
                  [webnf/base "_" :upgrade false]
                  [io.replikativ/hasch "0.3.4"]
                  [org.clojure/data.fressian "0.2.1"]
-                 [ring/ring-core "1.6.1"]
+                 [ring/ring-core "1.6.2"]
                  [instaparse "1.4.7"]]
   :profiles
-  {:dev {:dependencies [[ring/ring-mock "0.3.0"]
-                        [org.clojure/test.check "0.10.0-alpha1"]]}})
+  {:dev {:dependencies [[ring/ring-mock "0.3.1"]
+                        [org.clojure/test.check "0.10.0-alpha2"]]}})
