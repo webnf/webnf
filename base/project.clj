@@ -13,5 +13,5 @@
                  [org.clojure/tools.logging "0.4.0"]
                  [org.clojure/tools.nrepl "0.2.13"]]
   :profiles
-  {:dev {:dependencies [[org.clojure/clojurescript "1.9.562"]
+  {:dev {:dependencies [[org.clojure/clojurescript "1.9.854"]
                         [webnf.deps/dev "_" :upgrade false]]}})

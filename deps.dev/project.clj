@@ -9,7 +9,7 @@
                   :exclusions [ibdknox/tools.reader ;; conflics with o.c/t.r
                                org.clojure/tools.nrepl
                                org.clojure/clojurescript]]
-                 [org.clojure/tools.reader "1.0.4"] ; override reader from lein-light-repl
+                 [org.clojure/tools.reader "1.0.5"] ; override reader from lein-light-repl
                  [org.clojure/tools.nrepl "0.2.13"]
                  [cider/cider-nrepl "0.15.0"
                   :exclusions [org.clojure/tools.nrepl]]

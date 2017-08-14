@@ -4,11 +4,11 @@
   :dependencies [[org.clojure/algo.generic "0.1.2"]
                  [org.clojure/algo.monads "0.1.6"]
                  [com.google.code.findbugs/jsr305  "3.0.2"]
-                 [org.clojure/clojurescript "1.9.562"
+                 [org.clojure/clojurescript "1.9.854"
                   :exclusions [org.clojure/tools.reader
                                com.google.guava/guava
                                org.mozilla/rhino]]
-                 [com.google.guava/guava "22.0"]
+                 [com.google.guava/guava "23.0"]
                  [org.mozilla/rhino "1.7.7.1"]
                  [org.clojure/core.async "0.3.443" :exclusions [org.clojure/tools.analyzer.jvm]]
                  [org.clojure/core.cache "0.6.5"]
@@ -49,5 +49,5 @@
                  [org.clojure/tools.macro "0.1.5"]
                  [org.clojure/tools.namespace "0.3.0-alpha4"]
                  [org.clojure/tools.nrepl "0.2.13"]
-                 [org.clojure/tools.reader "1.0.4"]
+                 [org.clojure/tools.reader "1.0.5"]
                  [org.clojure/tools.trace "0.7.9"]])

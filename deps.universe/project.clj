@@ -32,7 +32,7 @@
                  ;; APIs
                  [joda-time "2.9.9"]
                  [clj-http "3.6.1" :exclusions [commons-logging]]
-                 [amazonica "0.3.108" :exclusions [joda-time commons-logging]]
+                 [amazonica "0.3.109" :exclusions [joda-time commons-logging]]
 
                  ;; Services
                  [http-kit "2.3.0-alpha2"]])
