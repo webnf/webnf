@@ -3,7 +3,7 @@
   :plugins [[lein-modules "0.3.11"]]
 
   :profiles {:provided
-             {:dependencies [[org.clojure/clojure "1.9.0-alpha17"]]}
+             {:dependencies [[org.clojure/clojure "1.9.0-beta1"]]}
              
              :dist
              {:modules {:dirs ["../dist"]}}
@@ -27,5 +27,5 @@
                         webnf.deps                       "0.2.0-alpha3-SNAPSHOT"
                         webnf.handler                    "0.2.0-alpha3-SNAPSHOT"
                         webnf.compat/yuicompressor       "2.4.8"
-                        ring                             "1.5.0"
-                        ring/ring-mock                   "0.3.0"}})
+                        ring                             "1.6.2"
+                        ring/ring-mock                   "0.3.1"}})

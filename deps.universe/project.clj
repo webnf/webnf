@@ -9,8 +9,8 @@
 
                  ;; Algorithms
                  [com.lambdaworks/scrypt "1.4.0"]
-                 [net.mikera/core.matrix "0.60.3"]
-                 [instaparse "1.4.7"]
+                 [net.mikera/core.matrix "0.61.0"]
+                 [instaparse "1.4.8"]
                  [nf.fr.eraasoft/objectpool "1.1.2"]
                  [clojurewerkz/meltdown "1.1.0"]
                  [net.polyc0l0r/hasch "0.3.0-beta2" :exclusions [org.clojure/clojurescript com.google.guava/guava]]
@@ -23,7 +23,7 @@
                   :exclusions [com.google.code.findbugs/annotations com.google.guava/guava]]
                  [danlentz/clj-uuid "0.1.7"]
                  [org.fressian/fressian "0.6.6"]
-                 [cheshire "5.7.1"]
+                 [cheshire "5.8.0"]
 
                  ;; Evaluation controllers
                  [com.stuartsierra/component "0.3.2"]
@@ -31,8 +31,8 @@
 
                  ;; APIs
                  [joda-time "2.9.9"]
-                 [clj-http "3.6.1" :exclusions [commons-logging]]
-                 [amazonica "0.3.109" :exclusions [joda-time commons-logging]]
+                 [clj-http "3.7.0" :exclusions [commons-logging]]
+                 [amazonica "0.3.112" :exclusions [joda-time commons-logging]]
 
                  ;; Services
-                 [http-kit "2.3.0-alpha2"]])
+                 [http-kit "2.3.0-alpha4"]])

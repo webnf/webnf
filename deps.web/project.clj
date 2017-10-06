@@ -7,7 +7,7 @@
                  [org.lesscss/lesscss "1.7.0.1.1"
                   :exclusions [org.slf4j/slf4j-simple
                                org.mozilla/rino]]
-                 [org.mozilla/rhino "1.7.7.1"]
+                 [org.mozilla/rhino "1.7.7.2"]
                  [commons-codec "1.10"]
                  [javax.mail/javax.mail-api "1.6.0"]
                  [com.sun.mail/javax.mail "1.6.0"]
@@ -20,7 +20,7 @@
                  [liberator "0.15.1"]
                  [prone "1.1.4"]
                  [webnf.compat/yuicompressor "_" :upgrade false]
-                 [garden "1.3.2"
+                 [garden "1.3.3"
                   :exclusions [com.yahoo.platform.yui/yuicompressor]]
                  [webnf/enlive "_" :upgrade false]
                  [camel-snake-kebab "0.4.0"]])

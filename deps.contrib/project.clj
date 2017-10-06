@@ -4,12 +4,12 @@
   :dependencies [[org.clojure/algo.generic "0.1.2"]
                  [org.clojure/algo.monads "0.1.6"]
                  [com.google.code.findbugs/jsr305  "3.0.2"]
-                 [org.clojure/clojurescript "1.9.854"
+                 [org.clojure/clojurescript "1.9.946"
                   :exclusions [org.clojure/tools.reader
                                com.google.guava/guava
                                org.mozilla/rhino]]
-                 [com.google.guava/guava "23.0"]
-                 [org.mozilla/rhino "1.7.7.1"]
+                 [com.google.guava/guava "23.1-jre"]
+                 [org.mozilla/rhino "1.7.7.2"]
                  [org.clojure/core.async "0.3.443" :exclusions [org.clojure/tools.analyzer.jvm]]
                  [org.clojure/core.cache "0.6.5"]
                  [org.clojure/core.contracts "0.0.6"]
@@ -18,7 +18,7 @@
                  [org.clojure/core.match "0.3.0-alpha5"]
                  [org.clojure/core.memoize "0.5.9" :exclusions [org.clojure/core.cache]]
                  [org.clojure/core.rrb-vector "0.0.11"]
-                 [org.clojure/core.typed "0.4.0" :classifier "slim"]
+                 [org.clojure/core.typed "0.4.1" :classifier "slim"]
                  [org.clojure/core.unify "0.5.7"]
                  [org.clojure/data.avl "0.0.17"]
                  [org.clojure/data.codec "0.1.0"]
@@ -29,11 +29,11 @@
                  [org.clojure/data.int-map "0.2.4"]
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/data.priority-map "0.0.7"]
-                 [org.clojure/data.xml "0.2.0-alpha2"]
+                 [org.clojure/data.xml "0.2.0-alpha3"]
                  [org.clojure/data.zip "0.1.2"]
                  [org.clojure/java.classpath "0.2.3"]
                  [org.clojure/java.data "0.1.1"]
-                 [org.clojure/java.jdbc "0.7.0"]
+                 [org.clojure/java.jdbc "0.7.3"]
                  [org.clojure/java.jmx "0.3.4"]
                  [org.clojure/jvm.tools.analyzer "0.6.2"]
                  [org.clojure/math.combinatorics "0.1.4"]
@@ -49,5 +49,5 @@
                  [org.clojure/tools.macro "0.1.5"]
                  [org.clojure/tools.namespace "0.3.0-alpha4"]
                  [org.clojure/tools.nrepl "0.2.13"]
-                 [org.clojure/tools.reader "1.0.5"]
+                 [org.clojure/tools.reader "1.1.0"]
                  [org.clojure/tools.trace "0.7.9"]])

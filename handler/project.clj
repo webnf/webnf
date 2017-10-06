@@ -10,7 +10,7 @@
   - Common dependencies
   - Dataflow / Validation"
   :source-paths ["src/clj"]
-  :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
+  :dependencies [[org.clojure/clojure "1.9.0-beta1"]
                  [webnf/base "_" :upgrade false]
                  [webnf/async-servlet "_" :upgrade false]
                  [webnf.deps/web "_" :upgrade false]
