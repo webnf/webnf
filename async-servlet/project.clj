@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.9.0-beta1"]
                  [webnf.deps/logback "0.2.0-alpha2"]
                  [webnf/base "_" :upgrade false]
-                 [ring/ring-servlet "1.6.2"
+                 [ring/ring-servlet "_" :upgrade false
                   :exclusions [javax.servlet/servlet-api]]
                  [javax.servlet/javax.servlet-api "4.0.0" :scope "provided"]]
   :aot [webnf.async-servlet.UpgradeHandler]

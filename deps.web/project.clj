@@ -12,7 +12,7 @@
                  [javax.mail/javax.mail-api "1.6.0"]
                  [com.sun.mail/javax.mail "1.6.0"]
                  [commons-net "3.6"]
-                 [ring/ring-core "1.6.2"]
+                 [ring/ring-core "_" :upgrade false]
                  [ring-mock "0.1.5"]
                  [net.cgrand/moustache "1.2.0-alpha2"
                   :exclusions [ring/ring-core]]

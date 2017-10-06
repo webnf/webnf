@@ -27,5 +27,5 @@
                         webnf.deps                       "0.2.0-alpha3-SNAPSHOT"
                         webnf.handler                    "0.2.0-alpha3-SNAPSHOT"
                         webnf.compat/yuicompressor       "2.4.8"
-                        ring                             "1.6.2"
+                        ring                             "1.5.0"
                         ring/ring-mock                   "0.3.1"}})
