@@ -1,6 +1,7 @@
 (ns webnf.js.xhr
   (:require [goog.Uri :as Uri]
             [goog.net.XhrIo :as XhrIo]
+            [goog.net.EventType :as NET]
             [webnf.async.promise :refer [promise]]
             [webnf.async :refer [callback-read-port]]
             [webnf.base.logging :as log]
@@ -60,54 +61,44 @@
                                    :body    (s/or :text-body string? :xml-body ::xml-doc)
                                    :xhr     #(instance? js/XMLHttpRequest %))))
 
-(s/fdef xhr
+(s/fdef request
         :args (s/cat
                :request-uri ::uri
                :request-data (s/? ::options)
                :on-finish ::response-callback))
 
-(defn xhr
+;; Feature detect XMLHttpRequest.responseType
+
+(defn request
   "Request an uri with clojure data, via XMLHttpRequest.
 
   Takes a callback, that will be called with [status headers body], returns a goog.net.XhrIo object.
   Takes headers and params as clojure data, passes headers as clojure data into callback."
   ([uri on-finish] (xhr uri nil on-finish))
   ([uri
-    {:keys [method body headers params xml]}
+    {:keys [method body headers params response-type on-progress timeout with-credentials]
+     :or {method "GET"}}
     on-finish]
-   (let [uri (Uri/parse uri)
-         _ (reduce-kv (fn [_ param value]
-                        (.setParameterValue uri param value))
-                      nil params)
-         headers (and headers (to-js headers))]
-     (XhrIo/send uri #(let [t (.-target %)]
-                        (on-finish (.getStatus t)
-                                   (hmap (.getAllResponseHeaders t))
-                                   (if xml
-                                     (.getResponseXml t)
-                                     (.getResponseText t))
-                                   t))
-                 (as-str method) body headers))))
-
-(defn xhr-async
-  "Request an uri with XmlHttpRequest, return channel that will
-  receive response in ring format {:uri :status :headers :body}
-
-  Request data can also be passed in ring format
-  {:method :params :headers :body :always-refresh}
-  :auto-refresh true triggers a request on every read
-  :parse-response can be a custom response parser working directly on the XmlHttpRequest"
-  ([uri] (xhr uri nil))
-  ([uri {:keys [method body headers params auto-refresh parse-response xml] :as options}]
-   (let [rp (callback-read-port (fn [result]
-                                  (xhr uri options
-                                       (fn [status headers body target]
-                                         (result
-                                          (if parse-response
-                                            (parse-response target)
-                                            {:uri (.getLastUri target)
-                                             :status status
-                                             :headers headers
-                                             :body body}))))))]
-     (if auto-refresh
-       rp (promise rp)))))
+   (letfn [(on-complete [event]
+             (let [request (.-target event)]
+               (on-finish (.getStatus request)
+                          (hmap (.getAllResponseHeaders request))
+                          (.getResponse request)
+                          request)))
+           (cleanup     [event]
+             (.dispose (.-target event)))]
+     (doto (XhrIo.)
+       (.listenOnce NET/COMPLETE on-complete)
+       (.listenOnce NET/READY cleanup)
+       (.setProgressEventsEnabled (boolean on-progress))
+       (cond-> timeout (.setTimeoutInterval timeout))
+       (cond-> response-type (.setResponseType response-type))
+       (cond-> with-credentials (.setWithCredentials true))
+       (cond-> on-progress (.listen NET/PROGRESS on-progress))
+       (.send (if (empty? params)
+                uri
+                (reduce-kv #(doto %1 (.setParameterValue %2 %3))
+                           (Uri/parse uri) params))
+              (as-str method)
+              body
+              (and headers (to-js headers)))))))
