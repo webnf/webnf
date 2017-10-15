@@ -194,6 +194,24 @@
         (throw (ex-info "Not an absolute path" {:href href})))
       (vec (rest p)))))
 
+(defn encode-uri-params
+  "Encode a map into a form-params string"
+  [params]
+  (str/join "&"
+            (map #(str (encode-uri-component (key %))
+                       \=
+                       (encode-uri-component (val %)))
+                 params)))
+
+(defn decode-uri-params
+  "Decode a form-params string into a map"
+  [s]
+  (apply hash-map
+         (map decode-uri-component
+              (mapcat #(str/split % #"=" 2)
+                      (str/split (str/replace s "+" " ")
+                                 #"&")))))
+
 (defn str-quote
   "Quotes string with configurable quote and escape character (default \" and \\)"
   ([v] (str-quote v \" \\))
