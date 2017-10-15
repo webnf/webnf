@@ -1,7 +1,7 @@
 (defproject webnf.handler/auth "0.2.0-alpha3-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]]
   :description "A zero-auth provider, based on a custom protocol"
-  :dependencies [[org.clojure/clojure "1.9.0-beta1"]
+  :dependencies [[org.clojure/clojure "1.9.0-beta2"]
                  [webnf.deps/logback "_" :upgrade false]
                  [webnf/base "_" :upgrade false]
                  [io.replikativ/hasch "0.3.4"]

@@ -17,7 +17,7 @@
                  [weasel "0.7.0" :exclusions [org.clojure/clojurescript]]
                  [ring "1.6.2"]
                  [figwheel-sidecar "0.5.14" :exclusions [org.clojure/clojurescript]]
-                 [binaryage/devtools "0.9.4"]
+                 [binaryage/devtools "0.9.7"]
                  [spyscope "0.1.6"]
                  [debugger "0.2.0"]
                  [compliment "0.3.4"]

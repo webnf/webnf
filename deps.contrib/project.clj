@@ -8,7 +8,7 @@
                   :exclusions [org.clojure/tools.reader
                                com.google.guava/guava
                                org.mozilla/rhino]]
-                 [com.google.guava/guava "23.1-jre"]
+                 [com.google.guava/guava "23.2-jre"]
                  [org.mozilla/rhino "1.7.7.2"]
                  [org.clojure/core.async "0.3.443" :exclusions [org.clojure/tools.analyzer.jvm]]
                  [org.clojure/core.cache "0.6.5"]
@@ -18,7 +18,7 @@
                  [org.clojure/core.match "0.3.0-alpha5"]
                  [org.clojure/core.memoize "0.5.9" :exclusions [org.clojure/core.cache]]
                  [org.clojure/core.rrb-vector "0.0.11"]
-                 [org.clojure/core.typed "0.4.1" :classifier "slim"]
+                 [org.clojure/core.typed "0.4.3" :classifier "slim"]
                  [org.clojure/core.unify "0.5.7"]
                  [org.clojure/data.avl "0.0.17"]
                  [org.clojure/data.codec "0.1.0"]

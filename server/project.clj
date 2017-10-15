@@ -3,7 +3,7 @@
   :description "Vhost functionality with servlets and a jetty runner"
   :java-source-paths ["src/jvm"]
   :source-paths ["src/clj"]
-  :dependencies [[org.clojure/clojure "1.9.0-beta1"]
+  :dependencies [[org.clojure/clojure "1.9.0-beta2"]
                  [webnf/async-servlet "_" :upgrade false]
                  [webnf/base "_" :upgrade false]
                  [webnf.deps/web "_" :upgrade false]

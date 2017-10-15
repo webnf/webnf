@@ -3,7 +3,7 @@
   :description "A servlet 3.0 implementation, that enables the async api for ring applications"
   :java-source-paths ["src/jvm"]
   :source-paths ["src/clj"]
-  :dependencies [[org.clojure/clojure "1.9.0-beta1"]
+  :dependencies [[org.clojure/clojure "1.9.0-beta2"]
                  [webnf.deps/logback "0.2.0-alpha2"]
                  [webnf/base "_" :upgrade false]
                  [ring/ring-servlet "_" :upgrade false
