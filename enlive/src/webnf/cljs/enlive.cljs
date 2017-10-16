@@ -2,8 +2,9 @@
   (:require
    [goog.dom :as dom]
    [clojure.string :as str]
-   [webnf.util :refer [xhr dom-clone!]]
-   [webnf.promise :refer [promise]]
+   [webnf.js.xhr.async :refer [request]]
+   [webnf.js.dom :refer [dom-clone!]]
+   [webnf.async.promise :refer [promise]]
    [cljs.core.async :refer [<! map<]])
   (:require-macros
    [cljs.core.async.macros :refer [go]]))
@@ -251,7 +252,7 @@
 
 (defn load-html* [uri]
   (go (let [{:keys [status header body] :as resp}
-            (<! (xhr uri))]
+            (<! (request uri))]
         (if (= status 200)
           body
           (throw (ex-info "Request error" {:uri uri :response resp}))))))
