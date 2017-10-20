@@ -1,6 +1,6 @@
 (ns webnf.js.xhr
+  (:import goog.net.XhrIo)
   (:require [goog.Uri :as Uri]
-            [goog.net.XhrIo :as XhrIo]
             [goog.net.EventType :as NET]
             [webnf.async.promise :refer [promise]]
             [webnf.async :refer [callback-read-port]]
