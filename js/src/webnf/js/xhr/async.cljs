@@ -1,5 +1,7 @@
 (ns webnf.js.xhr.async
-  (:require [webnf.js.xhr :as xhr]))
+  (:require [webnf.js.xhr :as xhr]
+            [webnf.async.promise :refer [promise]]
+            [webnf.async :refer [callback-read-port]]))
 
 (defn request
   "Request an uri with XmlHttpRequest, return channel that will

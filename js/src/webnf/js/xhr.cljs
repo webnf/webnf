@@ -2,8 +2,6 @@
   (:import goog.net.XhrIo)
   (:require [goog.Uri :as Uri]
             [goog.net.EventType :as NET]
-            [webnf.async.promise :refer [promise]]
-            [webnf.async :refer [callback-read-port]]
             [webnf.base.logging :as log]
             [clojure.string :refer [split-lines]]
             [webnf.js :refer [to-js]]
@@ -74,7 +72,7 @@
 
   Takes a callback, that will be called with [status headers body], returns a goog.net.XhrIo object.
   Takes headers and params as clojure data, passes headers as clojure data into callback."
-  ([uri on-finish] (xhr uri nil on-finish))
+  ([uri on-finish] (request uri nil on-finish))
   ([uri
     {:keys [method body headers params response-type on-progress timeout with-credentials]
      :or {method "GET"}}
