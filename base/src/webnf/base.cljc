@@ -28,7 +28,8 @@
                                          pretial ap rcomp scat
                                          path->href href->path
                                          update-in str-quote
-                                         string-builder append!))
+                                         string-builder append!
+                                         conjv conjs conjm conjq))
 
 ;; Deprecated aliases. A recent addition, to the webnf zoo. In the
 ;; spirit of clojure, we won't rename functions, without leaving an

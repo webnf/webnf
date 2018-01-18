@@ -33,6 +33,13 @@
                            :cljs (.append ^StringBuffer sb* s*)))
            sb ss)))
 
+(def conjv (fnil conj []))
+(def conjs (fnil conj #{}))
+(def conjm (fnil conj {}))
+(def conjq (fnil conj #?(:clj  clojure.lang.PersistentQueue/EMPTY
+                         :cljs [] #_FIXME)))
+
+
 (defn update-in
   "Version of {clojure,cljs}.core/update-in, fixed for empty paths
   see http://dev.clojure.org/jira/browse/CLJ-1623"
