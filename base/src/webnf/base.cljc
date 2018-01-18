@@ -20,7 +20,8 @@
    (autoload-some ^:static (webnf.base.util
                             ^:macro forcat ^:macro static-case
                             ^:macro defunrolled ^:macro squelch
-                            ^:macro deprecated-alias))))
+                            ^:macro deprecated-alias
+                            ^:macro condas->))))
 
 ;; Here are some cross-platform functions
 

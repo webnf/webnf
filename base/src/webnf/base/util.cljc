@@ -48,6 +48,12 @@
     (assoc m k (apply update-in (get m k) ks* f args))
     (apply f m args)))
 
+(defmacro condas->
+  "chains of (cond-> x, p? (as-> x e), q? (as-> x f),,,)"
+  [as & {:as test-exprs}]
+  `(as-> ~as (for [[t e] test-exprs]
+               `(if ~t ~e ~as))))
+
 #?(:clj (autoload clojure.pprint/pprint))
 
 (defn pprint-str
