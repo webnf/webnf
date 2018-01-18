@@ -5,7 +5,7 @@
    [clojure.string :as str]
    [ring.util.servlet :as servlet]
    [clojure.tools.logging :as log]
-   [webnf.base :refer [hostname local-ip]]
+   [webnf.base :as base :refer [hostname local-ip]]
    [webnf.server.util :as util]
    [webnf.server.component :as scmp]
    [com.stuartsierra.component :as cmp])
@@ -149,9 +149,7 @@
         (.setHost host)
         (.setIdleTimeout idle-timeout)))))
 
-(defn to-coll [value]
-  (if (instance? java.util.Collection value)
-    value (list value)))
+(base/deprecated-alias to-coll base/to-coll)
 
 (defn server [& {:as opts
                  :keys [host http? http-port https? https-port

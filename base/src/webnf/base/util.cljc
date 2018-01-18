@@ -117,11 +117,14 @@
   [f]
   #(apply f %1))
 
-(defn to-many
+(defn to-coll
   "Ensure that seq can be called on a value. If value is not a coll
   and not nil, it is put into an empty collection"
   [v]
-  (if (or (nil? v) (coll? v)) v (cons v nil)))
+  (if (or (nil? v)
+          #?(:clj (instance? java.util.Collection v)
+             :cljs (coll? v)))
+    v (cons v nil)))
 
 ;; ## Two new core operations
 
@@ -241,3 +244,10 @@
                 str)]
      (if (= s s*)
        s s*))))
+
+(defmacro deprecated-alias
+  "Define an alias for a function in another namespace"
+  [alias target]
+  `(defn ~alias [~'& args#]
+     (log/warn "Function" ~(resolve alias) "is DEPRECATED. Please use" ~(resolve target) "instead!")
+     (apply ~target args#)))
