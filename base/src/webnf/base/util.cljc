@@ -226,6 +226,30 @@
         (throw (ex-info "Not an absolute path" {:href href})))
       (vec (rest p)))))
 
+(comment
+  ;; experimental transducer, that would hard-code a for-step in terms
+  ;; of reduce. That could be used to peel a lazy-seq layer, but the
+  ;; complexity doesn't seem worth it
+  (defmacro forcat-xf [value [binding expr] & body]
+    `(fn [xf#]
+       (fn
+         ([s#] (xf# s#))
+         ([s# ~value]
+          (reduce (fn [s# ~binding]
+                    (xf# s# (do ~@body)))
+                  s# ~expr))))))
+
+(defn into-str
+  "Like (partial apply str), but with the possibility of transducing
+   the arguments."
+  ([s strs] (into-str s identity strs))
+  ([s xf strs]
+   (transduce xf append!
+              (string-builder (+ (count s)
+                                 (* (count strs) 8))
+                              s)
+              strs)))
+
 (defn encode-uri-params
   "Encode a map into a form-params string"
   [params]
