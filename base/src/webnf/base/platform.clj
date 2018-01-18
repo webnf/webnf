@@ -159,3 +159,14 @@
               (not= cpe0 cpe1))
          (recur pn (update-in duplicate-files [p0] (fnil into #{}) [cpe0 cpe1]))
          :else (recur pn duplicate-files))))))
+
+(comment
+
+  (with-open [w (io/writer "/tmp/ar")]
+    (doseq [[p _] (find-ambigous-resources)]
+      (.write w (str/join "/" p))
+      (.write w "\n")))
+
+  (type (find-ambigous-resources))
+
+  )
