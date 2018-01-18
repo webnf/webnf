@@ -27,7 +27,8 @@
 (autoload-some ^:static (webnf.base.util to-coll pprint-str
                                          pretial ap rcomp scat
                                          path->href href->path
-                                         update-in str-quote))
+                                         update-in str-quote
+                                         string-builder append!))
 
 ;; Deprecated aliases. A recent addition, to the webnf zoo. In the
 ;; spirit of clojure, we won't rename functions, without leaving an

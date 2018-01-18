@@ -11,6 +11,28 @@
   #?(:clj  (:import (java.net URLEncoder URLDecoder))
      :cljs (:import (goog.string StringBuffer))))
 
+(defn string-builder
+  "use with append!"
+  ([size-or-init-str] (if (string? size-or-init-str)
+                        (string-builder (count size-or-init-str) size-or-init-str)
+                        (string-builder size-or-init-str "")))
+  ([size init-str]
+   #?(:clj  (.append (StringBuilder. size) init-str)
+      :cljs (StringBuffer. init-str))))
+
+(defn append!
+  "Reducer function to append to a string-builder instance
+   completing arity returns string from builder"
+  ([sb] (str sb))
+  ([sb s] #?(:clj  (.append ^StringBuilder sb s)
+             :cljs (.append ^StringBuffer sb s)))
+  ([sb s & ss]
+   #?(:clj  (.append ^StringBuilder sb s)
+      :cljs (.append ^StringBuffer sb s))
+   (reduce (fn [sb* s*] #?(:clj  (.append ^StringBuilder sb* s*)
+                           :cljs (.append ^StringBuffer sb* s*)))
+           sb ss)))
+
 (defn update-in
   "Version of {clojure,cljs}.core/update-in, fixed for empty paths
   see http://dev.clojure.org/jira/browse/CLJ-1623"
