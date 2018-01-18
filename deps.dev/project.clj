@@ -9,17 +9,19 @@
                   :exclusions [ibdknox/tools.reader ;; conflics with o.c/t.r
                                org.clojure/tools.nrepl
                                org.clojure/clojurescript]]
-                 [org.clojure/tools.reader "1.1.0"] ; override reader from lein-light-repl
+                 [org.clojure/tools.reader "1.1.1"] ; override reader from lein-light-repl
                  [org.clojure/tools.nrepl "0.2.13"]
+                 [org.clojure/tools.trace "0.7.9"]
                  [cider/cider-nrepl "0.15.1"
                   :exclusions [org.clojure/tools.nrepl]]
+                 [refactor-nrepl "2.3.1"]
                  [com.cemerick/piggieback "0.2.2" :exclusions [org.clojure/clojurescript]]
                  [weasel "0.7.0" :exclusions [org.clojure/clojurescript]]
-                 [ring "1.6.2"]
+                 [ring "1.6.3"]
                  [figwheel-sidecar "0.5.14" :exclusions [org.clojure/clojurescript]]
-                 [binaryage/devtools "0.9.7"]
+                 [binaryage/devtools "0.9.8"]
                  [spyscope "0.1.6"]
                  [debugger "0.2.0"]
-                 [compliment "0.3.4"]
+                 [compliment "0.3.5"]
                  [cljs-tooling "0.2.0"]
                  [cljfmt "0.5.7"]])

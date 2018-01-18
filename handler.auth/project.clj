@@ -1,7 +1,7 @@
 (defproject webnf.handler/auth "0.2.0-alpha3-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]]
   :description "A zero-auth provider, based on a custom protocol"
-  :dependencies [[org.clojure/clojure "1.9.0-beta2"]
+  :dependencies [[org.clojure/clojure "1.9.0"]
                  [webnf.deps/logback "_" :upgrade false]
                  [webnf/base "_" :upgrade false]
                  [io.replikativ/hasch "0.3.4"]
@@ -9,5 +9,5 @@
                  [ring/ring-core "_" :upgrade false]
                  [instaparse "1.4.8"]]
   :profiles
-  {:dev {:dependencies [[ring/ring-mock "0.3.1"]
+  {:dev {:dependencies [[ring/ring-mock "0.3.2"]
                         [org.clojure/test.check "0.10.0-alpha2"]]}})

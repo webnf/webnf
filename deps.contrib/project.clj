@@ -8,9 +8,9 @@
                   :exclusions [org.clojure/tools.reader
                                com.google.guava/guava
                                org.mozilla/rhino]]
-                 [com.google.guava/guava "23.2-jre"]
-                 [org.mozilla/rhino "1.7.7.2"]
-                 [org.clojure/core.async "0.3.443" :exclusions [org.clojure/tools.analyzer.jvm]]
+                 [com.google.guava/guava "23.6-jre"]
+                 [org.mozilla/rhino "1.7.8-RC1"]
+                 [org.clojure/core.async "0.4.474" :exclusions [org.clojure/tools.analyzer.jvm]]
                  [org.clojure/core.cache "0.6.5"]
                  [org.clojure/core.contracts "0.0.6"]
                  [org.clojure/core.incubator "0.1.4"]
@@ -29,11 +29,11 @@
                  [org.clojure/data.int-map "0.2.4"]
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/data.priority-map "0.0.7"]
-                 [org.clojure/data.xml "0.2.0-alpha3"]
+                 [org.clojure/data.xml "0.2.0-alpha5"]
                  [org.clojure/data.zip "0.1.2"]
                  [org.clojure/java.classpath "0.2.3"]
                  [org.clojure/java.data "0.1.1"]
-                 [org.clojure/java.jdbc "0.7.3"]
+                 [org.clojure/java.jdbc "0.7.5"]
                  [org.clojure/java.jmx "0.3.4"]
                  [org.clojure/jvm.tools.analyzer "0.6.2"]
                  [org.clojure/math.combinatorics "0.1.4"]
@@ -49,5 +49,5 @@
                  [org.clojure/tools.macro "0.1.5"]
                  [org.clojure/tools.namespace "0.3.0-alpha4"]
                  [org.clojure/tools.nrepl "0.2.13"]
-                 [org.clojure/tools.reader "1.1.0"]
+                 [org.clojure/tools.reader "1.1.1"]
                  [org.clojure/tools.trace "0.7.9"]])

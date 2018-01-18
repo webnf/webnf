@@ -3,12 +3,13 @@
   :description "Common dependencies for web apps"
   :url "http://github.com/webnf/webnf"
   :dependencies [[eu.bitwalker/UserAgentUtils "1.20"]
-                 [net.sourceforge.cssparser/cssparser "0.9.23"]
+                 [net.sourceforge.cssparser/cssparser "0.9.24"]
                  [org.lesscss/lesscss "1.7.0.1.1"
                   :exclusions [org.slf4j/slf4j-simple
                                org.mozilla/rino]]
-                 [org.mozilla/rhino "1.7.7.2"]
-                 [commons-codec "1.10"]
+                 [com.stuartsierra/component "0.3.2"]
+                 [org.mozilla/rhino "1.7.8-RC1"]
+                 [commons-codec "1.11"]
                  [javax.mail/javax.mail-api "1.6.0"]
                  [com.sun.mail/javax.mail "1.6.0"]
                  [commons-net "3.6"]
