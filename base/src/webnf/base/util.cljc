@@ -39,6 +39,9 @@
 (def conjq (fnil conj #?(:clj  clojure.lang.PersistentQueue/EMPTY
                          :cljs [] #_FIXME)))
 
+(defn update! [tm k f & args]
+  ;; TODO unroll
+  (assoc! tm k (apply f (get tm k) args)))
 
 (defn update-in
   "Version of {clojure,cljs}.core/update-in, fixed for empty paths
@@ -257,22 +260,32 @@
               strs)))
 
 (defn encode-uri-params
-  "Encode a map into a form-params string"
+  "Encode a map of {\"key\" [\"values\",,,]} into a form-params string"
   [params]
-  (str/join "&"
-            (map #(str (encode-uri-component (key %))
-                       \=
-                       (encode-uri-component (val %)))
-                 params)))
+  {:pre [(map? params)
+         (every? string? (keys params))
+         (every? coll? (vals params))
+         (every? #(every? string? %) (vals params))]}
+  (into-str
+   ""
+   (comp
+    (mapcat    #(for [p (get params %)]
+                  (list (encode-uri-component %) "=" (encode-uri-component p))))
+    (interpose ["&"])
+    cat)
+   (keys params)))
 
 (defn decode-uri-params
-  "Decode a form-params string into a map"
+  "Decode a form-params string into a map of {\"key\" [\"values\",,,]}"
   [s]
-  (apply hash-map
-         (map decode-uri-component
-              (mapcat #(str/split % #"=" 2)
-                      (str/split (str/replace s "+" " ")
-                                 #"&")))))
+  (persistent!
+   (reduce (fn [tm s]
+             (let [[k v] (str/split s #"=" 2)]
+               (update! tm (decode-uri-component k) conjv (decode-uri-component v))))
+           (transient {})
+           (str/split (str/replace s "+" " ")
+                      #"&"))))
+
 
 (defn str-quote
   "Quotes string with configurable quote and escape character (default \" and \\)"
