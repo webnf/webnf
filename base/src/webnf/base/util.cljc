@@ -317,9 +317,10 @@
      (if (= s s*)
        s s*))))
 
-(defmacro deprecated-alias
-  "Define an alias for a function in another namespace"
-  [alias target]
-  `(defn ~alias [~'& args#]
-     (log/warn "Function" ~(resolve alias) "is DEPRECATED. Please use" ~(resolve target) "instead!")
-     (apply ~target args#)))
+#?(:clj
+   (defmacro deprecated-alias
+     "Define an alias for a function in another namespace"
+     [alias target]
+     `(defn ~alias [~'& args#]
+        (log/warn "Function" ~(resolve alias) "is DEPRECATED. Please use" ~(resolve target) "instead!")
+        (apply ~target args#))))
