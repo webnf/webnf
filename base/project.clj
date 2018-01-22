@@ -6,7 +6,7 @@
                  ;; a few essential contribs
                  [org.clojure/test.check "0.10.0-alpha2"]
                  [org.clojure/core.async "0.4.474" :exclusions [org.clojure/tools.analyzer.jvm]]
-                 [org.clojure/tools.analyzer.jvm "0.7.1"]
+                 [org.clojure/tools.analyzer.jvm "0.7.2"]
                  [org.clojure/core.match "0.3.0-alpha5"]
                  [org.clojure/core.typed "0.4.3" :classifier "slim"]
                  [org.clojure/core.unify "0.5.7"]
