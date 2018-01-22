@@ -3,7 +3,8 @@
   (:refer-clojure :exclude [update-in])
   (:require [webnf.base.autoload
              #?@(:cljs [:refer-macros [autoload autoload-some]])]
-            #?@(:cljs [webnf.base.util cljs.pprint cljs.repl])))
+            #?@(:cljs [[webnf.base.util :refer-macros [deprecated-alias]]
+                       cljs.pprint cljs.repl])))
 
 ;; The following form should be quite interesting. First note, that
 ;; although it is read by host clojure only, it provides many macros,
