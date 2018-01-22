@@ -318,9 +318,12 @@
        s s*))))
 
 #?(:clj
-   (defmacro deprecated-alias
+   (defmacro* deprecated-alias
      "Define an alias for a function in another namespace"
      [alias target]
-     `(defn ~alias [~'& args#]
-        (log/warn "Function" ~(resolve alias) "is DEPRECATED. Please use" ~(resolve target) "instead!")
-        (apply ~target args#))))
+     :clj  `(defn ~alias [~'& args#]
+              (log/warn "Function" ~(resolve alias) "is DEPRECATED. Please use" ~(resolve target) "instead!")
+              (apply ~target args#))
+     :cljs `(defn ~alias [~'& args#]
+              (webnf.base.logging/warn "Function" ~(resolve alias) "is DEPRECATED. Please use" ~(resolve target) "instead!")
+              (apply ~target args#))))
